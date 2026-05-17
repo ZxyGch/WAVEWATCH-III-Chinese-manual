@@ -96,14 +96,6 @@ xelatex -interaction=nonstopmode -halt-on-error manual_zh.tex
 manual_zh.pdf
 ```
 
-如果只想快速预览，也可以先运行两遍 XeLaTeX：
-
-```sh
-xelatex -interaction=nonstopmode -halt-on-error manual_zh.tex
-xelatex -interaction=nonstopmode -halt-on-error manual_zh.tex
-```
-
-不过参考文献和交叉引用可能不会完全更新。
 
 ## 清理生成文件
 
