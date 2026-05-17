@@ -1,5 +1,7 @@
 # WAVEWATCH III manual v7.14
 
+> 手册的 PDF 版在 https://github.com/ZxyGch/WAVEWATCH-III-Chinese-manual/releases/tag/v7.14 
+
 这个目录是 WAVEWATCH III 的用户手册和系统文档源码目录。原始手册由一组
 LaTeX 文件组成，入口文件是 `manual.tex`，默认生成英文版 `manual.pdf`。
 
