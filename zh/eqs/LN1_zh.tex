@@ -1,0 +1,39 @@
+\vsssub
+\subsubsection{~$S_{ln}$：Cavaleri and Malanotte-Rizzoli 1981} \label{sec:LN1}
+\vsssub
+
+\opthead{LN1}{Pre-WAM}{H. L. Tolman}
+
+\noindent
+线性输入源项有助于模型从静止条件一致地起转，并改善初始波浪增长行为。
+\ws\ 中提供了 \cite{art:CMR81} 的参数化，并包含 \cite{tol:JPO92} 引入的
+低频能量滤波器。输入项可表示为
+\begin{equation}
+\cS_{lin}(k,\theta) = 80 \left( \frac{\rho_a}{\rho_w} \right ) ^2
+  g^{-2}  k^{-1} \max \left [ 0 , u_* \cos (\theta - \theta_w) \right ]^4 \: G
+   \:\:\: , \label{eq:CMR81}
+\end{equation}
+
+\noindent
+其中 $\rho_a$ 和 $\rho_w$ 分别为空气和水的密度，$G$ 为滤波函数
+
+\begin{equation}
+G = \exp \left [ - \left ( \frac{f}{f_{filt}} \right ) ^{-4} \right ]
+\:\:\: . \label{eq:GSln}
+\end{equation}
+
+\noindent
+在 \cite {tol:JPO92} 中，滤波频率 $f_{filt}$ 给定为 Pierson-Moskowitz
+频率 $f_{PM}$，后者按式~(\ref{eq:f_PM}) 估计。在当前实现中，滤波器既可与
+$f_{PM}$ 相关，也可与式~(\ref{eq:tail_E_f}) 中定义的谱预报部分截止频率
+$f_{hf}$ 相关：
+
+\begin{equation}
+f_{filt} = \max \left [ \alpha_{PM} f_{PM} , \alpha_{hf} f_{hf} \right ]
+\:\:\: ,
+\end{equation}
+
+\noindent
+其中常数 $\alpha_{PM}$ 和 $\alpha_{hf}$ 由用户定义。二者默认值分别设为
+$\alpha_{PM} = 1$ 和 $\alpha_{hf} = 0.5$。加入对 $f_{hf}$ 的依赖，可保证所有
+风区下都有一致的增长行为，并避免在极短风区中由低频线性增长占主导。

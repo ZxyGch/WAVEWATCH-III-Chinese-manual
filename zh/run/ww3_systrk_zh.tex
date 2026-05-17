@@ -1,0 +1,24 @@
+\vsssub
+\subsubsection{波浪系统的时空跟踪} \label{sec:ww3systrk}
+\vsssub
+
+\proddefH{ww3\_systrk}{w3systrk}{ww3\_systrk.ftn}
+\proddeff{输入}{ww3\_systrk.inp}{传统配置文件。}{10} (App.~\ref{sec:config211})
+\proddefa{partition.ww3}{谱分区文件。}{11}
+\proddefa{sys\_restart.ww3\opt}{带系统记忆的重启动文件。}{12}
+\proddefa{sys\_mask.ww3\opt}{掩膜文件。}{13}
+\proddeff{输出}{sys\_log.ww3}{输出日志（并行运行时附加处理器编号）。}{20}
+\proddefa{sys\_coord.ww3}{场的经纬度坐标。}{21}
+\proddefa{sys\_hs.ww3}{各个波浪系统的有效波高场。}{22}
+\proddefa{sys\_tp.ww3}{各个波浪系统的峰值周期场。}{23}
+\proddefa{sys\_dir.ww3}{各个波浪系统的峰值方向场。}{24}
+\proddefa{sys\_dspr.ww3}{各个波浪系统的方向扩展场。}{25}
+\proddefa{sys\_pnt.ww3}{有效波高、峰值周期和峰值方向的点输出文件。}{26}
+\proddefa{sys\_restart1.ww3}{重启动文件。}{27}
+\proddefa{*.nc}{NetCDF 文件。}{ }
+
+\vspace{\baselineskip}
+\noindent
+该程序目前仅实现于规则网格。时空跟踪基于谱分区数据文件进行。用于跟踪波浪系统的时间区间和地理区域都可以是分区文件所含数据的子集。组合参数 {\code dirKnob} 和 {\code perKnob} 用于影响地理空间中系统组合算法的严格程度，{\code dirTimeKnob} 和 {\code perTimeKnob} 则是在时间空间中的对应参数。较低的数值意味着更严格的判据，从而得到更小、数量更多的系统；这通常也会增加处理时间。上文给出了推荐值。这些值可以通过定义掩膜文件 {\file sys\_mask.ww3} 在局地进行调整，例如在岛屿周围。参数 {\code hsKnob} 和 {\code wetPts} 是低能量与小系统过滤器，即所有平均 $H_\mathrm{m0}$ 低于 {\code hsKnob} 的波浪系统，或尺寸小于整个区域大小的 {\code wetPts}*100\% 的波浪系统，都会被剔除。参数 {\code seedLat} 和 {\code seedLon} 影响波浪系统搜索螺旋的起点；默认值位于模式区域中心（由 {\code 0. 0.} 表示）。跟踪运行结束时，系统记忆的结束状态存储在 {\file sys\_restart1.ww3} 中。将该文件改名为 {\file sys\_restart.ww3} 后，可用于从先前的系统记忆状态重启动跟踪序列。
+
+\pb

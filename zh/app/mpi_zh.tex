@@ -1,0 +1,216 @@
+\pagestyle{myheadings} \setcounter{page}{1} \setcounter{footnote}{0}
+
+\section{~分布式机器设置（MPI）} \label{app:mpi}
+\newcounters
+\vssub
+\subsection{~模式设置}
+\vssub
+
+为了在分布式内存机器上使用 \mpi\ 运行 \ws，需要满足两个要求。第一，所有
+可执行程序都需要正确编译。这意味着代码要用适当的 \ws\ 选项（开关）以及
+适当的编译器选项进行编译。第二，模式的并行版本需要在适当的并行环境中
+运行。这意味着并行代码要在多处理器机器上运行，并调用该机器上适当的并行
+环境。下面对这两个问题作较详细讨论。
+
+在第~\ref{chapt:run} 章描述的所有 \ws\ 程序中，只有三个程序能从
+\mpi\ 并行实现中获益：实际模式 {\file ww3\_shel} 和 {\file ww3\_multi}，
+以及初始条件程序 {\file ww3\_strt}。{\file ww3\_strt} 通常不用于业务环境，
+一般可用单处理器模式运行。以多处理器模式运行 {\file ww3\_strt} 的主要
+原因是降低其内存需求。这三个代码是唯一会同时操作所有网格点全部谱的代码，
+因此比所有其他 \ws\ 程序需要多得多的内存。并行运行这些程序的另一个好处
+（除缩短运行时间之外）是，随着处理器数量增加，这些程序的并行版本在每个
+处理器上需要的内存会减少。
+
+基于上述原因，对大多数并行机器上的实现而言，只需用 \mpi\ 选项编译主程序
+{\file ww3\_shel} 和 {\file ww3\_multi} 就足够了。除 {\file ww3\_strt}
+之外，所有其他 \ws\ 程序都设计为单处理器使用。后面这些程序不应在并行
+环境中运行，因为这会导致输出文件中的 I/O 错误。此外，由于这些代码的设计
+方式，它们在并行环境中不可能获得运行时间收益。由于所有程序共享子程序，
+必须确保编译过程正确完成，也就是说，子程序和主程序必须使用兼容的编译器
+设置进行编译。这意味着并行和非并行程序之间共享的子程序，应针对每个应用
+分别编译。
+
+编译程序 \mpi\ 版本的第一步，是确保使用了正确的编译器和编译器选项。
+随 \ws\ 发行版提供的示例 {\file comp} 和 {\file link} 脚本中，给出了
+在使用 xlf 编译器的 IBM 系统以及使用 Portland 编译器的 Linux 系统上的
+示例。
+
+第二步是在编译 \ws\ 的所有部分时调用适当的编译选项（开关）。大多数程序
+将按单处理器用途编译。为确保所有子程序都与其链接到的主程序一致，编译
+过程应分为两部分。图~\ref{fig:make_MPI} 给出了一个简单脚本，可正确编译
+所有 \ws\ 程序。该示例的扩展版本现在可作为 \command{make\_MPI} 使用，
+也可在 \command{w3\_automake} 中使用。另一种做法是交互式运行脚本中的
+命令，并在适当的时候直接编辑 {\file switch} 文件。
+
+\begin{figure}
+\begin{center} \begin{tabular}{|c|} \hline \\
+\begin{minipage}{5in}
+\begin{verbatim}
+#!/bin/sh
+
+# Generate appropriate switch file for shared and
+# distributed computational environments
+
+  cp switch switch.hold
+  sed -e 's/DIST/SHRD/g' \
+      -e 's/MPI //g'      switch.hold > switch.shrd
+  sed 's/SHRD/DIST MPI/g' switch.hold > switch.MPI
+
+# Make all single processor codes
+
+  cp switch.shrd switch
+  w3_make ww3_grid ww3_strt ww3_prep ww3_outf ww3_outp \
+          ww3_trck ww3_grib gx_outf gx_outp
+
+# Make all parallel codes
+
+  cp switch.MPI switch
+  w3_make ww3_shel ww3_multi
+
+# Go back to a selected switch file
+
+  cp switch.shrd switch
+# cp switch.hold switch
+
+# Clean up
+
+  rm -f switch.hold switch.shrd switch.MPI
+  w3_clean
+
+# end of script
+\end{verbatim}
+\end{minipage} \\ \\ \hline
+\end{tabular} \end{center}
+
+\caption{在分布式（\mpi）环境中确保所有 \ws\ 代码正确编译的简单脚本。
+   该脚本假定运行脚本之前已在 {\file switch} 文件中选择 {\F shrd} 开关。}
+   \label{fig:make_MPI}
+%\botline
+\end{figure}
+
+另一种一致编译代码的方法是，先用 {\file w3\_source} 为每个代码抽取所有
+必要子程序，然后把源代码和 makefile 放入各自目录，并使用 {\file make}
+命令编译。在这种情况下，{\file ww3\_shel} 和 {\file ww3\_multi} 的代码
+使用适当的 \mpi\ 开关抽取，而所有其他代码则使用共享内存体系结构的开关
+抽取。
+
+所有代码正确编译之后，实际波浪模式 {\file ww3\_shel} 和
+{\code ww3\_multi} 需要在适当的并行环境中运行。实际并行环境在很大程度上
+取决于所用计算机系统。例如，在 {\ncep} 的 IBM 系统上，处理器数量和适当
+环境在脚本开头的 `job cards' 中设置。随后通过如下调用将代码引入并行环境：
+
+\command{poe ww3\_shel}
+
+\noindent
+相反，在许多 Linux 类型系统上，\mpi\ 实现包含 {\file mpirun} 命令，通常
+以下列形式使用：
+
+\command{mpirun -np \$NP  ww3\_shel}
+
+\noindent
+其中 {\code -np \$NP} 选项通常从资源文件请求进程数（{\code \$NP} 是具有
+数值的 shell 脚本变量）。有关在你的系统上运行并行代码的细节，请参考手册
+或用户支持（如有）。
+
+注意，作为并行模式设置的一部分，可以使用 I/O 选项在并行和非并行文件系统
+之间进行选择 \citep[另见][]{tol:MMAB03a}。
+
+
+% -------------------------------------------------------------
+\vssub
+\subsection{~常见错误}
+\vssub
+
+尝试在 \mpi\ 下运行 {\file ww3\_shel} 和 {\file ww3\_multi} 时，最常见的
+错误包括：
+
+\begin{itemize}
+\item 在并行环境中运行串行代码（编译时没有 \mpi）。 \\ \vspace{-3mm}
+
+   这会导致数据文件损坏，因为所有进程都试图写入同一个文件。可通过
+   {\file ww3\_shel} 的标准输出识别这一问题。正确的并行代码版本中，
+   每一行输出只会出现一次。非并行版本则会为启动的每个单独进程生成每一行
+   输出的一份副本。
+
+\item 在并行环境中运行串行代码（预期 MPI 代码之外的程序）。
+   \\ \vspace{-3mm}
+
+   这会导致数据文件损坏，因为所有进程都试图写入同一个文件。可通过程序的
+   标准输出识别这一问题，此时每一行输出会出现多个副本。
+
+\item {\file ww3\_shel} 或 {\file ww3\_multi} 已正确编译，但没有在并行
+   环境中运行。 \\ \vspace{-3mm}
+
+   在某些系统上，这会导致 {\code ww3\_shel} 自动执行失败。如果没有出现
+   这种情况，则只能使用系统工具跟踪代码在何时何处运行来查明。
+
+\item 编译期间混用了串行编译和并行编译的子程序。
+      \\ \vspace{-3mm}
+
+   这是代码编译、链接和运行时错误最常见的来源。按照上一节概述的步骤操作
+   可避免该问题。
+
+\end{itemize}
+
+
+%%%%%%%%%%%%
+
+\vssub
+\subsection{~MPI 点对点通信错误}
+\vssub
+
+并行运行含有多个大型重叠网格的 {\file ww3\_multi} 时，会涉及大量同时
+活动的 MPI 点对点通信（MPI send/recv 对）。为保证正确执行，每条活动
+MPI 消息都必须具有唯一的封套（send id、recv id、tag、communicator），
+且 tag 值必须处于允许范围内。在此背景下，可能出现两类 MPI 点对点通信
+错误：(1) MPI 消息 tag 值超过上限，或 (2) 两条或更多 MPI 消息具有相同
+封套。第一类错误可能导致 {\file ww3\_multi} 因 MPI ``invalid tag" 错误
+或内部 tag 上限超限错误而崩溃。第二类错误可能导致从一个 MPI 任务发送到
+另一个任务的谱被投递到错误位置。第二类错误更难检测，因为它不会被 MPI
+捕获，可能只表现为模式输出中的异常结果。
+
+为处理这些可能的错误，{\file ww3\_multi} 中不同点对点通信集合的 MPI tag
+允许范围由 {\file WMMDATMD} 中定义的 $MTAGB$、$MTAG0$、$MTAG1$、$MTAG2$
+和 $MTAG\_UB$ 参数控制。这些参数必须满足
+$MTAGB \geq 0$ 且
+$7*NRGRD-1 \leq MTAG0 < MTAG1 < MTAG2 < MTAG\_UB \leq MPI\_TAG\_UB$，
+其中 $MPI\_TAG\_UB$ 是 MPI 实现的 tag 上限。
+
+特定 MPI 实现的 $MPI\_TAG\_UB$ 值可在运行时使用
+$MPI\_COMM\_GET\_ATTR$ 例程获得。MPI 实现可以自由地将 $MPI\_TAG\_UB$
+设置为大于 MPI 标准规定的最小值（$32767 = 2^{15}-1$）。在当前发布版
+OpenMPI 中，$MPI\_TAG\_UB$ 的值为 2147483647（$2^{31}-1$）。在采用
+Cray MPICH 的 Cray XC40 上，$MPI\_TAG\_UB$ 的值小得多，即
+2097151（$2^{21}-1$）。作为目前已知可用并行平台中最低的
+$MPI\_TAG\_UB$ 值，Cray XC40 的值被用于在 {\file WMMDATMD} 中设置
+$MTAG\_UB$。
+
+如果 MPI tag 值超过 MPI 实现施加的上限（$MPI\_TAG\_UB$），
+{\file ww3\_multi} 可能因 MPI ``invalid tag" 错误而崩溃。如果 MPI tag
+值超过某个内部 tag 上限，{\file ww3\_multi} 将以错误代码 1001 崩溃，
+并报告被超过的是哪个 tag 上限。下面说明允许的 MPI tag 范围及其设置方式。
+
+$MTAGB$ 参数只用作阻塞通信的 tag 下限，而这些阻塞通信不与其他点对点通信
+重叠。因此，将 $MTAGB$ 设为最低允许 MPI tag 值 0 即可。
+
+除了作为 {\file WMINIOMD} 中内部边界数据通信的 tag 下限之外，$MTAG0$
+参数还在 {\file WMIOPOMD} 中用作统一点输出通信的 tag 上限。为确保统一
+点输出通信 tag 值 $\geq 0$，$MTAG0$ 必须至少为 $7*NRGRD-1$。
+{\file WMMDATMD} 中采用了较宽裕的设置 $MTAG0 = 1000$。
+
+内部边界数据点对点通信（{\file WMINIOMD:WMIOBS}）的允许 tag 范围为
+$(MTAG0,MTAG1]$。鉴于该通信只涉及模式网格的边界点，{\file WMMDATMD}
+中采用了较宽裕的设置 $MTAG1 = 10000$。
+
+从高等级网格到低等级网格的点对点通信（{\file WMINIOMD:WMIOHS}）允许
+tag 范围为 $(MTAG1,MTAG2]$。相同等级模式网格之间点对点通信
+（{\file WMINIOMD:WMIOES}）允许 tag 范围为 $(MTAG2,MTAG\_UB]$。高等级
+到低等级通信以及相同等级通信都涉及模式网格的边界点和内部点。因此，这两组
+通信允许的 tag 范围应大于内部边界数据通信的允许范围。在嵌套网格应用中
+（例如，一个单一全球网格加上若干区域嵌套），高等级到低等级通信所需的
+tag 范围将大于相同等级通信所需的 tag 范围。{\file WMMDATMD} 中采用
+$MTAG2 = 1500000$，以便将总允许 tag 范围中更大的一部分分配给高等级到
+低等级通信。其他多网格应用可能需要调整 $MTAG2$。
+
+
+%\bpage \pagestyle{empty}

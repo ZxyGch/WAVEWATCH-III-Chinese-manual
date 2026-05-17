@@ -1,0 +1,15 @@
+\vssub
+\subsection{~潮汐分析的使用} \label{sub:num_tide}
+\conthead{\ws}{F. Ardhuin}
+
+\noindent
+为减小输入文件体积，水位和海流可由其潮汐振幅和相位来定义。这通过使用 {\code TIDE} 开关实现，该开关会在 current.ww3 和 level.ww3 文件中激活所需信息的检测。潮汐分析可通过 {\file
+  ww3\_prnc} 预处理程序，从 NetCDF 海流或水位文件中完成。在这种情况下，分析方法使用 \cite{art:For09} 的灵活潮汐分析包。预先计算的潮汐分潮可由 {\file ww3\_shel} 在运行时使用。
+
+不过，该方法可能效率不高，因为存储大量潮汐分潮需要大量内存；和其他强迫参数一样，它们不会在处理器之间分解：每个处理器都存储完整空间网格上的强迫参数。为避免这一点，可使用潮汐预报程序 {\file ww3\_prtide} 将潮汐分潮生成为时间序列，该程序会产生常规的 {\file current.ww3} 或
+{\file level.ww3} 文件。
+
+分析和预报所用潮汐分潮的选择在 {\file ww3\_prnc} 和 {\file ww3\_prtide} 的输入文件中指定。这里定义了两个快捷选项。{\code VFAST} 是以下 20 个分量的组合：Z0（平均值）、SSA、MSM、MSF、MF、2N2、MU2、N2、NU2、M2、S2、K2、MSN2、
+MN4、M4、MS4、S4、M6、2MS6 和 M8。当使用 {\code ww3\_shel} 进行潮汐预报时，海流或水位的时间步长设为 1800~s。
+
+在 {\file ww3\_prtide} 中，还会对潮汐分潮值进行质量检查：可在 {\file ww3\_prtide.inp} 中为某些分潮定义不现实的大振幅阈值。对于超过这些阈值的模式网格点，所有分量都会被置零；但对于 UNST 网格，会搜索邻近点以提供合理值并避免强梯度。

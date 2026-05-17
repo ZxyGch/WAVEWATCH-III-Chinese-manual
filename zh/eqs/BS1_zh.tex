@@ -1,0 +1,63 @@
+\vsssub
+\subsubsection{~$S_{bs}$：底部散射} \label{sec:BS1}
+\vsssub
+
+\opthead{BS1}{CREST model}{ F. Ardhuin}
+
+\noindent
+波浪在倾斜海底上传播时会发生部分反射。在水深变化 $\Delta d$ 相对于平均水深 $d$
+较小的极限下，反射系数与底部谱成正比 \cite{art:Kre49}，并导致波能在方向上的重新分配。
+这一过程可写成源项形式；当考虑尺度大于底部自相关长度的谱演化时，该形式能给出准确的
+反射系数，并且在 $\Delta d / d \simeq 0.6$ 以内仍具有合理精度 \citep{art:AM07}。
+源项为
+
+\begin{equation}
+\cS_{\mathrm{bs}}({\bk}) =
+\frac{\pi}{2}\int_{0}^{2 \pi}
+ \frac{k'^2 M^2({\bk},\textbf{k}')}{\sigma \sigma' \left(k' C'_g +
+{\bk}  \cdot {\bf U}  \right)}
+ F^B({\bk}-\textbf{k}')
+\left[N(\textbf{k}')- N(\textbf{k})\right] {\mathrm d}
+\theta',\label{Sbscat}
+\end{equation}
+
+\noindent
+其耦合系数为
+
+\begin{equation}
+M({\bk},{\bk}^\prime)\simeq M_b({\bk},{\bk}^\prime) =\frac{g {\bk}
+\cdot {\bk}^\prime}{\cosh(kd)\cosh(k'd)}
+\end{equation}
+
+\noindent
+这里忽略了底部诱导的流和水位变化影响，这适用于流速相对于内禀相速为低到中等的情形，
+即 $U/C < 0.3$。对于更大的 Froude 数，特别是在接近阻塞的条件下，当前实现预计不会
+准确。在式~(\ref{Sbscat}) 中，$k$ 与 $k'$ 由共振条件 $\omega=\omega'$ 联系，
+即 $\sigma+{\bk} \cdot {\bf U}=\sigma' + {\bk}^\prime \cdot {\bf U}$，
+其中 ${\bf U}$ 为相位平流速度 \cite[参见，例如][]{tol:WISE07}。
+
+底部谱 $F^B({\bk})$ 在文件 {\file bottom\_spectrum.inp} 中指定。该谱可由多波束
+水深数据确定。在缺少详细水深数据时，沙丘谱可基于 \cite{art:Hino68} 的工作进行
+参数化。近期观测总体上确认了早期关于沙丘谱的数据 \citep{art:AM07}，即大 $k$ 下
+存在无量纲常数谱，$F^B({\bk}) \sim k^{-4}$。
+
+为便于计算，底部谱采用双边形式，并归一化为使底部方差（单位为平方米）满足
+
+\begin{equation}
+<d^2> =\int_{-\infty}^{\infty} \int_{-\infty}^{\infty}
+F^B(k_x,k_y)  {\mathrm d} k_x  {\mathrm d} k_y.
+\end{equation}
+
+\noindent
+在当前实现中，假定该底部谱在所有网格点上相同。
+
+源项根据流的取值采用不同方法计算。对于零流，相互作用只涉及相同频率的波，相互作用
+始终相同，并且相对于方向谱是线性的。在这种情况下，相互作用表示为矩阵问题。也就是说，
+方向谱 $F$ 是含有 {\F NTH} 个分量的向量，源项是同样大小的向量，通过矩阵乘法
+$S = M F$ 得到，其中 $M$ 是一个方阵（{\F NTH,NTH}）数组。该数组是底部谱和无量纲
+水深 $kd$ 的函数。该散射矩阵在预处理步骤中，针对有限个波数模预先计算并对角化
+\citep{art:AH02}。这一预处理的成本随离散波数数量线性增加。
+
+对于非零流，相互作用模式依赖流的大小和方向（若底部谱各向同性，则只依赖大小），
+预先计算散射矩阵会使额外成本至少增加一个数量级。在当前实现中，非零流下的相互作用
+积分会在每次源项调用时重新计算。

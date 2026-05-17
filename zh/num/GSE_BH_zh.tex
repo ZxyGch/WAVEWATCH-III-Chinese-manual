@@ -1,0 +1,154 @@
+\addcontentsline{toc}{subsubsection}{\strut \hspace{24mm} Booij and Holthuijsen 1987}
+
+\vspace{\baselineskip} 
+\vspace{\baselineskip} 
+\noindent {\bf Booij and Holthuijsen 1987}
+
+\opthead{PR2}{\ws}{H. L. Tolman}
+
+
+经典 GSE 缓解方法来自 \cite{art:BH87}。他们为离散谱推导了另一种传播方程，其中包含扩散修正，以便在谱描述离散的情况下仍能考虑连续色散。该修正只影响空间传播；对于一般空间坐标 $(x,y)$，其形式为
+
+% ------ Correction linear dispersion --------- %
+% eq:d_bal_0         Booij and Holthuijsen, 1987
+% eq:Dxx
+% eq:Dyy
+% eq:Dxy
+% eq:Dss
+% eq:Dnn
+
+\begin{equation}
+\frac{\p \cN}{\p t} +
+\frac{\p}{\p x} \left [ \dot{x} \cN 
+           - D_{xx} \frac{\p \cN}{\p x} \right ] +
+\frac{\p}{\p y} \left [ \dot{y} \cN 
+           - D_{yy} \frac{\p \cN}{\p y} \right ] -
+2 D_{xy} \frac{\p^2 \cN}{\p x \p y} = 0
+\: , \label{eq:d_bal_0}\end{equation}  \begin{equation}
+D_{xx} = D_{ss} \, \cos^2 \theta + D_{nn} \, \sin^2 \theta
+\: , \label{eq:Dxx} \end{equation} \begin{equation}
+D_{yy} = D_{ss} \, \sin^2 \theta + D_{nn} \, \cos^2 \theta
+\: , \label{eq:Dyy} \end{equation}  \begin{equation}
+D_{xy} = ( D_{ss} - D_{nn} ) \, \cos \theta \, \sin \theta
+\: , \label{eq:Dxy} \end{equation} \begin{equation}
+D_{ss} = (\Delta c_g )^2 \: T_s / 12
+\: , \label{eq:Dss} \end{equation} \begin{equation}
+D_{nn} =  ( c_g \Delta \theta )^2 \: T_s / 12
+\: , \label{eq:Dnn} \end{equation}
+
+\noindent
+其中 $D_{ss}$ 是离散波分量传播方向上的扩散系数，$D_{nn}$ 是沿该离散波分量波峰方向的扩散系数，$T_s$ 是自涌浪生成以来经过的时间。在当前分步法中，扩散可作为单独步骤加入：
+
+% eq:d_bal_1         Separated diffusion equation
+
+\begin{equation}
+\frac{\p \cN}{\p t} = 
+\frac{\p}{\p x} \left [ D_{xx} \frac{\p \cN}{\p x} \right ] +
+\frac{\p}{\p y} \left [ D_{yy} \frac{\p \cN}{\p y} \right ] +
+   2 D_{xy} \frac{\p^2 \cN}{\p x \p y}
+\: . \label{eq:d_bal_1} \end{equation}
+
+\noindent
+该方程在实现时采用两个简化，其合理性见 \cite{tol:OMB95} 的讨论。第一，涌浪“年龄” $T_s$ 在整个模式中保持常数（由用户定义，没有默认值）。第二，扩散系数 $D_{ss}$ 和 $D_{nn}$ 按深水假设计算：
+
+% eq:Dss_d
+% eq:Dnn_d
+
+\begin{equation}
+D_{ss} = \left ( \: (X_\sigma-1) \: \frac{\sigma_m}{2 k_m} \right )^2
+\: \frac{T_s}{12} \: , \label{eq:Dss_d} \end{equation} \begin{equation}
+D_{nn} =  \left ( \frac{\sigma_m}{2 k_m} \Delta \theta \right )^2
+\: \frac{T_s}{12} \: , \label{eq:Dnn_d} \end{equation}
+
+\noindent
+其中 $X_\sigma$ 按式~(\ref{eq:sigma_grid}) 定义。采用这两个假设后，对于每个独立谱分量，扩散张量在整个空间区域内为常数。
+
+式~(\ref{eq:d_bal_1}) 用前向时间、中心空间格式求解。在 $\phi$ ($x$) 空间中点 $i$ 与 $i-1$ 之间的单元界面处，式~(\ref{eq:d_bal_1}) 右端第一项中方括号内的项（记为 $\cD_{i,-}$）估计为
+
+% eq:ddif_1          Discrete diffusion 1
+
+\begin{equation}
+D_{xx} \frac{\p \cN}{\p x} \approx \cD_{i,-} =
+\left . D_{xx} \; \left ( \frac{\cN_i - \cN_{i-1}}{\Delta x} \right ) \: 
+\right |_{j,l,m} \: . \label{eq:ddif_1} \end{equation}
+
+\noindent
+计数器为 $i$ 和 $i+1$ 的相应值，以及 $\lambda$ ($y$) 空间中的梯度，仍通过轮换索引和增量得到。如果两个网格点之一位于陆地上，则式~(\ref{eq:ddif_1}) 设为零。式~(\ref{eq:d_bal_1}) 右端的混合导数（记为 $\cD_{ij,--}$）在 $x$ 空间中的网格点 $i$ 和 $i-1$、以及 $y$ 空间中的 $j$ 和 $j-1$ 上估计为
+
+% eq:ddif_2          Discrete diffusion 2
+
+\begin{equation}
+\cD_{ij,--} = \left . \: D_{xy} 
+\left ( \frac{- \cN_{i,j} + \cN_{i-1,j} +
+              \cN_{i,j-1} - \cN_{i-1,j-1}}
+           {0.5 ( \Delta x_j + \Delta x_{j-1} ) \: \Delta y}
+              \right ) \: \right |_{l,m} 
+\: . \label{eq:ddif_2} \end{equation}
+
+\noindent
+注意，由于使用球面网格，增量 $\Delta x$ 是 $y$ 的函数。只有当所考虑的四个网格点全为海点时才计算该项，否则将其设为零。对式~(\ref{eq:d_bal_1}) 中第一项采用时间前向离散，对右端第一项和第二项的其余部分采用空间中心离散，最终算法为
+
+% eq:ddif_3          Discrete diffusion 3
+
+\begin{eqnarray}
+\cN_{i,j,l,m}^{n+1} = \cN_{i,j,l,m}^n + 
+\frac{\Delta t}{\Delta x} 
+   \left ( \cD_{i,+} - \cD_{i,-} \right ) +
+\frac{\Delta t}{\Delta y}
+   \left ( \cD_{j,+} - \cD_{j,-} \right ) \nonumber \\
++ \frac{\Delta t}{4} \left ( \cD_{ij,--} + 
+   \cD_{ij,-+} + \cD_{ij,+-} + \cD_{ij,++} \right )
+\: . \label{eq:ddif_3} \end{eqnarray}
+
+\noindent
+当满足下式时可得到稳定解 \citep[e.g.,][Part I section 7.1.1]{bk:Fle88}：
+
+% eq:ddif_4          Stability
+
+\begin{equation}
+\frac{D_{\max} \: \Delta t}{\min(\Delta x , \Delta y)^2}
+\leq 0.5 \: , \label{eq:ddif_4} \end{equation}
+
+\noindent
+其中 $D_{\max}$ 为扩散系数的最大值（通常 $D_{\max} = D_{nn}$）。由于该稳定性判据是网格增量的二次函数，在大尺度应用的高纬度地区，稳定性可能成为严重问题。为避免这对模式时间步长造成过度约束，使用修正涌浪年龄 $T_{s,c}$：
+
+% eq:Ts_cor
+
+\begin{equation}
+T_{s,c} = T_s \min \left \{ \: 1 \: , \: 
+\left ( \frac{\cos(\phi)}{\cos(\phi_c)} \right )^2 \: \right \}
+\: , \label{eq:Ts_cor} \end{equation}
+
+\noindent
+其中 $\phi_c$ 是用户定义的截止纬度。
+
+\vspace{\baselineskip} \noindent
+ 
+上述扩散是涌浪传播所需要的，但对增长中的风海并不真实。对于风海，不带色散修正的 \uq{} 格式已经足够平滑，可以给出稳定的有限风区增长曲线 \citep{tol:OMB95}。为去除轻微振荡，对增长中的波分量使用小的各向同性扩散。为保证该扩散较小且对所有谱分量等效，它由预设的单元 Reynolds（或单元 Peclet）数 $\cR = c_g \Delta x D_g^{-1} = 10$ 计算，其中 $D_g$ 是增长分量的各向同性扩散：
+
+% eq:Dg              Diffusion growing components
+
+\begin{equation}
+D_g = \frac{c_g \: \min(\Delta x , \Delta y)}{\cR} \: . \label{eq:Dg}
+ \end{equation}
+
+\noindent
+涌浪和风海的扩散按无量纲风速或反波龄 $u_{10} c^{-1} = u_{10} k \sigma^{-1}$ 进行线性组合：
+
+% eq:Xg              Linear combination for diffusion
+% eq:Dss_f           Final Dss
+% eq:Dnn_f           Final Dnn
+
+\begin{equation}
+X_g = \min \: \left \{ \: 1 \: , \: \max \: \left [ \: 0 \: , \:
+3.3 \left ( \frac{k \, u_{10}}{\sigma} \right ) - 2.3
+\: \right ] \: \right \}
+ \: , \label{eq:Xg} \end{equation} \begin{equation}
+D_{ss} = X_g D_g + (1-X_g) D_{ss,p}
+\: , \label{eq:Dss_f} \end{equation} \begin{equation}
+D_{nn} = X_g D_g + (1-X_g) D_{nn,p}
+\: , \label{eq:Dnn_f} \end{equation}
+
+\noindent
+其中后缀 $p$ 表示式~(\ref{eq:Dss_d}) 和 (\ref{eq:Dnn_d}) 中定义的传播扩散。式~(\ref{eq:Dg}) 和 (\ref{eq:Xg}) 中的常数在模式中预设。
+

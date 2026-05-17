@@ -1,0 +1,98 @@
+\vssub
+\subsection{~辅助程序} \label{sec:auxprog}
+
+\vsssub
+\subsubsection{一般概念}
+\vsssub
+
+除轨迹输出后处理器外，这里介绍的所有辅助程序都从预定义输入文件读取输入。该文件的内容决定每个辅助程序的用户选择。注释行可用用户确定的字符表示，规则如下：输入文件第一行的第一个字符将被视为注释字符，用于在整个输入文件中标识注释行。该注释字符必须出现在输入行的第一列才有效。在以下各节的所有示例中，第一行的第一个字符为 `{\tt \$}'。因此，所有以 `{\tt \$}' 开头的行都只包含注释，不会被解析到辅助程序中。按照标准，所有辅助程序都会将格式化输出写到标准输出单元。
+
+以下各节使用示例输入文件描述所有可用辅助程序。这些示例文件位于 \ws{} 软件包的 {\code inp} 目录中。每个示例输入文件内都包含用户可激活的全部可能选项，其中大多数以 `{\tt \$}' 开头作为注释行。本节中的文件反映示例文件的实际内容。以下各节还显示与所示输入文件相关联的可执行程序名称、程序名（如 program 语句中所示）、源代码文件，以及输入和输出文件及其单元号（在文件名后的括号中）。标有 \opt{} 的输入和输出文件为可选文件。下文提到的中间文件均为 {\F unformatted} 文件，此处不详细说明。每个文件均由单个例程写入和读取，并给出相应例程以供查阅更多文档。
+
+\begin{list}{}{\itemsep 0mm \parsep 0mm \leftmargin 40mm \labelwidth 30mm}
+\item[{mod\_def.ww3} \hfill] 子程序 {\F w3iogr}（{\file w3iogrmd.ftn}）。
+\item[{out\_grd.ww3} \hfill] 子程序 {\F w3iogo}（{\file w3iogomd.ftn}）。
+\item[{out\_pnt.ww3} \hfill] 子程序 {\F w3iopo}（{\file w3iopomd.ftn}）。
+\item[{track\_o.ww3} \hfill] 子程序 {\F w3iotr}（{\file w3iotrmd.ftn}）。
+\item[{restart.ww3}  \hfill] 子程序 {\F w3iors}（{\file w3iorsmd.ftn}）。
+\item[{nest.ww3}     \hfill] 子程序 {\F w3iobc}（{\file w3iobcmd.ftn}）。
+\item[{partition.ww3}\hfill] 子程序 {\F w3iosf}（{\file w3iosfmd.ftn}）。
+\end{list}
+
+\noindent
+程序的预处理和编译将在后续两章讨论。源代码中提供了模式测试运行示例。
+
+\vsssub
+\subsubsection{配置文件}
+\vsssub
+
+这里介绍的所有辅助程序都从 namelist 文件（新形式）或输入文件（传统形式）读取参数和配置。虽然大多数辅助程序提供 namelist 文件选项，但仍有一些程序只能使用传统输入文件形式。后一类程序的 namelist 文件将在未来公开发布版中提供。对于已经使用 namelist 的程序，模板文件存放在 model/nml 目录中。也可以使用 model/aux/bash 目录中存放的 {\code bash} 工具，将传统 {\file inp} 文件转换为新的 {\file nml} 格式。若运行目录中同时存在 {\file inp} 和 {\file nml} 文件，则优先使用 namelist 文件。对于回归测试，默认行为是所有程序都使用 {\file inp} 文件运行；若要改用 {\file nml} 文件，必须添加 -N 选项。一些新功能仅在 namelist 中可用，未来开发也将主要面向 namelist 使用。
+
+专用于某一程序的 namelist 配置文件提供了更易读且适应性更强的文件。一个 {\file nml} 文件包含一个或多个 namelist，每个参数都有默认值，并可由用户定义值覆盖。nml 文件中 namelist 的定义没有强制顺序。namelist 以 `{\tt \&SOMETHING\_NML}' 开始，以 `{\tt /}' 结束。若 namelist 文件跳过某一节，则会使用全部默认值。当程序读取其 namelist 文件时，所有 namelist 的默认值和用户定义值都会输出到日志文件中，以提高可追踪性。
+
+读取程序配置的传统方式来自预定义输入文件。输入文件第一行的第一个字符将被视为注释字符，用于标识输入文件中的注释行。该注释字符必须位于输入行的第一列才有效。在以下各节的所有示例中，以 `{\tt \$}' 开头的行因此只包含注释。所有程序还会将格式化输出写到标准输出单元。
+
+\vspace{\baselineskip} \noindent
+下面给出一个 {\file inp} 文件片段及其对应的 {\file nml} 文件片段：
+
+\vspace{\baselineskip} \noindent
+\rule[1mm]{43mm}{.5mm} {\rm 示例输入文件开始（传统形式）}
+\rule[1mm]{43mm}{.5mm}
+\begin{footnotesize}
+\begin{verbatim}
+$ -------------------------------------------------------------------- $
+$ WAVEWATCH III Grid preprocessor input file                           $
+$ -------------------------------------------------------------------- $
+$ Grid name (C*30, in quotes)
+$
+  'TEST GRID (GULF OF NOWHERE)   '
+$
+$ Frequency increment factor and first frequency (Hz) ---------------- $
+$ number of frequencies (wavenumbers) and directions, relative offset
+$ of first direction in terms of the directional increment [-0.5,0.5].
+$ In versions 1.18 and 2.22 of the model this value was by definiton 0,
+$ it is added to mitigate the GSE for a first order scheme. Note that
+$ this factor is IGNORED in the print plots in ww3_outp.
+$
+   1.1  0.04118  32  24  0.
+$
+\end{verbatim}
+\end{footnotesize}
+\rule[1mm]{46mm}{.5mm} 示例输入文件结束（传统形式）
+\rule[1mm]{45.1mm}{.5mm}
+
+\vspace{\baselineskip} \noindent
+\rule[1mm]{43mm}{.5mm} {\rm 示例输入文件开始（namelist 形式）}
+\rule[1mm]{43mm}{.5mm}
+\begin{footnotesize}
+\begin{verbatim}
+! -------------------------------------------------------------------- !
+! WAVEWATCH III - ww3_grid.nml - Grid pre-processing                   !
+! -------------------------------------------------------------------- !
+
+
+! -------------------------------------------------------------------- !
+! Define the spectrum parameterization via SPECTRUM_NML namelist
+!
+! * namelist must be terminated with /
+! * definitions & defaults:
+!     SPECTRUM%XFR   = 0.  ! frequency increment
+!     SPECTRUM%FREQ1 = 0.  ! first frequency (Hz)
+!     SPECTRUM%NK    = 0   ! number of frequencies (wavenumbers)
+!     SPECTRUM%NTH   = 0   ! number of direction bins
+!     SPECTRUM%THOFF = 0.  ! relative offset of first direction [-0.5,0.5]
+! -------------------------------------------------------------------- !
+&SPECTRUM_NML
+  SPECTRUM%XFR           =  1.1
+  SPECTRUM%FREQ1         =  0.04118
+  SPECTRUM%NK            =  32
+  SPECTRUM%NTH           =  24
+/
+\end{verbatim}
+\end{footnotesize}
+\rule[1mm]{46mm}{.5mm} 示例输入文件结束（namelist 形式）
+\rule[1mm]{45.1mm}{.5mm}
+
+
+
+\pb

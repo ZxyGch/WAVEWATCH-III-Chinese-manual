@@ -1,0 +1,75 @@
+\vsssub
+\subsubsection{~$S_{in} + S_{ds}$：\wam\ cycle 3} \label{sec:ST1}
+\vsssub
+
+\opthead{ST1}{\wam\ 模型}{H. L. Tolman}
+
+\noindent
+\wam\ cycle 1 到 cycle 3 的输入和耗散源项基于 \cite{art:Sea81} 和 \cite{art:KHH84}\citep[另见][]{art:WAM88}。输入源项写为
+
+%-------------%
+% WAM-3 input %
+%-------------%
+% eq:Snyder
+% eq:Wu
+
+\begin{equation}
+\cS_{in}(k,\theta) = C_{in} \frac{\rho_a}{\rho_w} \max
+\left [ 0 , \left (
+\frac{28 \, u_\ast}{c} \cos ( \theta - \theta_w ) - 1
+\right ) \right ]
+\: \sigma \: N(k,\theta) \; , \label{eq:Snyder}
+\end{equation}
+\begin{equation}
+u_\ast = u_{10} \sqrt{(0.8 + 0.065u_{10})10^{-3}}
+\: , \label{eq:Wu}
+\end{equation}
+
+\noindent
+其中 $C_{in}$ 为常数 $(C_{in} = 0.25)$，$\rho_a$（$\rho_w$）为空气（水）的密度，$u_\ast$ 为风摩擦速度 \citep{art:Cha55,art:Wu82}，$c$ 为相速度 $\sigma/k$，$u_{10}$ 为平均海平面以上 10~m 处的风速，$\theta_w$ 为平均风向。相应的耗散项写为
+
+%-------------------%
+% WAM-3 dissipation %
+%-------------------%
+% eq:Snyder_ds
+% eq:sigma_hat
+% eq:alpha_hat
+
+\begin{equation}
+\cS_{ds}(k,\theta) = C_{ds} \, \hat{\sigma} \, \frac{k}{\hat{k}}
+\left ( \frac{\hat{\alpha}}{\hat{\alpha}_{PM}} \right ) ^2
+N(k,\theta) \; , \label{eq:Snyder_ds}
+\end{equation}
+\begin{equation}
+\hat{\sigma} = \left ( \overline{\sigma^{-1}} \right) ^{-1} \: ,
+\label{eq:sigma_hat}
+\end{equation}
+\begin{equation}
+\hat{\alpha} = E \, \hat{k}^2 \,g^{-2} \: ,
+\label{eq:alpha_hat}
+\end{equation}
+
+\noindent
+其中 $C_{ds}$ 为常数 $(C_{ds} = -2.36 \: 10^{-5})$，$\hat{\alpha}_{PM}$ 为 {\sc pm} 谱对应的 $\hat{\alpha}$ 值 $(\hat{\alpha}_{PM} = 3.02\:10^{-3})$，$\hat{k}$ 由式~（\ref{eq:k_hat}）给出。
+
+与这些源项对应的参数化尾部[式~（\ref{eq:tail_E_f}）和（\ref{eq:tail_N_k}）]由\footnote{~最初，\wam\ 使用 $m = 5$；当前设置用于获得一致的极限行为 \cite[例如][]{tol:JPO92}。} $m = 4.5$ 以及下式给出：
+
+%------------%
+% WAM-3 tail %
+%------------%
+% eq:tail_WAM3
+% eq:f_PM
+
+\begin{equation}
+f_{hf} = \max \left [ \: 2.5 \, \hat{f}_r \: , \: 4 \,
+f_{PM} \: \right ] \: ,
+\label{eq:tail_WAM3}
+\end{equation}
+\begin{equation}
+f_{PM} = \frac{g}{28 \, u_\ast} \: ,
+\label{eq:f_PM}
+\end{equation}
+
+\noindent
+其中 $f_{PM}$ 为 \cite{art:PM64} 频率，由风摩擦速度 $u_\ast$ 估算。该尾部的形状和连接点在当前模型中为硬编码。可调参数 $C_{in}$、$C_{ds}$ 和 $\alpha_{PM}$ 预设为其默认值，但用户可在模型输入文件中重新定义。也可使用 \cite{art:AlET03} 提出的替代 $f_{PM}$ 和 $\alpha_{PM}$ 值。
+

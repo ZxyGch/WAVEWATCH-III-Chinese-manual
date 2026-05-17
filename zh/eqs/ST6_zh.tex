@@ -1,0 +1,348 @@
+\vsssub
+\subsubsection{~$S_{in} + S_{ds}$：Rogers et al. 2012 \& Zieger et al. 2015} \label{sec:ST6}
+\vsssub
+
+\opthead{ST6}{AUSWEX, Lake George}{A. Babanin, I. Young, M. Donelan, E. Rogers, S. Zieger, Q. Liu}
+
+\noindent
+这一版本实现了基于观测的深水源汇项物理过程。这些过程包括风输入源项，以及由负风输入、
+白帽耗散和波-湍流相互作用（涌浪耗散）造成的汇项。风输入和白帽耗散源项基于澳大利亚
+Lake George 的观测；波-湍流耗散基于实验室实验和涌浪衰减的现场观测；负输入基于
+实验室测试。总风能输入受到风应力约束，而风应力可独立获得。
+
+\paragraph{风输入。} 除了首次直接现场测量强风强迫下的风输入外，Lake George 实验还揭示了
+此前未被考虑的若干风-浪交换新物理特征：
+(i) 完全气流分离，它会在强风/陡波条件下导致风输入相对减小；
+(ii) 波增长率对波陡的依赖，这表明风输入源函数具有非线性行为；
+(iii) 存在破碎波时输入增强
+\citep{art:Dea06,art:Bea07}（最后这一特征未在这里实现）。
+按照 \citet{art:RBW12}，该输入源项写为
+\begin{eqnarray}
+\cS_{in}(k,\theta) & = & \frac{\rho_a}{\rho_w}\, \sigma\,\gamma(k,\theta)\,N(k,\theta)  ,
+\label{eq:ST601} \\ \gamma(k,\theta) &=& G\,\sqrt{B_n}\,W  ,
+\label{eq:ST602} \\
+G                &=& 2.8-\Bigl (1+\tanh (10\sqrt{B_n}W-11) \Bigr)  ,
+\label{eq:ST603} \\
+B_n              &=& A(k)\,N(k)\sigma\,k^3  ,
+\label{eq:ST604} \\
+W                &=& \left (\frac{U_s}{c}\,-\,1 \right )^2  .
+\label{eq:ST605}
+\end{eqnarray}
+
+\noindent
+在式 (\ref{eq:ST601})--(\ref{eq:ST605}) 中，$\rho_a$ 和 $\rho_w$ 分别为空气和水的密度，
+$U_s$ 为尺度风速，$c$ 表示波相速，$\sigma$ 为弧频率，$k$ 为波数。
+\citet{art:Phi84} 引入的谱饱和度 (\ref{eq:ST604}) 是波陡 $ak$ 的谱度量。
+全方向作用量密度通过对所有方向积分得到：
+$N(k)=\int N(k,\theta)d\theta$。\linebreak
+方向谱狭窄度的倒数 $A(k)$ 定义为\linebreak
+$A^{-1}(k) =$ $\int_{0}^{2\pi} [{N(k,\theta)}/{N_{\max}(k)}] d\theta$，
+其中 $N_{\max}(k)=\max\bigl \{N(k,\theta)\bigr \}$，对所有方向
+$\theta\in[0,2\pi]$ 取最大值 \citep{art:BS87}。
+
+\citet{art:Dea06} 用平均海面以上 10\,m 风速来参数化增长率 (\ref{eq:ST602})。
+然而，波浪模型通常使用摩擦速度 $u_\star=\tau/\rho_a$，以保证不同风速下风区律的一致性
+\citep[][p. 253]{bk:WAM94}。因此，\citet{art:RBW12} 按照 \citet{art:KHH84}，
+主张使用近似
+\begin{equation}
+U_s = U_{10} \simeq \Upsilon u_{\ast},\ \mathrm{and}\ \Upsilon = 28
+\label{eq:Upsilon}
+\end{equation}
+
+\begin{eqnarray}
+W_1 & = & \mathrm{max}^2 \left \{ 0,\frac{U}{c}\ \cos(\theta-\theta_w)-1
+\right \}  , \label{eq:ST606-1} \\
+W_2 & = & \mathrm{min}^2 \left \{ 0,\frac{U}{c}\ \cos(\theta-\theta_w)-1
+\right \} .\label{eq:ST606-2}
+\end{eqnarray}
+
+\noindent
+$W$ 的方向分布实现为顺风项 (\ref{eq:ST606-1}) 和逆风项 (\ref{eq:ST606-2}) 之和，
+使二者互补（即 $W=\{W_1\cup W_2$\}；见本节后文的{\it 负输入}）：
+\begin{equation}\label{eq:ST606}
+W=W_1-a_0\,W_2  .
+\end{equation}
+
+\paragraph{风输入约束。} 输入项的一个重要部分是计算从大气到海洋的动量通量，
+它必须与波接收的通量一致。在海面上，应力 $\vec{\tau}$ 可写为黏性应力和波支撑应力之和：
+$\vec{\tau} = \vec{\tau}_{v} + \vec{\tau}_{w}$。波支撑应力 $ \vec{\tau}_{w}$
+用作风输入的主要约束，且不能超过总应力 $\vec{\tau} \le \vec{\tau}_{tot}$。
+这里总应力由通量参数化确定：$\vec{\tau}_{tot}=\rho_a u_\star|u_\star|$。
+波支撑应力 $\tau_w$ 可通过对风动量输入函数积分来计算：
+
+\begin{equation}\label{eq:ST609}
+   \vec{\tau}_w = \rho_w g \int_{0}^{2\pi} \int_{0}^{k_{max}}
+   \frac{S_{in}(k^\prime,\theta)}{c} \Bigl (\cos\theta,\sin\theta \Bigr )
+   dk^\prime d\theta  .
+\end{equation}
+
+\noindent
+波支撑应力 (\ref{eq:ST609}) 的计算包括直到最高离散波数 $k_{max}$ 的已解析谱部分，
+也包括短波支撑的应力。为了考虑后者，在能量密度谱最高频率之外假定一条 $f^{-5}$
+诊断尾部。为满足约束，在 $\vec{\tau} > \vec{\tau}_{tot}$ 的情况下，施加依赖波数的
+因子 $L$ 来削减谱高频部分的能量：$S_{in}(k^\prime)=L(k^\prime)\,S_{in}(k^\prime)$，
+其中
+
+\begin{equation}\label{eq:ST610}
+L(k^\prime) = \min \Bigl \{ 1, \exp \bigl ( \mu\,[1- U/c] \bigr ) \Bigr
+\}  .
+\end{equation}
+
+\noindent
+削减式 (\ref{eq:ST610}) 是风速和相速的函数，并采用指数形式，旨在削减谱离散部分的能量。
+削减强度由系数 $\mu$ 控制，它对高频影响较大，而对能量占优部分影响很小。
+$\mu$ 的取值在每个积分时间步通过迭代动态计算 \citep{art:Tea10}。
+
+阻力系数为
+\begin{equation}\label{eq:ST607}
+C_d \times 10^4 = 8.058 + 0.967 U_{10} - 0.016 U_{10}^2 ,
+\end{equation}
+该式被选用并实现为开关 {\code FLX4}。这一参数化由 \citet{art:Hwa11} 提出，
+考虑了风速超过 30\,m~s$^{-1}$ 时海面阻力的饱和及进一步下降。为防止在极强风
+($U_{10}\ge50.33$m~s$^{-1}$) 下 $u_\star$ 降为零，表达式 (\ref{eq:ST607})
+被修改为给出 $u_\star=2.026$m~s $^{-1}$。{\it 重要！} 在 {\code ST6} 中，
+对风输入场任一均匀偏差的整体调整，是通过风应力参数 $u_\star$ 而不是 $U_{10}$ 完成的。
+为此，(\ref{eq:ST607}) 左端表达式 $C_d \times 10^4$ 中的因子被替换为
+$C_d \times \mathrm{FAC}$，并作为 {\F FLX4} namelist 参数 {\code CDFAC} 加入
+（见本节末尾的{\it 整体调整}）。黏性阻力系数
+\begin{equation}\label{eq:ST608}
+  C_v \times 10^3 = 1.1 - 0.05 U_{10} ,
+\end{equation}
+由 \citet{art:Tea10} 使用 \citet{art:BP98} 的数据参数化为风速函数。
+
+\paragraph{负输入。} 除正输入外，{\code ST6} 还包含负输入项，用于在波谱中存在逆向
+风应力分量的部分抑制波增长 (\ref{eq:ST606-1})--(\ref{eq:ST606-2})。逆风下的增长率
+为负 \citep{pro:Don99}，并在满足波支撑应力 $\tau_w$ 的约束后施加。
+(\ref{eq:ST606}) 中 $a_0$ 的取值是输入参数化中的调节参数，可通过 {\F SIN6}
+namelist 参数 {\code  SINA0} 调整。
+
+\noindent
+\paragraph{白帽耗散。} 对于由波浪破碎造成的耗散，Lake George 现场研究揭示了若干
+新特征：(i) 波浪破碎的阈值行为 \citep{art:BBY01}。波浪只有在超过某一通用波陡时
+才会破碎，此时破碎概率取决于超过该阈值波陡的程度。低于临界阈值的波，白帽耗散为零。
+(ii) 由于长波影响短波破碎和耗散而产生的累积耗散效应
+\citep{pro:Don01,pro:BY05,art:Mea06,art:YB06,art:Bea10}；
+(iii) 强风下的非线性耗散函数
+(\citeauthor{art:Mea06}, \citeyear{art:Mea06};\linebreak
+ \citeauthor{art:Bea07}, \citeyear{art:Bea07})；
+(iv) 耗散方向展宽的双峰分布
+\citep{art:YB06,art:Bea10}（最后这一特征未在 {\code ST6} 中实现）。
+按照 \citet{art:RBW12}，白帽耗散项实现为
+\begin{equation}\label{eq:ST620}
+  \cS_{ds}(k,\theta) = \Bigl [ T_1(k,\theta) + T_2(k,\theta) \Bigr ]\ N(k,\theta) ,
+\end{equation}
+
+\noindent
+其中 $T_1$ 是固有破碎项，表示为传统的波谱函数；$T_2$ 表示为低于波数 $k$ 的波谱积分，
+用于描述每个频率/波数上由长波造成的短波破碎或耗散的累积效应。当该频率处于谱峰或低于
+谱峰时，固有破碎项 $T_1$ 是唯一的破碎耗散项。一旦谱峰移动到该频率以下，$T_2$
+就会被激活，并随谱峰继续下移而逐渐变得更重要。
+
+阈值谱密度 $F_{\mathrm{T}}$ 计算为
+\begin{equation}\label{eq:ST621}
+  F_{\mathrm{T}}(k)=\frac{\varepsilon_{\mathrm{T}}}{A(k)\,k^3}  ,
+\end{equation}
+其中 $k$ 为波数，$\varepsilon_{\mathrm{T}}=0.035^2$ 为经验常数
+\citep{art:Bea07,bk:Bab11}。令超过临界阈值谱密度（此时波浪破碎占主导）的超越量为
+$\Delta(k)=F(k)-F_{\mathrm{T}}(k)$。进一步令 $\mathcal{F}(k)$ 为用于归一化的通用谱密度，
+则固有破碎分量可计算为
+\begin{equation}\label{eq:ST622}
+T_1(k)=a_1 A(k)\frac{\sigma}{2\pi} \left [ \frac{\Delta(k)}{\mathcal{F}(k)}
+\right ]^{p_1}  .
+\end{equation}
+
+\noindent
+累积耗散项在频率空间中是非局地的，并基于一个向高频增长的积分，在较小尺度上占主导：
+
+\begin{equation}\label{eq:ST623}
+T_2(k)=a_2 \int\limits_0^k A(k) \frac{c_g}{2\pi} \left [
+\frac{\Delta(k)}{\mathcal{F}(k)} \right ]^{p_2}\!\!dk .
+\end{equation}
+
+\noindent
+耗散项 (\ref{eq:ST622})--(\ref{eq:ST623}) 依赖五个参数：用于归一化的通用谱密度
+$\mathcal{F}(k)$，以及四个系数 $a_1$、$a_2$、$p_1$ 和 $p_2$。系数 $p_1$ 和 $p_2$
+控制耗散项中归一化阈值谱密度 $\Delta(k)/\mathcal{F}(k)$ 的强度。Namelist 参数
+{\code SDSET} 在 (\ref{eq:ST622})--(\ref{eq:ST623}) 的归一化中切换使用谱密度
+$F(k)$ 或阈值谱密度 $F_{\mathrm{T}}(k)$。根据 \citet{art:Bea07} 和
+\citet{art:Bab09}，式 (\ref{eq:ST621})--(\ref{eq:ST623}) 中方向狭窄度参数取为
+一，即 $A(k)\approx 1$。
+
+\begin{table} \begin{center}
+\footnotesize
+\begin{threeparttable}
+\begin{tabular}{|l|c|c|c|c|c|} \hline \hline
+参数              &  WWATCH 变量 & namelist &  vers.\,4.18 & vers.\,5.16 & vers.\,6.07 \\
+\hline
+  $F_{\mathrm{T}}$ &  SDSET       & SDS6     &  T       &  T         & T          \\
+  $a_1$            &  SDSA1       & SDS6     & 6.24E-7  & 3.74E-7    & 4.75E-6    \\
+  $p_1$            &  SDSP1       & SDS6     &  4       &  4         & 4          \\
+  $a_2$            &  SDSA2       & SDS6     & 8.74E-6  & 5.24E-6    & 7.00E-5    \\
+  $p_2$            &  SDSP2       & SDS6     &  4       &  4         & 4          \\
+\hline
+  $\Upsilon$\tnote{\textdagger}       &  SINWS       & SIN6     & n/a      & n/a        & 32.0       \\
+  $N_{hf}$\tnote{\textdagger}         &  SINFC       & SIN6     & n/a      & n/a        & 6.0        \\
+  $a_0$            &  SINA0       & SIN6     & 0.04     & 0.09       & 0.09       \\
+  $b_1$ 为常数     &  CSTB1       & SWL6     & n/a      &  F         & F          \\
+  $b_1$, $B_1$     &  SWLB1       & SWL6     & 0.25E-3  & 0.0032     & 0.0041     \\
+  $\mathrm{FAC}$   &  CDFAC       & FLX4     & 1.00E-4  & 1.00E-4    & 1.0\tnote{\textdaggerdbl}        \\
+\hline
+  $C$              &  NLPROP      & SNL1     & 3.00E7   &  3.00E7    & 3.00E7    \\
+ \hline \hline
+\end{tabular}
+\begin{tablenotes}
+	\item[\textdagger] 在 WW3 版本 4.18 和 5.16 中，$\Upsilon = 28.0$
+            与 $N_{hf} = 6.0$ 被硬编码在 {\code ST6} 模块中。
+    \item[\textdaggerdbl] 对 2011 年及以后的 CFS 风场，全球模拟推荐
+            $\mathrm{CDFAC} \sim 1.0$；对 ERA5 再分析风场，建议
+            $\mathrm{CDFAC} \sim 1.08$ \citep{Liu2019, Liu2021}。
+\end{tablenotes}
+\end{threeparttable} \end{center}
+\caption{{\code ST6} 同 {\code DIA} 非线性求解器（第~\ref{sec:NL1} 节）联用时的
+         率定参数汇总。表中数值代表模型默认设置。缩写 ``n/a'' 表示该变量在对应代码
+         版本中不适用。}
+\label{tab:ST601} \botline \end{table}
+
+\citet{art:RBW12} 基于时长受限的学术测试率定了耗散项。{\code ST6} 中使用并列于
+表~\ref{tab:ST601} 的率定系数，与 \citet{art:RBW12} 的值略有不同，主要原因是
+波支撑应力 $\vec{\tau}_w$ 以矢量分量形式实现，并且此前 \citet{art:RBW12} 未考虑
+非破碎涌浪耗散 (\ref{eq:ST624})。
+
+\paragraph{涌浪耗散。} 在没有波浪破碎时，还存在其他波浪衰减机制。这里把它们称为
+涌浪耗散，并按照波浪同海洋湍流的相互作用来参数化 \citep{bk:Bab11}。不过，该机制
+对风生波也保持活跃。如果谱高于波浪破碎阈值，它在整个谱上的贡献较小；但在谱前缘，
+甚至在完全 Pierson-Moscowitz 发展情况下的谱峰处，它会占主导。
+
+\begin{equation}\label{eq:ST624}
+  \cS_{swl}(k,\theta) = -\frac{2}{3}b_1 \sigma\ \sqrt{B_n}\ N(k,\theta).
+\end{equation}
+
+\noindent
+通过使式 (\ref{eq:ST624}) 中的系数 $b_1$ 依赖波陡，可以减小波高空间偏差中的大梯度：
+
+\begin{equation}\label{eq:ST625}
+   b_1 = B_1 \, 2\sqrt{E}\,k_p .
+\end{equation}
+
+在式 (\ref{eq:ST625}) 中，$B_1$ 是尺度系数，$E$ 是式 (\ref{eq:etot}) 中的海面
+总方差，$k_p$ 是谱峰波数。式 (\ref{eq:ST625}) 可通过 {\F SWL6} namelist 参数
+{\code CSTB1} 启用。式 (\ref{eq:ST625}) 中系数 $B_1$ 和/或式 (\ref{eq:ST624})
+中 $b_1$ 的值，可通过 {\F SWL6} namelist 参数 {\code SWLB1} 定制
+（见表~\ref{tab:ST601}）。
+
+\noindent
+\paragraph{vers.\,6.07 以来的更新} 按照 \citet{art:RBW12}，版本 4.18 和 5.16
+采用了尺度风速 $U_s = 28u_{\ast}$ (\ref{eq:Upsilon})（表~\ref{tab:ST601}）。
+这些 {\code ST6} 配置已被证明在不同空间尺度和不同天气条件下具有良好技巧
+\citep[e.g.][]{art:ZBRY15, liu2017}。然而，\citet[][their Fig. 5]{art:ZBRY15}
+也指出 {\code ST6}（版本 4.18 和 5.16）倾向于高估谱高频尾部的能级，表明该特定
+频率范围内不同源项之间的平衡不够准确。
+
+Rogers（2014，未发表工作）发现，在 SWAN 的 {\code ST6} 实现中使用
+$U_s = 32u_{\ast}$（即 $\Upsilon = 32$）可提高模型估计尾部能级的技巧
+[另见 \citet{Rogers2017}]。随后，\citet{Liu2019} 使用 WW3 对 {\code ST6}
+进行了全面重新率定，新的一组参数（即 $a_0,\ a_1,\ a_2,\ B_1$）总结在
+表~\ref{tab:ST601} 最后一列。更新后的 {\code ST6} 包不仅能很好地预测常用总体
+波浪参数（如有效波高和波周期），还明显改善了高频能级（以饱和谱和均方斜率表示）的估计。
+在时长受限测试中，重新率定的 {\code ST6} 得到的全方向频率谱 $E(f)$ 表现出清楚的
+过渡行为，即从近似 $f^{-4}$ 幂律过渡到约 $f^{-5}$ 幂律，这与先前现场研究相当
+\citep{Forristall1981}。
+
+\begin{table}[htbp]
+	\footnotesize
+	\begin{center}
+	\begin{tabular}{|l|c|c|c|c|} \hline \hline
+            {\code ST6} & $a_0$ & $a_1$ & $a_2$ & $B_1$\\
+                        & 0.05 & $4.75 \times 10^{-6}$ & $7.00 \times 10^{-5}$ & $6.00 \times 10^{-3}$  \\
+            \hline
+            {\code GMD} & $\lambda$ & $\mu$ & $\theta_{12}\ (^{\circ})$ & $C_{deep}$  \\
+                        & $0.127$ & $0.000$ & $\ 3.0$ & $4.88 \times 10^7$            \\
+		        & $0.127$ & $0.097$ & $21.0$ & $1.26 \times 10^8$             \\
+		        & $0.233$ & $0.098$ & $26.5$ & $6.20 \times 10^7$             \\
+		        & $0.283$ & $0.237$ & $24.7$ & $2.83 \times 10^7$             \\
+		        & $0.355$ & $0.183$ & $-$ & $1.17 \times 10^7$                \\
+            \hline \hline
+	\end{tabular}
+	\end{center}
+        \caption{{\code ST6} 同 {\code GMD} 非线性求解器 \citep[或具体为 {\code G35};][]{Liu2019} 联用时的率定参数汇总}
+	\label{tab:ST602}
+	\botline
+\end{table}
+
+除了把 {\code ST6} 同 {\code DIA}（第~\ref{sec:NL1} 节）非线性求解器联用外，
+\citet{Liu2019} 还尝试将 {\code ST6} 同 $S_{nl}$ 的 {\code GMD} 参数化
+（第~\ref{sec:NL3} 节）联用。作为第一步，只采用含 5 个四波组、并采用三参数四波组定义的
+{\code GMD} 配置 \citep[即][]{tol:OMOD13d} 中的 {\code G35}。通过
+\citet{tol:OMOD13e} 设计的整体遗传优化技术，专门为 {\code ST6} 优化了 {\code GMD}
+的可调参数；对应的 {\code ST6} 可调参数总结于表~\ref{tab:ST602}\footnote{
+对于表~\ref{tab:ST602} 所示 {\code GMD} 的第五个四波组布局，三参数
+$(\lambda,\ \mu,\ \theta_{12})$ 四波组定义退化为双参数 $(\lambda,\ \mu)$ 形式，
+而 $\theta_{12}$ 由 $\mu$ 的取值隐含给出 \citep{tol:OMOD13d}。相应地，
+{\code ST6+GMD} 与 \citet{tol:OMOD11} 的保守非线性高频滤波器
+[另见第~\ref{sec:NLS} 节] 的组合可能是稳定模型积分所必需的，特别是在高分辨率谱网格
+（如 $\Delta \theta < 5^{\circ}$）下。},\footnote{不同于表~\ref{tab:ST601}，
+这里我们只列出 {\code ST6} 和 {\code GMD} 的重要参数。关于这一特定模型配置中
+namelist 变量的详细设置，请读者参阅 {\code bin/README.UoM}。}。
+\citet{Liu2019} 表明，在时长受限测试中，{\code GMD} 模拟的 $E(f)$ 与 $S_{nl}$
+的精确解（如 {\code WRT}；第~\ref{sec:NL2} 节）高度一致 \citep[另见][]{tol:OMOD13d}。
+在 1 年全球后报中，基于 {\code DIA} 的模型会把低频波能量（波周期 $T > 16$ s）
+高估 90\%。使用 {\code GMD} 后，此类模型误差显著降低到 $\sim$20\%。值得注意的是，
+表~\ref{tab:ST602} 所示 {\code GMD} 方法的计算开销约为 {\code DIA} 的 5 倍。
+
+为灵活控制预报频率区域的高频范围，我们在版本 6.07 中引入
+\begin{equation}
+f_{hf} = N_{hf}/T_{m0, -1}
+\end{equation}
+其中 $f_{hf}$ 是截止高频上限 (\ref{eq:tail_E_f})，$T_{m0,-1}$ 是
+(\ref{eq:Tm0m1}) 中定义的平均波周期。$N_{hf}$ 通过 namelist 参数 SINFC
+设置（表~\ref{tab:ST601}），负的 $N_{hf}$（例如 $N_{hf} = -1$）表示
+\emph{高频谱尾在没有任何预设斜率的情况下自由演化。}
+
+\noindent
+\paragraph{主导波破碎概率}
+按照 \citet[][their Fig.~12]{art:BBY01}，主导波破碎概率 $b_T$ 可由波谱
+$F(f, \theta)$ 按如下参数形式估计：
+\begin{equation}
+b_T = 85.1 \Big[ (\epsilon_p - 0.055) (1 + H_s / d) \Big]^{2.33},
+\label{eq:bt}
+\end{equation}
+其中 $H_s$ 为有效波高，$d$ 为水深，$\epsilon_p$ 为谱峰显著陡度，定义为
+\begin{equation}
+%\left \lbrace
+\begin{array}{rcl}
+\epsilon_p &=& H_p k_p / 2\\
+H_p &=& 4 \Big[\int_{0}^{2\pi} \int_{0.7f_p}^{1.3f_p} F(f, \theta) \mathrm{d}f \mathrm{d}\theta \Big]^{1/2}
+\label{eq:steepness}
+\end{array}
+%\right.
+\end{equation}
+其中 $k_p$ 和 $f_p$ 分别为谱峰波数和频率。注意，当我们从 $F(f,\theta)$ 计算
+$H_s$、$H_p$ 和 $f_p$（$k_p$）时（式 \ref{eq:bt} 和 \ref{eq:steepness}），
+只考虑风海贡献。按照 \citet{Janssen1989} 和 \citet{Bidlot2001}，当
+\begin{equation}
+\frac{c(k)}{U_{10} \cos (\theta - \theta_u)}  < \beta_w,
+\label{eq:beta}
+\end{equation}
+时，我们把谱分量视为风海；其中 $c(k)$ 为相速，$U_{10}$ 为海面以上 10 m 风速，
+$\theta_u$ 为风向，$\beta_w$ 为常数风强迫参数。我们把 $\beta_w$ 实现为可调参数
+（{\F MISC} namelist 参数 {\code BTBET}），默认使用 $\beta_w=1.2$。
+
+\noindent
+\paragraph{整体调整。} 源项 {\code ST6} 已使用通量参数化 {\code FLX4} 进行了率定。
+可通过 {\F FLX4} namelist 参数 {\code CDFAC=1.0E-4}\footnote{自 vers.\,6.07 起，
+该值改为 {\code CDFAC=1.0}，因为量级 $10^{-4}$ 已硬编码在 {\code FLX4} 模块中
+（表~\ref{tab:ST601}）。} 对阻力参数化 {\code FLX4} 重新缩放，从而实现对风场的
+整体调整。其效果类似于调节 {\code ST4} 源项包中变量 $\beta_{max}$，见方程
+(\ref{eq:SinWAM4}) 和 (\ref{eq:tauhfint})；该变量可通过 namelist 参数
+{\code BETAMAX} 定制（见第 \ref{sec:ST3}--\ref{sec:ST4} 节）。
+\citet{pro:Aea11} 和 \citet{art:RA13} 列出了不同取值组合，使模型可适配不同风场。
+在优化波浪模型时，建议只重新调节参数 $a_0$、$b_1$ 和 $\mathrm{FAC}$。同样，
+$\mathrm{FAC}$ 可能消除风场偏差，而这一偏差通常会随再分析产品选择而变化
+\citep[][见表~\ref{tab:ST601}]{Liu2021}。这种削减已在飓风等极端风条件下测试
+\citep{art:ZBRY15}。在全球后报中，负输入系数可用于在散点比较中调节波高整体偏差，
+而涌浪耗散尺度系数主要影响大海况。当使用离散相互作用近似 ({\code DIA}) 计算四波
+相互作用时，比例常数默认值变为 $C=3.00\times10^7$。
+
+\textrm{\textit{\underline{代码限制：}}} 对于版本 4.18 和 5.16，当动力源项积分的最小
+时间步远小于总体时间步（即小于 1/15）时，模型会变得不稳定。该问题自 vers.\,6.07 起
+已经解决。

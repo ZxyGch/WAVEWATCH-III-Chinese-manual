@@ -1,0 +1,16 @@
+\vsssub
+\subsubsection{NetCDF 边界条件程序} \label{sub:ww3bounc}
+\vsssub
+
+\proddefH{ww3\_bounc}{w3bounc}{ww3\_bounc.ftn}
+\proddeff{输入}{ww3\_bounc.nml}{Namelist 配置文件。}{10} (App.~\ref{sec:config042})
+\proddefa{ww3\_bounc.inp}{传统配置文件。}{10} (App.~\ref{sec:config041})
+\proddefa{mod\_def.ww3}{模式定义文件。}{20}
+\proddefa{'spectra file' \opt}{NetCDF 格式的波谱文件。}{user}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{nest.ww3}{边界条件文件。}{33}
+
+\vspace{\baselineskip} \noindent
+注意：当使用该程序为旋转极点网格上的模式生成边界输入时，输入谱始终假定为在标准极点上定义。
+
+\pb

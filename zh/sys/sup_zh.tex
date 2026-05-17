@@ -1,0 +1,200 @@
+\vsssub
+\subsubsection{~辅助程序} \label{sec:aux_mod}
+\vsssub
+
+\vspace{\baselineskip}
+\noindent
+\ww\ 有若干辅助前处理器和后处理器，以及两个波浪模式壳程序（见
+\para\ref{sec:auxprog}）。这些辅助程序和一些附加例程存放在以下文件中。
+一般而言，仅由程序自身使用的子程序作为内部子程序与主程序存放在一起。
+在这种情况下，不需要使用模块结构。例外是附加模块 {\file w3fldsmd.ftn}，
+该模块处理输入场在场预处理器和独立模式壳之间的波浪模式数据流。后一个
+模块没有显式的 \ws\ 依赖，因此可以集成到任意自定义数据预处理器中。
+
+% fig:prepro
+
+% \input{zh/sys/fig_prep_zh}
+
+\vspace{\baselineskip} 
+\noindent
+输入数据文件管理模块 \hfill {\file w3fldsmd.ftn}
+
+\begin{flisti}
+\fit{w3fldo}{打开并检查 {\F w3shel} 的数据文件。}
+\fit{w3fldg}{读取和写入 {\F w3shel} 的数据文件（模式输入）。}
+\fit{w3fldd}{读取和写入 {\F w3shel} 的数据文件（数据同化）。}
+\fit{w3fldp}{准备从任意网格插值输入场。}
+\fit{w3fldh}{管理 {\F w3shel} 中的均一输入场。}
+\fit{w3fldm}{处理 {\F w3shel} 中的移动网格数据。}
+\end{flisti}
+
+\noindent
+网格预处理程序 \hfill {\file ww3\_grid.ftn}
+
+\begin{flisti}
+\fit{w3grid}{网格预处理器。}
+\fit{readnl}{读取 {\F namelist} 输入（内部）。}
+\end{flisti}
+
+\noindent
+初始条件程序 \hfill {\file ww3\_strt.ftn}
+
+\begin{flisti}
+\fit{w3strt}{初始条件程序。}
+\end{flisti}
+
+\noindent
+边界条件程序 \hfill {\file ww3\_bound.ftn}
+
+\noindent
+边界条件程序（NetCDF） \hfill {\file ww3\_bounc.ftn}
+
+\begin{flisti}
+\fit{w3bound}{边界条件程序（NetCDF）。}
+\end{flisti}
+
+\noindent
+输入场预处理程序 \hfill {\file ww3\_prep.ftn}
+
+\noindent
+来自 NetCDF 文件的输入场预处理程序 \hfill {\file ww3\_prnc.ftn}
+
+\begin{flisti}
+\fit{w3prep}{通用壳输入场的预处理器。}
+\end{flisti}
+
+\noindent
+潮汐预处理程序 \hfill {\file ww3\_prtide.ftn}
+
+\begin{flisti}
+\fit{w3prtide}{潮汐预处理器。}
+\end{flisti}
+
+\noindent
+重启动文件预处理程序 \hfill {\file ww3\_uprstr.ftn}
+
+\begin{flisti}
+\fit{w3uprstr}{重启动文件预处理器。}
+\fit{readnl}{读取 {\F namelist} 输入（内部）。}
+\end{flisti}
+
+\noindent
+通用波浪模式程序 \hfill {\file ww3\_shel.ftn}
+
+\begin{flisti}
+\fit{w3shel}{通用程序壳。}
+\end{flisti}
+
+% fig:shell
+
+% \input{zh/sys/fig_shel_zh}
+
+\noindent
+{\file ww3\_multi} 的网格拆分 \hfill {\file ww3\_gspl.ftn}
+
+\begin{flisti}
+\fit{w3gspl}{网格拆分程序。}
+\fit{grinfo, grtrim grfill, grlost, grsqrg, grsngl, grsepa, grfsml, grfrlg, gr1grd}{}
+\fit{      }{\vspace{-\baselineskip} 逐步调整单个网格的例程。}
+\end{flisti}
+
+\noindent
+通用波浪模式程序 \hfill {\file ww3\_multi.ftn}
+
+\begin{flisti}
+\fit{w3mlti}{多网格程序壳。}
+\end{flisti}
+
+\noindent
+{\file ww3\_multi} 的网格输出整合 \hfill {\file ww3\_gint.ftn}
+
+\begin{flisti}
+\fit{w3gint}{用于整合平均波浪参数网格场的后处理程序。}
+\fit{w3exgi}{实际输出例程（内部）。}
+\end{flisti}
+
+\noindent
+网格数据后处理程序 \hfill {\file ww3\_outf.ftn}
+
+\begin{flisti}
+\fit{w3outf}{平均波浪参数网格场的后处理程序。}
+\fit{w3exgo}{实际输出例程（内部）。}
+\end{flisti}
+
+\pb \noindent
+网格数据后处理程序（NetCDF） \hfill {\file ww3\_ounf.ftn}
+
+\begin{flisti}
+\fit{w3ounf}{平均波浪参数网格场的后处理程序，使用 Fortran90 的 NetCDF3
+             或 NetCDF4 库。}
+\fit{w3crnc}{创建 NetCDF 文件，定义维度和头部数据。}
+\fit{w3exnc}{实际输出例程（内部）。}
+\end{flisti}
+
+\noindent
+网格数据后处理程序（GrADS） \hfill {\file gx\_outf.ftn}
+
+\begin{flisti}
+\fit{gxoutf}{把平均波浪参数网格场转换为 GrADS 输入文件的后处理程序。}
+\fit{gxexgo}{实际输出例程（内部）。}
+\end{flisti}
+
+\noindent
+网格数据后处理程序（GRIB） \hfill {\file ww3\_grib.ftn}
+
+\begin{flisti}
+\fit{w3grib}{用于生成 GRIB 文件的后处理程序。}
+\fit{w3exgb}{实际输出例程（内部）。}
+\end{flisti}
+
+% fig:post
+
+% \input{zh/sys/fig_post_zh}
+
+\noindent
+点后处理程序 \hfill {\file ww3\_outp.ftn}
+
+\begin{flisti}
+\fit{w3outp}{在选定位置输出的后处理程序。}
+\fit{w3expo}{实际输出例程（内部）。}
+\end{flisti}
+
+\noindent
+点后处理程序 \hfill {\file ww3\_ounp.ftn}
+
+\begin{flisti}
+\fit{w3ounp}{使用 NetCDF 在选定位置输出的后处理程序。}
+\fit{w3crnc}{创建 NetCDF 文件，定义维度和头部数据。}
+\fit{w3exnc}{实际输出例程（内部）。}
+\end{flisti}
+
+\noindent
+点后处理程序（GrADS） \hfill {\file gx\_outp.ftn}
+
+\begin{flisti}
+\fit{gxoutp}{把选定位置的输出转换为 GrADS 输入文件的后处理程序。}
+\fit{gxexpo}{实际输出例程（内部）。}
+\end{flisti}
+
+\noindent
+轨迹输出后处理程序 \hfill {\file ww3\_trck.ftn}
+
+\begin{flisti}
+\fit{w3trck}{把无格式直接访问轨迹输出文件转换为整数打包格式化文件。}
+\end{flisti}
+
+\noindent
+轨迹输出后处理程序 \hfill {\file ww3\_trnc.ftn}
+
+\begin{flisti}
+\fit{w3trck}{把无格式直接访问轨迹输出文件转换为 NetCDF 文件。}
+\fit{w3crnc}{创建 NetCDF 文件，定义维度和头部数据。}
+\fit{w3exnc}{实际输出例程（内部）。}
+\end{flisti}
+
+\noindent
+波场跟踪后处理程序 \hfill {\file ww3\_systrk.ftn}
+
+\begin{flisti}
+\fit{w3systrk}{在空间和时间上跟踪波场。}
+\end{flisti}

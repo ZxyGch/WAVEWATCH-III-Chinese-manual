@@ -1,0 +1,74 @@
+\vsssub
+\subsubsection{~连续移动网格} \label{sub:num_move}
+\opthead{MGx}{\ws}{H. L. Tolman}
+
+\addcontentsline{toc}{subsubsection}{\strut \hspace{24mm} 一般概念}
+
+
+为处理飓风等快速变化、小尺度条件下的波浪增长问题，模式 3.02 版加入了一个选项，可向网格添加给定的连续平流速度。该模式版本在 \cite{tol:OMOD05b} 中有详细说明。这里仅给出简要描述。
+
+
+
+\begin{center}
+\rule[1mm]{55mm}{1.0mm} WARNING \rule[1mm]{55mm}{1.0mm} \\
+ \vspace{\baselineskip}
+\parbox{120mm}{\ws\ 的连续移动网格版本仅用于在高度理想化条件下测试波浪模式性质。该模式版本只应在无平均流、无陆块的深水条件下使用。此外，为避免大圆传播带来的复杂性，只应使用 Cartesian 网格。该选项也仅针对传播选项 {\F pr1} 和 {\F pr3} 实现。注意，无论在编译阶段还是运行阶段，脚本或程序都不会检查这些条件。该选项不被视为适合一般应用。} \\
+\vspace{\baselineskip}
+\rule[1mm]{55mm}{1.0mm} WARNING \rule[1mm]{55mm}{1.0mm}
+\end{center}
+
+\noindent
+对于上述应用，式~(\ref{eq:bal_plane}) 可写为
+
+\begin{equation}
+\frac{\partial N}{\partial t} + 
+\left ( {\bf\dot{x}}-{\bf{v}}_g \right ) \cdot \nabla_x N  = 
+\frac{S}{\sigma} \: , \label{eq:bal_move}
+\end{equation}
+
+\noindent
+其中 ${\bf{v}}_g$ 表示网格的平流速度。该选项在编译模式时选择。第二个编译级选项允许把网格平流速度 ${\bf{v}}_g$ 加到风场上。这样提供了一种简单方法，可保证风场质量守恒不依赖于实际和瞬时的网格平流速度。平流速度 ${\bf{v}}_g$ 可随时间变化，并由用户在模式运行时提供（见下文）。
+
+
+
+
+在式~(\ref{eq:bal_move}) 适用的简化条件下，如果考虑到该方程等价于
+
+\begin{equation}
+\frac{\partial N}{\partial t} + 
+\nabla_x \cdot \left ( {\bf\dot{x}}-{\bf{v}}_g \right ) N  = 
+\frac{S}{\sigma} \: , \label{eq:bal_move2}
+\end{equation}
+
+\noindent
+则移动网格的实现很直接。这又意味着，对于求解式~(\ref{eq:bal_plane}) 的任意数值格式，平流速度 ${\bf{v}}_g$ 可直接加到 ${\bf\dot{x}}$ 中。由于这会影响净平流速度，也会影响稳定性特征。该影响已通过在式~(\ref{eq:dtpl}) 的实际传播时间步长计算中包含移动网格速度而自动考虑。因此，用户只需提供代表 $\bf{v}_g = 0$ 情形的合适最大传播时间步长。
+
+由于频率相同但传播方向不同的谱分量在网格中的停留时间不同，网格运动会对 Garden Sprinkler Effect (GSE) 产生表观影响。当前 GSE 缓解方法对较年轻涌浪往往比对较老涌浪更有效。因此，在移动网格中停留时间较长的涌浪往往表现出更明显的 GSE \citep[见][]{tol:OMOD05b}。为缓解 GSE 缓解中的这种表观不平衡，将式~(\ref{eq:GSE_avg}) 替换为
+
+\begin{equation}
+\pm \gamma_a \gamma_{a,s} \: \Delta c_g \: \Delta t \: \bs \:\:\: ,
+\pm \gamma_a \gamma_{a,n} \: c_g \Delta \theta \: \Delta t \: \bn \:\:\: ,
+\label{eq:move_GSE_avg1}
+\end{equation}
+
+\begin{equation}
+\gamma_a = \left ( \frac{|\dot{\bf{x}}|}{|\dot{\bf{x}}-\bf{v}_g|}
+\right ) ^{p}
+\label{eq:move_GSE_avg2}
+\end{equation}
+
+\noindent
+其中 $\gamma_a$ 是考虑网格运动的修正因子，幂次 $p$ 是允许一定调节的参数。采用该修改后，可根据相应谱分量在移动网格中的预期停留时间，重新缩放所施加的平滑量，从而使 GSE 影响在网格上分布得更均匀 \citep[见][]{tol:OMOD05b}。
+
+
+为开启移动网格选项或风场/GSE 修正，在 \ws\ 源代码中加入了三个可选开关（另见 \para\ref{sec:switches}）：
+
+\begin{slist}
+\sit{mgp} {Apply advection correction for continuous moving grid.}
+\sit{mgw} {Apply wind correction for continuous moving grid.}
+\sit{mgg} {Apply GSE alleviation for
+           continuous moving grid.}
+\end{slist}
+
+\noindent
+平流速度和方向输入到 shell 的方式类似于均匀流输入（见第~\ref{sec:ww3shel} 节中 {\file ww3\_shel.inp} 文件底部），只是把关键字 `{\code CUR}' 换为 `{\code MOV}'。与所有均匀输入场一样，平流速度可随时间变化。移动网格模式运行示例见测试算例 {\file ww3\_ts3}。第 \ref{sec:ww3multi} 节中的 {\file ww3\_multi.inp} 也有类似能力，并在测试算例 {\file mww3\_test\_05} 中测试。

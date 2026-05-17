@@ -1,0 +1,108 @@
+\vssub
+\subsection{~关于本手册}
+\vssub
+
+本文档是 \ww\ 风浪建模框架 \WWver\ 版本的用户手册和系统文档。
+虽然该框架的代码管理主要由 NCEP/NOAA 负责，模式开发本身则依赖一个开发者社区，
+即下文列出的 \ws\ 开发组（WW3DG）。本手册按如下方式说明波浪建模框架。
+
+\begin{list}{$\bullet$}{\rightmargin 5mm \parsep 0mm \itemsep 0mm}
+\item \textbf{第~\ref{chapt:eq} 章}：控制方程，
+\item \textbf{第~\ref{chapt:num} 章}：数值方法，
+\item \textbf{第~\ref{chapt:run} 章}：模式结构和数据流，
+\item \textbf{第~\ref{chapt:impl} 章}：安装、编译和运行，
+\item \textbf{第~\ref{chapt:sys} 章}：通用代码结构以及不同方面实现细节的说明。
+\end{list}
+
+希望安装该框架的用户可以直接跳到第~\ref{chapt:impl} 章，
+然后依次修改示例运行中的输入文件（例如第~\ref{chapt:run} 章）。
+不过，这并不能替代对 \ws\ 的深入理解；这种理解需要通过第~\ref{chapt:eq} 章
+到第~\ref{chapt:impl} 章的系统阅读来获得。
+
+本手册采用用户手册和系统文档合并的形式，目的是为用户提供必要背景，
+使其能够按照自身需求在框架中加入新的物理和数值方法。随着 \ws\ 发展为波浪建模框架，
+这种方式变得更加重要。按设计，用户可以应用自己的数值和/或物理方法，
+从而基于 \ws\ 框架开发新的波浪模式。在这种方式下，来自框架的优化、并行化、
+嵌套以及输入和输出服务程序可以很容易地在实际模式之间共享。
+
+尽管本文档旨在完整且自洽，但系统文档中的所有要素并非都达到同样详尽的程度。
+关于更多系统细节，请参考已经完整注释的源代码。请注意，\ws\ 代码开发最佳实践指南
+现已发布 \citep{tol:MMAB10a, tol:MMAB14b}。该建模框架的应用在文献中已有广泛记录，
+近期应用的一些综述可见 \cite{tol:WaF02}、\cite{art:HET09}、
+\cite{art:CET13a}、\cite{art:AET13}、\cite{art:RET14}、
+\cite{art:LiET14}、\cite{art:RAR14} 和 \cite{art:ZET18}。
+
+\vspace{\baselineskip}
+\noindent
+当前模式版本（\WWver）是在上一正式发布版（6.07 版本）基础上的新公开版本。
+自上一发布版以来，\ws\ \WWver\ 新增了如下功能并进行了如下代码结构调整。
+
+\begin{list}{$\bullet$}{\rightmargin 5mm \parsep 0mm \itemsep 0mm}
+
+\item 为下一模式版本做准备（模式版本 7.00）。
+
+\item 通过 WRST 开关新增在重启动文件中读取/写入风场的选项（模式版本 7.01）。
+
+\item 新增在多重网格中向曲线子网格插值输入场的能力（模式版本 7.02）。
+
+\item 新增第二路重启动文件写出流（模式版本 7.03）。
+
+\item 将代码中的版本报告改为日期字符串（模式版本 7.04）。
+
+\item 更新 IS2 默认参数化（模式版本 7.05）。
+
+\item 在 ST4 中加入 Romero 耗散（模式版本 7.06）。
+
+\item 更新潮汐及其 MPI 实现（模式版本 7.07）。
+
+\item 为非结构网格边界条件上的 CFL 提供可选的关闭选项（模式版本 7.08）。
+
+\item 为 ww3\_uprstr 新增风海和涌浪分量数据同化选项（模式版本 7.09）。
+
+\item 扩展 OASIS-NEMO 耦合模式系统的参数集合（模式版本 7.10）。
+
+\item 新增将边界条件输出到旋转经纬度网格的方法（模式版本 7.11）。
+
+\item 改进 NetCDF 网格化输出，使其更符合 CF 约定（模式版本 7.12）。
+
+\item 进行了大规模代码清理：移除对 NetCDFv3 的支持，将 NC4 设为默认；
+      将 F90 设为默认并移除 DUM 选项；移除编译器指令开关
+      （C90、NEC、SX6、SX8）；移除 Grib1 支持（NCEP1 开关）；
+      移除 OMPX 和 NCC 开关；移除实验性和补充开关
+      （XX0、XXX、FLXX、PRX、STX、NLX、BTX、DBX、TRX、BSX）；
+      并对构建系统进行了模块化和清理（模式版本 7.13）。
+
+\item 从 WW3 预处理器和 ftn 源代码目录转为使用 CPP 预处理器，
+      并使用 src 作为源代码目录（模式版本 7.14）。
+
+\end{list}
+
+\vspace{\baselineskip} \noindent
+关于本模式的最新信息（包括缺陷和缺陷修复）可在 \ws\ GitHub wiki 页面查看：
+\begin{center}
+\url{https://github.com/NOAA-EMC/WW3/wiki}
+\end{center}
+也可在 NCEP \ws\ 页面查看：
+\begin{center}
+\url{http://polar.ncep.noaa.gov/waves/wavewatch/}
+\end{center}
+评论、问题和建议应发送给代码管理者 Ali Abdolali（ali.abdolali@noaa.gov）
+和 Jose-Henrique Alves（henrique.alves@noaa.gov），或发送至通用 \ws\ 用户邮件列表：
+
+\begin{center}
+ncep.list.wwatch3.users@lstsrv.ncep.noaa.gov
+\end{center}
+
+\noindent
+对于 NCEP 之外贡献内容相关的问题，NCEP 会将问题转给相应代码作者。
+可在如下网页订阅 \ws\ 用户邮件列表：
+\begin{center}
+\footnotesize
+\url{https://www.lstsrv.ncep.noaa.gov/mailman/listinfo/ncep.list.wwatch3.users}
+\end{center}
+
+\nocite{tol:OMOD02b}
+\nocite{tol:PACO02}
+\nocite{tol:GAOS02}
+\nocite{tol:OMB02b}
+\nocite{tol:OMB02c}

@@ -1,0 +1,31 @@
+\vsssub
+\subsubsection{点输出后处理器} \label{sec:ww3outp}
+\vsssub
+
+\proddefH{ww3\_outp}{w3outp}{ww3\_outp.ftn}
+\proddeff{输入}{ww3\_outp.inp}{传统配置文件。}{10} (App.~\ref{sec:config161})
+\proddefa{mod\_def.ww3}{模式定义文件。}{20}
+\proddefa{out\_pnt.ww3}{原始点输出数据。}{20}
+\proddefa{NC\_globatt.inp}{附加全局属性。}{994}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{tab{\sl{nn}}.ww3 \opt}{平均参数表，其中
+{\file{\sl{nn}}} 为两位整数。}{\sl nn}
+\proddefa{\ldots \opt}{传输文件。}{user}
+
+\vspace{\baselineskip} 
+\vspace{\baselineskip} 
+\noindent 
+在 \ws{} 早期版本中，谱公报使用由 {\F itype = 1} 和 {\F otype = 3} 生成的谱数据传输文件以及 {\file w3split} 程序（见 section~\ref{sec:install}）生成。这是一段即将淘汰的代码，此处仅为向后兼容而提供。该程序从标准输入读取以下五条记录（不允许注释行）：
+
+\begin{list}{$\bullet$}{\itemsep 0mm \parsep 0mm}
+\item 输出位置名称。
+\item 表中使用的运行标识符。
+\item 输入文件名称。
+\item 标识 UNFORMATTED 输入文件的逻辑量。
+\item 输出文件名称。
+\end{list}
+
+\noindent
+以上所有字符串均以自由格式按字符读取，因此需要用引号括起。
+
+\pb

@@ -1,0 +1,17 @@
+\vssub
+\subsubsection{~一阶格式}
+\opthead{PR1}{\ws}{H. L. Tolman}
+
+\noindent
+在一阶格式中，$\theta$ 和 $k$ 空间中的通量使用式~(\ref{eq:1up_xy_1}) 至 (\ref{eq:1up_xy_3}) 计算（将 $\cN$ 替换为 $N$，并轮换相应计数器）。完整的一阶格式为
+
+% eq:1up_intra_tot
+
+\begin{equation}
+N_{i,j,l,m}^{n+1} = N_{i,j,l,m}^n 
+ + \frac{\Delta t}{\Delta \theta} \left [ \cF_{l,-} - \cF_{l,+} \right ]
+ + \frac{\Delta t}{\Delta k_m} \left [ \cF_{m,-} - \cF_{m,+} \right ]
+\: , \label{eq:1up_intra_tot} \end{equation}
+
+\noindent
+其中 $\Delta \phi$ 为方向增量，$\Delta k_m$ 为（局地）波数增量。低波数边界条件通过对 $m=1$ 取 $\cF_{m,-}=0$ 施加；高波数边界条件则使用参数化近似 (\ref{eq:tail_N_k}) 计算 $N$，即把离散网格向高波数方向扩展一个网格点。

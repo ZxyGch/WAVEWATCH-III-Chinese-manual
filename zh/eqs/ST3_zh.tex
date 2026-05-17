@@ -1,0 +1,151 @@
+\vsssub
+\subsubsection{~$S_{in} + S_{ds}$：\wam\ cycle 4 (ECWAM)} \label{sec:ST3}
+\vsssub
+
+\opthead{ST3}{\wam\ 模型}{F. Ardhuin}
+
+\noindent 
+这里描述的风--浪相互作用源项基于 \cite{art:Miles57} 的波浪增长理论，并由 \cite{art:Jan82} 修正。导致部分波浪生成的压力--坡度相关项按照 \cite{art:Jan91} 进行参数化。
+
+该参数化又由 \cite{rep:AB02} 扩展，以考虑不稳定大气条件下更强的阵风性。该效应已包含在当前参数化中，并通过可选的 {\code STAB3} 开关激活。{\code STAB3} 中使用的公式不在此处说明；读者可参阅 \cite{rep:AB02}。如果使用 {\code STAB3}，海气温差应由用户提供，例如使用 {\file ww3\_prep}。
+
+当前实现已尽量接近 ECWAM 模型 \citep{rep:Bea05} 中的实现，特别是应力查找表已经验证为相同。后续修改包括在风输入中加入负值部分，以表示涌浪耗散。
+
+源项写为 \citep{bk:Jan04}
+\begin{equation}
+\cS_{in}(k,\theta) =
+\frac{\rho_a}{\rho_w}\frac{\beta_{\mathrm{max}}}{\kappa^2}{\mathrm e}^{Z}Z^4
+\left(\frac{u_\star}{C}+z_\alpha\right)^2 \cos^{p_{in}}(\theta - \theta_u) \sigma N
+\left(k,\theta\right) + S_{out}(k,\theta),\label{eq:SinWAM4}
+\end{equation}
+
+\noindent 其中 $\rho_a$ 和 $\rho_w$ 为空气和水的密度，$\beta_{\mathrm{max}}$ 是无量纲增长参数（常数），$\kappa$ 是 von K\'{a}rm\'{a}n 常数，$p_{in}$ 是控制 $\cS_{in}$ 方向分布的常数。在当前实现中，空气/水密度比 ${\rho_a}/{\rho_w}$ 为常数。定义 $Z=\log(\mu)$，其中 $\mu$ 由 \cite{art:Jan91} 式（16）给出，并已针对中等水深修正，因此
+
+\begin{equation}
+Z=\log(k z_1)+\kappa/\left[\cos\left(\theta - \theta_u\right)
+\left(u_\star/C + z_\alpha \right)\right],
+\end{equation}
+
+\noindent
+其中 $z_1$ 是由波浪支撑应力 $\tau_w$ 修正的粗糙长度，$z_\alpha$ 是波龄调节参数\footnote{虽然这一调节参数 $z_\alpha$ 在 WAM-Cycle4 文档中描述得并不充分，但它对波浪增长有重要影响。它本质上会移动长波的波龄，这通常会增强增长，甚至生成比风速更快的波浪。这可表示风中的某些阵风性，并且可能应依赖分辨率。作为参考，R. Lalbeharry 曾发现，该参数在 SWAN 模型早期版本中设置不当。}。如果摩擦速度 $u_\star$ 已知，它给出粗糙度 $z_1$ 和高度 $z_u$（默认 $z_u=10$~m）处的风速：
+\begin{eqnarray}
+z_1&=&\alpha_0 \frac{\tau}{ \sqrt{1-\tau_w/u_\star^2}}, \\
+U(z_u)&=&\frac{u_\star}{\kappa} \log\left(\frac{z_u}{z_1}\right) 
+\end{eqnarray}
+
+\noindent
+实际中，这两个方程给出了 $u_\star$ 对 $U_{10}$ 和 $\tau_w/\tau$ 的隐式函数关系。该关系随后被制成表 \citep{art:Jan91, rep:Bea07}。
+
+该参数化的一个重要部分是波浪支撑应力 $\tau_w$ 的计算：
+
+\begin{equation}
+\tau_w=\left|\int_0^{k_{\max}} \int_0^{2 \pi} \frac{\cS_{in}(k',\theta)}{C}
+\left(\cos \theta, \sin \theta \right)  {\mathrm d} k' \mathrm d \theta +
+\tau_{\mathrm{hf}}(u_\star,\alpha) \left(\cos \theta_u, \sin \theta_u \right)
+\right|,\label{eq:tauwint}
+\end{equation}
+
+\noindent
+其中包括谱中已解析部分（直到 $k_{\max}$）以及更短波浪所支撑的应力 $\tau_{\mathrm{hf}}$。假设最高频率之外有一个 $f^{-X}$ 诊断尾部，则 $\tau_{\mathrm{hf}}$ 为
+
+\begin{eqnarray}
+\tau_{\mathrm{hf}}(u_\star,\alpha)&= &\frac{u_{\star}^2}{g^2}
+\frac{\sigma_{\max}^X 2 \pi \sigma }{2 \pi C_g(k_{\max})} \int_0^{2 \pi} N
+\left(k_{\max},\theta \right)
+\max\left\{0,\cos\left(\theta-\theta_u\right)\right\}^3 d \theta \nonumber \\
+& & \times \frac{\beta_{\mathrm{max}}}{\kappa^2}
+\int_{\sigma_{\max}}^{0.05*g/u_\star} \frac{{\mathrm
+e}^{Z_{\mathrm{hf}}}Z_{\mathrm{hf}}^4}{\sigma^{X-4}} {\mathrm d} \sigma
+\label{eq:tauhfint}
+\end{eqnarray}
+
+\noindent
+其中第二个积分仅是 $u_\star$ 和 Charnock 系数 $\alpha$ 的函数，易于制表。实际代码中取 $X=5$，变量 $Z_{\mathrm{hf}}$ 定义为
+
+\begin{equation}
+Z_{\mathrm{hf}}(\sigma)=\log(k z_1)+\min\left\{\kappa/\left(u_\star/C +
+z_\alpha \right),20\right\}.
+\end{equation}
+
+\noindent
+该参数化对 $k_{\max}$ 处的谱能级敏感。更高的谱能级会导致更大的 $u_\star$，并因而通过 $z_1$ 对风输入产生正反馈。高频谱能级通过耗散项受到涌浪存在的影响，这会进一步加剧这种敏感性。
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|} \hline \hline
+参数         &  WWATCH 变量           & 名称列表 & WAM4 & BJA   & Bidlot 2012 \\
+\hline
+  $z_u$ &  ZWND                       & SIN3 & 10.0    & 10.0   & 10.0   \\
+  $\alpha_0$ &  ALPHA0                & SIN3 & 0.01    & 0.0095 &  0.0095 \\
+  $\beta_{\mathrm{max}}$ & BETAMAX    & SIN3 & 1.2     & 1.2    & 1.2  \\
+  $p_{\mathrm{in}}$ &  SINTHP         & SIN3 & 2       & 2      & 2  \\
+  $z_\alpha$ &  ZALP                  & SIN3 & 0.0110  & 0.0110 &  0.0080 \\
+  $s_1$ &  SWELLF                     & SIN3 & 0.0     & 0.0    & 1.0   \\
+\hline
+\end{tabular} \end{center}
+\caption{WAM4、BJA 和 ECWAM 模型 2012 更新中的参数值。这些源项参数化可通过 {\F SIN3} 和 {\F SDS3} 名称列表重新设置。BJA 通常优于 WAM4。ST3 的默认参数对应 BJA。请注意，变量名只适用于名称列表；在源项模块中，变量名略有不同，会将首字母重复，以便与指向这些变量的指针区分。} \label{tab:WAM4_parSIN}
+\botline
+\end{table}
+
+\begin{table}[htb] 
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|} \hline \hline
+参数                               &  WWATCH 变量         & 名称列表 & WAM4 & BJA   & Bidlot 2012 \\
+\hline
+  $C_{\mathrm{ds}}$                 &  SDSC1          & SDS3 & -4.5 & -2.1& -1.33       \\
+  $p$                               &  WNMEANP        & SDS3 & -0.5 & 0.5 &  0.5        \\
+  $p_{\mathrm{tail}}$               &  WNMEANPTAIL    & SDS3 & -0.5 & 0.5 &  0.5        \\
+  $\delta_1$                        &  SDSDELTA1      & SDS3 & 0.5  & 0.4 &  0.5        \\
+  $\delta_2$                        &  SDSDELTA2      & SDS3 & 0.5  & 0.6 &  0.5 \\
+  \hline \hline
+\end{tabular} \end{center}
+\caption{WAM4、BJA 以及 \cite{pro:Bid12} 更新中的参数值。这些源项参数化可通过 {\F SDS3} 名称列表重新设置。BJA 通常优于 WAM4。请注意，变量名只适用于名称列表；在源项模块中，变量名略有不同，会将首字母重复，以便与指向这些变量的指针区分。} \label{tab:WAM4_parSDS}
+\botline
+\end{table}
+
+
+业务化 ECWAM 模型在 2009 年 9 月引入了涌浪的线性阻尼。其形式由 \cite{bk:Jan04} 给出：
+
+\begin{equation}
+S_{out}(k,\theta)= 2 s_1  \kappa \frac{\rho_a }{\rho_w} \left(\frac{u_\star}{C}\right)^2 
+\left[\cos \left(\theta - \theta_u\right) - \frac{\kappa C}{u_\star \log(k z_0)}\right]
+\end{equation}
+
+\noindent 其中使用该阻尼时 $s_1$ 设为 1，否则为 0。当 $s_1=0$ 时，该参数化为 WAM4 或 BJA 参数化（见表 \ref{tab:WAM4_parSIN}）。
+
+由于与 WAM3 相比高频输入增加，Janssen (1994) 基于 WAM3 耗散调整了耗散函数，随后 \cite{rep:Bea05} 又对其形状进行了重塑。后一项修改称为“BJA”，即 Bidlot、Janssen 和 Abdallah。一个更新的修改显著改善了太平洋涌浪的模型结果，但代价是最高海况被低估。这对应于 IFS 版本 CY38R1 中的 ECMWF WAM 模型 \citep{pro:Bid12}。注意，这些参数是针对业务 ECMWF 分析中的中性风使用而优化的。将这些参数用于其他风场产品时可能需要重新调校这些系数。例如，对于 NCEP 或 CFSRR 风，BETAMAX 可能应减小，或 ZWND 增大。
+
+
+WAM4 耗散项的一般形式为
+
+\begin{equation}
+S_{ds}\left(k,\theta\right)^{\mathrm{WAM}} = C_{ds} \overline{\alpha}^2
+ \overline{\sigma} \left[\delta_1 \frac{k}{\overline{k}} + \delta_2
+\left(\frac{k}{\overline{k}}\right)^2\right]\label{eq:SdsWAM4}
+N\left(k,\theta\right)
+\end{equation}
+
+\noindent
+其中 $C_{ds}$ 为无量纲常数，$\delta_1$ 和 $\delta_2$ 为权重参数，
+
+\begin{equation}
+\overline{k}=\left[\frac{\int k^p N\left(k,\theta\right) {\mathrm d}
+\theta}{\int N\left(k,\theta\right) {\mathrm d} \theta}\right]^{1/p}
+\end{equation}
+
+\noindent
+其中 $p$ 为常数幂。类似地，平均频率定义为
+
+\begin{equation}
+\overline{\sigma}=\left[\frac{\int \sigma^p N\left(k,\theta\right) {\mathrm d}
+\theta}{ \int N\left(k,\theta\right) {\mathrm d} \theta}\right]^{1/p},
+\end{equation}
+
+\noindent
+因此平均陡度为 $\overline{\alpha}=E \overline{k}^2$。
+
+平均频率也出现在源项预报积分最高频率的定义中。由于该频率的定义可能不同于源项中的定义，因此使用另一个指数 $p_{\mathrm{tail}}$ 来定义。
+
+遗憾的是，这些参数化对涌浪敏感。涌浪高度增加通常会降低风海峰处的耗散，因为平均波数 $\overline{k}$ 以及平均陡度 $\overline{\alpha}$ 会减小。对于 WAM-Cycle 4 和 BJA 参数化中采用的 $p< 2$，这种敏感性更强，而且与长波对短波调制的预期效应相反。
+
+源项代码已经泛化，可通过简单改变 {\F SIN3} 和 {\F SDS3} 名称列表中的参数来使用 WAM4、BJA 或其他 ECWAM 参数化，见表 \ref{tab:WAM4_parSIN} 和 \ref{tab:WAM4_parSDS}。目前，名称列表参数的默认值对应 BJA \citep{rep:Bea05}。

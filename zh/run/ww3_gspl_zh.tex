@@ -1,0 +1,26 @@
+\vsssub
+\subsubsection{ww3\_multi 的自动网格拆分 (ww3\_gspl)} \label{sub:ww3gspl}
+\vsssub
+
+\proddefH{ww3\_gspl}{w3gspl}{ww3\_gspl.ftn}
+\proddeff{输入}{ww3\_gspl.inp}{传统配置文件。}{10} (App.~\ref{sec:config091})
+\proddefa{mod\_def.{\it xxx}}{待拆分网格的模式定义文件。}{11}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{{\it xxx}.bot}{子网格的水深文件。}{11}
+\proddefa{{\it xxx}.obst}{子网格的障碍物文件。}{11}
+\proddefa{{\it xxx}.mask}{子网格的掩膜文件。}{11}
+\proddefa{{\it xxx}.tmpl}{子网格的 {\file ww3\_grid.inp}。}{11}
+\proddefa{ww3\_multi.{\it xxx}.{\it n}}{需要修改的 {\file
+ww3\_multi.inp} 部分模板。}{11}
+\proddefa{ww3.ww3\_gspl}{包含子网格地图的 GrADS 文件（使用开关 {\F o16}）。}{35}
+\proddefa{ww3.ctl}{GrADS 地图控制文件（{\F o16}）。}{35}
+
+\vspace{\baselineskip} 
+\noindent 
+为进一步自动化网格拆分，提供了脚本 {\file ww3\_gspl.sh}。该脚本运行 {\file ww3\_gspl}，随后为所有子网格生成 {\file mod\_def} 文件。若提供了文件 {\file ww3\_multi.inp}，该文件也会被更新。脚本的工作方式可通过命令行标志 {\file -h} 显示，其输出如图~\ref{fig:gspl} 所示。
+
+\pb
+
+\input{zh/run/fig_gspl_zh}
+
+\clearpage

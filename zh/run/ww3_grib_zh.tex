@@ -1,0 +1,26 @@
+\vsssub
+\subsubsection{网格 GRIB 输出后处理器} \label{sec:ww3grib}
+\vsssub
+
+\proddefH{ww3\_grib}{w3grib}{ww3\_grib.ftn}
+\proddeff{输入}{ww3\_grib.inp}{传统配置文件。}{10} (App.~\ref{sec:config151})
+\proddefa{mod\_def.ww3}{模式定义文件。}{20}
+\proddefa{out\_grd.ww3}{原始网格输出数据。}{20}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{gribfile}{GRIB 文件。}{50}
+
+\vspace{\baselineskip} 
+\noindent
+该后处理器将平均波浪参数场打包为 GRIB 格式，可使用 GRIB version II 和 \ncep{} 的 w3 与 bacio 库例程，或使用 GRIB2 及 NCEP 的业务软件包。附加打包数据见第~\pageref{tab:fields} 页表~\ref{tab:fields}。
+
+GRIB 打包使用 \ncep{} 的 GRIB 表，见 \cite{rep:GRIB1}。由于 w3 和 bacio 例程并非完全可移植，它们不随代码提供。用户必须提供相应例程。建议使用强制开关组中包含 `{\F nogrb}' 开关的附加 \ws{} 开关来激活这些例程，就像目前 \ncep{} 例程的情况一样。GRIB2 打包按照 \cite{rep:GRIB2} 执行，并使用 NCEP 的标准业务软件包。
+
+表~\ref{tab:fields} 显示用于 GRIB 打包的 {\F kpds(5)} 数据值。对于分区数据，第一个数字表示风海，第二个数字表示涌浪。多数数据作为表面数据打包（{\F
+kpds(6) = 0}）。不过，对于分区涌浪场，连续场会按连续层打包，层类型指示符设为（{\F
+kpds(6) = 241}）。{\F kpds(7)} 标识实际层或涌浪场编号。
+
+表~\ref{tab:fields} 还显示若干用于 GRIB2 打包的 {\F kpds} 数据值。表中第一个数字表示 {\F listsec0(2)}，用于标识 discipline 类型（例如海洋学、气象学等）。第二个数字表示 {\F kpds(1)}，用于标识该 discipline 类型内的参数类别（例如波浪、环流、海冰等）。第三个数字表示 {\F kpds(2)}，用于标识实际参数。对于分区数据，A/B 表示 A 用于风海、B 用于涌浪。此外，{\F kpds(10) = 0} 用于表面数据，{\F kpds(10) = 241 } 用于在连续层上打包连续涌浪场。{\F kpds(12)} 标识实际层或涌浪场编号。
+
+尽管上述输入文件包含 \ws{} 全部 31 个输出场的标志，但并非所有场都可打包为 GRIB。如果选择了没有 GRIB 打包支持的参数，程序会向标准输出打印消息。表~\ref{tab:fields} 显示哪些参数可打包为 GRIB。注意，在 \ncep{}，从 GRIB 到 GRIB2 的转换与分区波浪模式输出的引入同时发生。这导致 GRIB 中出现一些重复定义，并导致 GRIB 和 GRIB2 打包之间出现一些表面上的不一致。
+
+\pb

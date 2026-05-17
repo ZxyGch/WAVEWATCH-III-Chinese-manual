@@ -1,0 +1,314 @@
+\vsssub
+\subsubsection{~$S_{\mathrm{in}} + S_{\mathrm{ds}}$：基于饱和度的耗散} \label{sec:ST4}
+\vsssub
+
+\opthead{ST4}{\ws}{F. Ardhuin, J.-F. Filipot \& L. Romero}
+
+\noindent
+这一参数化族使用来自 WAM cycle 4 的风输入正值部分，并对 $u_\star$ 作经验性削减，
+以便同基于饱和度的耗散达到平衡；该耗散项对累积项提供了不同选项。饱和度和累积项
+的定义主要有三种选择。具体选择由 {\F SDSBCHOICE} 参数控制：{\F SDSBCHOICE=1}
+对应 \cite{art:Aea10}，{\F SDSBCHOICE=2} 对应 \cite{Filipot&Ardhuin2012}，
+{\F SDSBCHOICE=3} 对应 \cite{Romero2019} 以及后续调整，包括 \cite{art:AA23}。
+最后一种选项使用由局地谱密度定义的饱和度，因此在未达到阈值的方向上给出零耗散，
+从而得到宽得多的方向谱。更强的双峰性还通过把强调制效应用作累积项来实现。
+
+还可以通过修改 namelist 参数作许多其他调整。表 \ref{tab:ST4_parSIN} 和
+\ref{tab:ST4_parSDS} 给出了若干成功组合，其结果见
+\citep{art:RA13,art:SAG16,art:AA23}。为了获得最佳性能，应针对具体风场进一步率定。
+\cite{Stopa2018} 给出了这方面的指导。
+
+\vsssub
+\textbf{风输入和涌浪耗散}
+\vsssub
+
+式 (\ref{eq:SinWAM4}) 中对 $u_\star$ 的削减，是通过把它替换为对每个频率定义的
+$u_\star '(k)$ 来实现的：
+
+\begin{equation}
+\left(u_\star '\right)^2=\left|u_\star^2 \left(\cos \theta_u, \sin
+\theta_u \right) - \left|s_u\right| \int_0^k \int_0^{2 \pi}
+\frac{S_{in}\left(k',\theta \right)}{C}  \left(\cos \theta, \sin
+\theta \right)  {\mathrm d} k' \mathrm d
+\theta,\label{ustarp}\right|
+\end{equation}
+
+\noindent
+其中遮蔽系数 $\left|s_u\right|\sim 1$ 可用于调节强风下的应力；若 $s_u=0$，
+强风应力会被明显高估。当 $s_u > 0$ 时，该遮蔽也会应用于式 (\ref{eq:tauhfint})
+中的诊断尾部，这需要估计高频应力的三维查找表，第三个参数为尾部能级。
+
+前文在 {\code ST3} 中说明过的 {\code STAB3} 开关也可同 {\code ST4} 一起使用。
+若使用 {\code STAB3}，用户应提供海气温差，例如通过 {\file ww3\_prep} 提供。
+
+\cite{art:ACC09} 的涌浪耗散参数化通过把 $s_1$ 设为非零整数值来启用，它由黏性
+边界层取值
+
+\begin{equation}
+\cS_{\mathrm{out,vis}}\left(k,\theta\right) = - s_5 \frac{\rho_a}{\rho_w}\left\{ 2 k \sqrt{2
+\nu \sigma}\right\}  N \left(k,\theta\right) , \label{eq:Dore}
+\end{equation}
+
+\noindent
+和湍流边界层表达式
+\begin{equation}
+\cS_{\mathrm{out,tur}} \left(k,\theta\right) = - \frac{\rho_a}{\rho_w}\left\{  16 f_e
+\sigma^2 u_{\mathrm{orb},s} / g \right\}
+ N\left(k,\theta\right),  \label{eq:swell_turb}
+\end{equation}
+
+\noindent
+组合而成，完整项为
+\begin{equation}
+\cS_{\mathrm{out}} \left(k,\theta\right) = r_{vis} \cS_{\mathrm{out,vis}}\left(k,\theta\right)  +
+ r_{tur} \cS_{\mathrm{out,tur}}\left(k,\theta\right),
+ \label{eq:swell_comb}
+\end{equation}
+
+\noindent
+其中两个权重 $ r_{\mathrm{vis}} $ 和 $r_{\mathrm{tur}}$ 由修正的海气边界层显著
+Reynolds 数 $\mathrm{Re} = 2 u_{\mathrm{orb},s} H_s / \nu_{a}$ 定义：
+
+\begin{eqnarray}
+ r_{\mathrm{vis}} &=& 0.5 (1- \tanh((\mathrm{Re}-\mathrm{Re}_{c})/s_7), \\
+ r_{\mathrm{tur}}&=& 0.5 (1+ \tanh((\mathrm{Re}-\mathrm{Re}_{c})/s_7) .
+\end{eqnarray}
+显著表面轨道速度定义为
+\begin{equation} u_{\mathrm{orb},s} = 2 \left [  \int \!\!\!\! \int
+      \sigma^3 \: N(k,\theta) \: dk d\theta \right ] ^{1/2}
+      \: . \label{eq:ub_orbs} \end{equation}
+
+\noindent
+第一个方程 (\ref{eq:Dore}) 是 \cite{art:Dore78} 的线性黏性衰减，其中 $\nu_a$
+为空气黏性，$s_5$ 是 $O(1)$ 的调节参数。少量测试表明，阈值
+Re$_{c}=2 \times 10^5 \times (4~\mathrm{m}/H_s)^{(1-s_6)}$ 在 $s_6=0$
+时能给出合理结果，尽管它也可能是风速的函数，而且我们还无法解释其对 $H_s$ 的依赖。
+当 $s_6=1$ 时，接近 $2 \times 10^5$ 的常数阈值给出相似但精度较低的结果。
+
+\begin{landscape}
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline \hline
+参数         &  WWATCH 变量       & namelist & T471    & T471f       & T405          & T500         & T601     \\
+\hline
+  $z_u$ &  ZWND                       & SIN4 & 10.0    & 10.0        & 10.0          & 10.0         & 10.0        \\
+  $\alpha_0$ &  ALPHA0                & SIN4 & 0.0095  & 0.0095      & 0.0095        &  0.0095      & 0.0095      \\
+  $\beta_{\mathrm{max}}$ & BETAMAX    & SIN4 & 1.43    &\textbf{1.33}& \textbf{1.55} &\textbf{1.52} & \textbf{2.0}\\
+  $p_{\mathrm{in}}$ &  SINTHP         & SIN4 & 2       & 2           & 2             &  2           & \textbf{1}  \\
+  $z_\alpha$ &  ZALP                  & SIN4 & 0.006   & 0.006       & 0.006         &0.006         & 0.006       \\
+  $s_u$ &  TAUWSHELTER                & SIN4 & 0.3     & 0.3         & \textbf{0.0}  &\textbf{1.0}  & \textbf{0.5}\\
+  $s_1$ &  SWELLF                     & SIN4 & 0.66    & 0.66        & 0.8           &  0.8         & 0.66        \\
+  $s_2$ &  SWELLF2                    & SIN4 & -0.018  & -0.018      & -0.018        &  -0.018      &  -0.018     \\
+  $s_3$ &  SWELLF3                    & SIN4 &  0.022  &  0.022      &\textbf{0.015} &\textbf{0.015}&  0.022      \\
+  $\mathrm{Re}_c$ &  SWELLF4          & SIN4 &$1.5\X^5$& $1.5\X^5$   &$\mathbf{10^5}$&$\mathbf{10^5}$&  $1.5\X^5$ \\
+  $s_5$ &  SWELLF5                    & SIN4 & 1.2     & 1.2         & 1.2           &  1.2         & 1.2         \\
+  $s_6$ &  SWELLF6                    & SIN4 & 0.      & 0.          & 0.            & 0.           & 0.          \\
+  $s_7$ &  SWELLF7                    & SIN4 &3.6$\X^5$&3.6$\X^5$    &\textbf{0.0}   &\textbf{0.0}  & 3.6$\X^5$   \\
+  $z_r$ &  Z0RAT                      & SIN4 & 0.04    & 0.04        & 0.04          &  0.04        &   0.04      \\
+  $z_{0,\max}$ &  Z0MAX               & SIN4 & 1.002   & 1.002       &\textbf{0.002} &  1.002       &  1.002      \\
+\hline
+\end{tabular}
+\end{center}
+\caption{T471、T471f、T405、T500 和 T601 源项参数化的参数值，可通过 {\F SIN4}
+namelist 重新设置。请注意，变量名只适用于 namelist。在源项模块中，为了把这些变量
+同指向它们的指针区分开，变量名略有不同，其首字母会加倍；SWELLFx 则合并在一个
+数组 SSWELLF 中。加粗数值表示不同于 ww3\_grid 设置的默认值。} \label{tab:ST4_parSIN}
+\end{table}
+\end{landscape}
+
+使用 ECMWF 风场时，TEST471 通常在全球尺度上给出最佳结果，唯一严重问题是在
+$H_s > 8$~m 时存在低偏差。TEST451f 对应针对 NCEP/NCAR 的 CSFR 风再分析
+\citep{art:CFSRR10} 的重新调节，直到 $H_s = 15$~m 几乎都没有偏差。2012 年 3 月
+以前完成的模拟和论文使用了略有不同的数值，例如把 SWELLF7 设为 0 即可恢复
+TEST441 和 TEST441f；TEST471 也曾使用 $s_u=1$ 以及若干其他调整（见 4.18 版手册）。
+TEST405 对短风区略优；TEST500 的总体质量居中，但它还在同一公式中包含了水深诱导
+破碎，因此可能更适合水深受限条件。
+
+式 (\ref{eq:swell_turb}) 是非线性湍流衰减的参数化。把模型结果同观测比较时发现，
+模型倾向于低估大涌浪、高估小涌浪，并带有区域性偏差。这一缺陷很可能部分来自这些
+涌浪生成或非线性演化中的误差。不过这里选择把 $f_e$ 调整为风速和风向的函数：
+
+\begin{equation}
+f_e = s_1 f_{e,GM} + \left[\left|s_3\right| + s_2 \cos
+(\theta-\theta_u)\right]u_\star / u_{\mathrm{orb}},\label{fevar}
+\end{equation}
+
+\noindent
+其中 $f_{e,GM}$ 是 Grant and Madsen (1979)\nocite{art:GM79} 对无平均流的粗糙
+振荡边界层理论给出的摩擦因子；其粗糙长度取为风粗糙度 $z_1$ 的 $r_z$ 倍。
+系数 $s_1$ 为 $O(1)$ 的调节参数，$s_2$ 和 $s_3$ 是另外两个可调参数，用于表示
+风对振荡海气边界层的影响。当 $s_2 < 0$ 时，逆风涌浪比顺风涌浪耗散更强。进一步，
+若 $s_3 > 0$，$\cS_{out}$ 将作用于整个谱，而不仅限于涌浪。
+
+\vsssub
+\textbf{波浪破碎和海洋湍流效应}
+\vsssub
+
+耗散项按照 \cite{art:Phi85} 的一般思想，由波谱饱和度来参数化。饱和谱为
+\begin{equation}
+B\left(k,\theta\right)= \sigma k^3  N(k,\theta) \label{defB},
+\end{equation}
+它对应于表面位移谱的无量纲形式。一般来说，要从谱空间转到物理空间，需要在波数和
+方向上的有限谱带内对饱和度积分，以计算破碎概率，然后再把该积分反卷积为谱耗散率。
+由于这些操作耗时过高，我们实现了三种方法。第一种只对方向积分 \citep{art:Aea10}，
+第二种对频带积分 \citep{Filipot&Ardhuin2012}，最后一种完全不积分而直接使用
+$B$ 的局地值。选择哪一种版本由 namelist 参数 {\F SDSBCHOICE} 启用。
+
+由于使用在整个圆周上积分的饱和谱时，方向波谱过窄 \citep{art:AL06}，
+\citet{art:Aea10} 将积分限制在半宽为 $\Delta_\theta$ 的扇区内：
+\begin{equation}
+B'\left(k,\theta\right)=
+\int_{\theta-\Delta_\theta}^{\theta+\Delta_\theta} \sigma k^3 cos^{\mathrm{sB}}\left(\theta-
+\theta^{\prime}\right) N(k,\theta^{\prime}) \mathrm d
+\theta^{\prime} \label{defBofkprime}.
+\end{equation}
+因此，两个能量相同但方向相反的系统组成的海况，通常会比所有能量沿同一方向传播的
+海况产生更少的耗散。
+
+最后，我们把耗散项定义为基于饱和度的项和累积破碎项
+$S_{\mathrm{bk,cu}}$ 之和：
+\begin{eqnarray}
+\cS_{ds}(k,\theta)& =&  \sigma
+ \frac{C_{\mathrm{ds}}^{\mathrm{sat}}}{B^2_r} \left[ \delta_d
+\max\left\{  B\left(k\right) -
+B_r,0\right\}^2 \right.
+\nonumber \\
+  & & +  \left(1-\delta_d \right) \left. \max\left\{B'\left(k,\theta \right)- B_r
+ ,0\right\}^2\right]N(k,\theta)  \nonumber \\
+ & & + \cS_{\mathrm{bk,cu}}(k,\theta) + \cS_{\mathrm{turb}}(k,\theta) \label{Sds_all}.
+\end{eqnarray}
+其中
+\begin{equation}
+B\left(k \right)=\max\left\{B'(k,\theta), \theta \in [0,2
+\pi[\right\} \label{defBof}.
+\end{equation}
+各向同性部分（乘以 $\delta_d$ 的项）和方向相关部分（含 $1-\delta_d$ 的项）的组合，
+旨在对所得谱的方向展宽提供一定控制。
+
+累积破碎项 $\cS_{\mathrm{bk,cu}}$ 表示相速为 $C'$ 的大破碎波对海表的平滑作用，
+这些大破碎波会抹除相速为 $C$ 的较小波。由于在不同观测中估计这一效应存在不确定性，
+这里采用 \cite{art:Aea09} 的理论模型。简言之，波峰相对速度为矢量差的范数
+$\Delta_C =\left|\mathbf{C}-\mathbf{C}'\right|$，短波的耗散率就是大型破碎波越过
+短波的通过率，即 $\Delta_C \Lambda(\mathbf{C}) d\mathbf{C}$ 的积分；其中
+$\Lambda (\mathbf{C}) d\mathbf{C}$ 是单位表面上，速度分量位于 $C_x$ 到
+$C_x+dC_x$ 以及 $C_y$ 到 $C_y+dC_y$ 之间的破碎波峰长度 \citep{art:Phi85}。
+这里的 $\Lambda$ 由破碎概率推断。根据 Banner et al. (2000, figure 6,
+$b_T=22\left(\varepsilon-0.055\right)^2$)\nocite{art:BBY00}，并取其饱和度参数
+$\varepsilon$ 约为 $1.6\sqrt{B'(k,\theta)}$，主导波的破碎概率近似为
+\begin{equation}
+P=56.8\left(\max\{\sqrt{B'(k,\theta)}-\sqrt{B'_r},0\}\right)^2.\label{PBanner}
+\end{equation}
+不过，由于他们使用了过零分析，对给定波尺度而言，记录被另一尺度主导时会有许多波
+未被计数：在他们的分析中任意时刻只有一个波。这会使破碎概率相对于本文方法高估约
+2 倍 \citep{art:FAB10}，因为本文认为同一地点和时刻可以存在多个不同尺度的波。
+该效应通过简单地把 $P$ 除以 2 来修正。
+
+采用这一方法时，单位表面上的波峰长度谱密度（不论是否破碎）$l(\mathbf{k})$ 满足
+$\int l(\mathbf{k}) \mathrm{d}k_x \mathrm{d}k_y$，我们取
+\begin{equation}
+l(\mathbf{k})= 1/(2\pi^2 k),
+\end{equation}
+单位表面上的破碎波峰长度谱密度则为
+$\Lambda(\mathbf{k})=l(\mathbf{k})P(\mathbf{k})$。
+
+最后，{\code ST4} 中基于饱和度耗散的最后一种选项，是对 \citet{Romero2019}
+参数化的推广，为调制项定义提供了一定灵活性；设定 {\F SDSBCHOICE = 3} 即可启用。
+在这种情况下，波数矢量 $\mathbf{k}$ 的破碎波峰密度只取决于同一波数上的饱和度
+$B(\mathbf{k})$，不在方向或频率上积分（若应用于单色波谱，积分会带来问题），但它
+包含长波造成的强调制 $M_L$ 和依赖风的修正 $M_W$：
+\begin{equation}
+\Lambda (\mathbf{k}) = \frac{1}{k} \exp \left(-\frac{B_{\mathbf{r}}}{M_l(\mathbf{k})  B(\mathbf{k})}\right) M_L(\mathbf{k}) M_W(k).
+\end{equation}
+其中风因子为
+\begin{equation}
+ M_W(k)=\left( 1+ D_W  \max(1,k/k_0) \right) / (1+D_W),
+\end{equation}
+其中 $k_0=g (3/ 28 u_\star)^2$；使用 DIA 时 $D_W$ 调整为 0.9，使用精确非线性
+相互作用时 $D_W=2$。长波调制或者作用于 $B$（若 $N_\theta > 0$），并采用上面给出
+的 $ M_l(k,\theta)$ 形式；或者如 \cite{Romero2019} 那样作用于 $\Lambda$，形式为
+\begin{equation}
+ M_L(k,\theta)=\left( 1+ M_\Lambda \sqrt{\mathrm{mss}'(k,\theta)}  \right)^{1.5}.
+\end{equation}
+在该表达式中，累积斜率 $\mathrm{mss}'$ 可以是 $\mathrm{mss}(k,\theta)$；若
+$N_\theta=0$，则强制其具有 $\cos^2 (\theta-\theta_w)$ 变化，其中 $\theta_w$ 是
+平均主导波方向（与 $k$ 无关）。在 \cite{Romero2019} 中，$\Lambda$ 的这种强
+$\cos^2$ 方向依赖是产生强双峰谱的关键，它也可能补偿各向同性耗散率。事实上，
+{\F SDSBCHOICE = 3} 的完整源项为
+\begin{eqnarray}
+\cS_{ds}(k,\theta)=  \frac{C_{\mathrm{ds}}^{\mathrm{sat}} (\sqrt{B(k)}-\sqrt{B_T} )^2.5}{g^2} \Lambda (k,\theta) c^5 + \cS_{\mathrm{bk,cu}}(k,\theta) + \cS_{\mathrm{turb}}(k,\theta) \label{Sds_all}. \nonumber \\
+\end{eqnarray}
+需要注意，耗散率 $b=C_{\mathrm{ds}}^{\mathrm{sat}} (\sqrt{B(k)}-\sqrt{B_T} )^2.5/{g^2}$
+中使用的饱和度是沿方向积分的，并使用真正的阈值 $B_T$，它不同于 $\Lambda$ 表达式
+中的 $B_r$。此外，对 \cite{Romero2019} 的推广允许使用对 $B$ 或 $\Lambda$ 的调制，
+并为该调制的方向分布提供不同选项。该破碎项还可与 \cite{art:Aea10} 的累积项以及
+\citet{art:AJ06} 的波-湍流相互作用项组合。
+
+对于 {\F SDSBCHOICE} 的三种选择，附加的累积项和波-湍流相互作用项都以相同方式计算。
+假设任一破碎波都会瞬时耗散所有频率至少高出一个因子 $r_{\mathrm{cu}}$ 的波的能量，
+则累积耗散率就等于这些较短波被较大破碎波追上的速率乘以谱密度，即
+\begin{equation}
+\cS_{\mathrm{bk,cu}}(k,\theta) = -C_{\mathrm{cu}}  N \left(k,\theta\right) \int_{f' < r_{\mathrm{cu}} f } \Delta_C \Lambda(\mathbf{k'}) \mathrm{d\mathbf{k'}},
+\label{Sds_cu1}
+\end{equation}
+其中 $r_{\mathrm{cu}}$ 定义会抹除短波的长波频率最大比值。这样得到源项
+\begin{eqnarray}
+\cS_{\mathrm{bk,cu}}(k,\theta) &=&  \frac{-14.2 C_{\mathrm{cu}}}{\pi^2}  N \left(k,\theta\right)
+ \nonumber \\
+& &\int_0^{ r^2_{\mathrm{cu}} k }\int_0^{2\pi}
+\max \left\{\sqrt{B(f',\theta')}-\sqrt{B_r},0\right\}^2
+\mathrm{d}\theta' \mathrm{d}k'.
+\label{Sds_sat_isotropic}
+\end{eqnarray}
+这里取 $r_{\mathrm{cu}}=0.5$，$C_{\mathrm{cu}}$ 是预期为 1 量级的调节系数，
+同时也修正 $l$ 估计中的误差。
+
+最后，\cite{art:TB02} 和 \cite{art:AJ06} 的波-湍流相互作用项为
+
+\begin{equation}
+\cS_{\mathrm{ds}}^{\mathrm{TURB}}\left(k,\theta\right) = - 2
+C_{\mathrm{turb}} \sigma \cos(\theta_u - \theta) k \frac{\rho_a
+u_\star^2}{g \rho_w}  N\left(k,\theta\right) .
+\end{equation}
+
+\noindent
+系数 $C_{\mathrm{turb}}$ 为 1 量级，可用于调整海洋层结和波群性。
+
+所有相关源项参数都可通过 namelist {\F SIN4} 和 {\F SDS4} 设置，从而得到
+TEST441b、TEST405（均由 \cite{art:Aea10} 描述）或 TEST500（由 \cite{art:FA12}
+描述）等参数化（见表 \ref{tab:ST4_parSIN} 和 \ref{tab:ST4_parSDS}）。请注意，
+在 TEST441b 中 DIA 常数 $C$ 已作小幅调整，$C=2.5\times 10^7$。TEST441f 对应使用
+NCEP/NCAR 风场时重新调节的风输入公式。
+
+\begin{landscape}
+\begin{table} \begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline \hline
+参数                               &  WWATCH 变量  & namelist  & T471        & T405             & T500         & T601        & T700  \\
+\hline
+ 				   & SDSBCHOICE    & SDS4      &  1          &     1            & \textbf{2}   & 1           & \textbf{3}  \\
+  $f_{\mathrm{FM}}$                &  FXFM3        & SDS4      & 2.5         & 2.5              &\textbf{9.9}  & 5           & \textbf{20} \\
+  $C_{\mathrm{ds}}^{\mathrm{sat}}$ & SDSC2         & SDS4      &$-2.2\X^{-5}$&$-2.2\X^{-5}$     &\textbf{0.0}  &$-2.2\X^{-5}$&  \textbf{-3.8}  \\
+  $C_{\mathrm{ds}}^{\mathrm{BCK}}$ & SDSBCK        & SDS4      &            &                   & 0.185        &             & \\
+  $C_{\mathrm{ds}}^{\mathrm{HCK}}$ & SDSHCK        & SDS4      &            &                   &  1.5         &             & \\
+  $\Delta_\theta$                  & SDSDTH        & SDS4      & 80          & 80               & 80           &  80         & \\
+  $\delta_\theta$                  & SDSSTRAINA    & SDS4      & 0           & 0                & 0            & \textbf{15} &  0  \\
+  $M_\theta$                       & SDSSTRAIN     & SDS4      & 0           & 0                & 0            & \textbf{10} &  0  \\
+  $N_\theta$                       & SDSSTRAIN2    & SDS4      & 0           & 0                & 0            & \textbf{20} &  \textbf{0}   \\
+  $B_r$                            & SDSBR         & SDS4      & 0.0009      &\textbf{0.00085}  & 0.0009       & 0.0009      &  \textbf{0.005}  \\
+  $B_r$                            & SDSBT         & SDS4      &             &                  &              &             &    0.0011     \\
+  $C_{\mathrm{cu}}$                & SDSCUM        & SDS4      & -0.40344    & \textbf{0.0}     &-0.40344      &-0.40344     & \textbf{0.0} \\
+  ${\mathrm{s_B}}$                 & SDSCOS        &SDS4       & 2.0         & \textbf{0.0}     & 2.0          & 2.0         &     \\
+  $p^{\mathrm{sat}}$               & SDSP          & SDS4      & 2.0         & 2.0              & 2.0          & 2.0         &     \\
+  $C_{\mathrm{turb}}$              & SDSC5         & SDS4      & 0.0         &  0.0             & 0.0          & \textbf{1.0}& 0.0 \\
+  $\delta_d$                       & SDSC6         & SDS4      & 0.3         &  0.3             & 0.3          &0.3          & \\
+  $ M_W$			   & SDSMWD	   & SDS4      &            &                   &              &             & 0.9 \\
+  $ M_\Lambda$			   & SDSFACMTF	   & SDS4      &            &                   &              &             & 400 \\
+  $C$                              & NLPROP        & SNL1      & $2.5\X^7$   &$\mathbf{2.7\X^7}$& $2.5\X^7$    & $2.5\X^7$   & $2.5\X^7$ \\
+ \hline \hline
+\end{tabular}
+\end{center}
+
+\caption{同表 \ref{tab:ST4_parSIN}，但对应 {\F SDS4} 和 {\F SNL1} namelist。
+加粗数值不同于 ww3\_grid 设置的默认值。当 SDSBCHOICE 使某些值不被使用时，表中省略这些值。
+请注意，\cite{Romero2019} 建议在使用 NL2 时取 $ M_W=2$。} \label{tab:ST4_parSDS}
+\end{table}
+\end{landscape}

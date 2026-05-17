@@ -1,0 +1,102 @@
+\addcontentsline{toc}{subsubsection}{\strut \hspace{24mm} 三阶格式 (UQ)}
+
+\vspace{\baselineskip}
+\vspace{\baselineskip} 
+\noindent {\bf 三阶格式 (UQ)}
+
+\opthead{UQ}{\ws}{H. L. Tolman}
+
+\noindent 
+\ws\ 中可用的三阶精度格式为 \qck\ 格式 \citep{art:Leo79,art:DM82}，并结合 \ult{} \tvd{}（总变差递减）限制器 \citep{art:Leo91}。这是 \ws\ 的默认传播格式。该格式在空间和时间上均为三阶精度，选择它是基于水质模式中高阶有限差分格式的大量相互比较 \citep[见][]{PhD:Cah,pro:FC93,tol:OMB95}。该格式分别应用于经向和纬向传播，并交替改变首先处理的方向。
+
+在 \qck\ 格式中，$\phi$ 空间中计数器为 $i$ 和 $i-1$ 的网格点之间的通量 $(\cF_{i,-})$ 计算为\footnote{~计数器为 $i+1$ 和 $i$ 的网格点之间的通量 $(\cF_{i,+})$ 仍通过替换相应索引得到。}
+
+% ------ QUICKEST scheme ---------- %
+% eq:quick_1         Basic flux
+% eq:quick_2         Boundary value
+% eq:quick_3         Divergence
+% eq:quick_4         CFL number
+
+\begin{equation}
+\cF_{i,-} = \left [ \dot{\phi}_b \: \cN_b \: \right ]^n_{j,l,m} \: , \label{eq:quick_1}
+\end{equation} \begin{equation}
+\dot{\phi}_b = 0.5 \: \left ( \dot{\phi}_{i-1} + \dot{\phi}_i 
+\: \right ) \: , \label{eq:quick_1a}
+\end{equation}  \begin{equation}
+\cN_b = \frac{1}{2} \left [ \rule[0mm]{0mm}{\baselineskip} \: 
+(1+C)\cN_{i-1} + (1-C)\cN_i \: \right ] - \:
+\left ( \frac{1-C^2}{6} \right ) \: {\cal CU} \: \Delta\phi^2, \label{eq:quick_2} \end{equation} \begin{equation}
+{\cal CU} =  \left \{ \begin{array}{ccc}
+(\: \cN_{i-2} - 2\cN_{i-1} + \cN_{i} \:)\: \: \Delta \phi^{-2}
+               & \mbox{for} & \dot{\phi}_b \geq 0 \\
+(\: \cN_{i-1} - 2\cN_{i} + \cN_{i+1} \:)\: \Delta \phi^{-2}
+               & \mbox{for} & \dot{\phi}_b   <  0
+\end{array} \right . \: , \label{eq:quick_3}
+\end{equation} \begin{equation}
+C = \frac{\dot{\phi}_b \: \Delta t}{\Delta \phi} 
+\: , \label{eq:quick_4} \end{equation}
+
+\noindent
+其中 $\cal CU$ 是作用量密度分布的（上游）曲率，$C$ 是带符号的 \cfl\ 数，用来标识传播方向。与一阶格式类似，当 $|C| \leq 1$ 时该格式给出稳定解。为保证该格式不产生非物理极值，它与 \ult\ 限制器结合使用。该限制器使用中心、上游和下游作用量密度（下标分别为 $c$、$u$ 和 $d$），定义为
+
+% ------ ULTIMATE limiter --------- %
+% eq:ult_1           Cell definition
+% eq:ult_2           Nondimensional action
+% eq:ult_3           Monotonic limiter
+% eq:ult_4           Non-monotonic action
+
+\begin{equation} \begin{array}{ccccc}
+\cN_c = \cN_{i-1} \: , \: & \cN_u = \cN_{ i-2 } \: , \: &
+                            \cN_d = \cN_{i} &
+                            \mbox{for} & \dot{\phi}_b \geq 0 \\
+\cN_c = \cN_{ i } \: , \: & \cN_u = \cN_{i+1} \: , \: &
+                            \cN_d = \cN_{i-1} &
+                            \mbox{for} & \dot{\phi}_b   <  0
+\end{array} \: . \label{eq:ult_1} \end{equation}
+
+\noindent
+为评估初始状态与解是否表现出相似的单调或非单调行为，定义归一化作用量 $\tilde\cN$：
+
+\begin{equation}
+\tilde\cN = \frac{\cN-\cN_u}{\cN_d - \cN_u} 
+\: . \label{eq:ult_2} \end{equation}
+
+\noindent
+若初始状态是单调的（即 $0 \leq \tilde\cN_c \leq 1$），则单元边界处的（归一化）作用量 $\cN_b$ 被限制为
+
+\begin{equation}
+\tilde\cN_c \leq \tilde\cN_b \leq 1 , \:\:\:
+\tilde\cN_b \leq \tilde\cN_c \: C^{-1}  . 
+\label{eq:ult_3} \end{equation}
+\noindent 否则 \begin{equation}
+\tilde\cN_b = \tilde\cN_c 
+\: . \label{eq:ult_4} \end{equation}
+
+\noindent
+如果与单元边界相邻的两个网格点之一位于陆地上，或表示活动边界点，则需要使用另一种格式。在这些情况下，式~(\ref{eq:1up_xy_2}) 和 (\ref{eq:quick_2}) 由下式代替：
+
+% eq:1_vel           Boundary velocity
+% eq:1_bval          Boundary value
+
+\begin{equation}
+\dot{\phi}_b = \dot{\phi}_s \: ,
+\label{eq:1_vel} \end{equation} \begin{equation}
+\cN_b = \cN_u \: ,
+\label{eq:1_bval} \end{equation}
+
+\noindent
+其中后缀 $s$ 表示海点的（平均）值。该边界条件表示一个简单的一阶迎风格式，不需要式 (\ref{eq:ult_1}) 至 (\ref{eq:ult_4}) 的限制器。
+
+最终传播格式类似于式~(\ref{eq:1up_xy_tot})，为
+
+% eq:uq_xy_tot
+
+\begin{equation}
+\cN_{i,j,l,m}^{n+1} = \cN_{i,j,l,m}^n +
+\frac{\Delta t}{\Delta \phi} \left [ \cF_{i,-} - \cF_{i,+} \right ]
+\: . \label{eq:uq_xy_tot} \end{equation}
+
+\noindent
+$\lambda$ 空间中的传播格式只需在上述方程中轮换索引和增量即可得到。\footnote{~\cite{tol:OMB02c} 第 31 页所述的“软”边界处理已不再可用，因为它与模式 3.14 版引入的高级嵌套技术不兼容。}
+
+注意，\uq\ 格式实现为交替的一维格式，因此需要在式~(\ref{eq:dtpl}) 中使用分量平流速度的最大值。为保持一致，对于给定分量，$\lambda$ 和 $\phi$ 传播始终使用相同时间步长。

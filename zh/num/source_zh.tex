@@ -1,0 +1,184 @@
+\vssub
+\subsection{~非冰源项积分} \label{sub:source}
+\vssub
+
+不涉及海冰的源项通过求解
+
+%---------------------%
+% Step : Source terms %
+%---------------------%
+% eq:step_source
+
+\begin{equation}
+\frac{\p N}{\p t} = \cS_{no~ice} \: . \label{eq:step_source}
+\end{equation}
+
+\noindent 
+来计入。与 \wam{} 中一样，这里采用半隐式积分格式。在该格式中，作用量密度的离散变化量 $\Delta N$ 为 \citep{art:WAM88}
+
+% eq:implicit_st
+
+\begin{equation}
+\Delta N(k,\theta) = \frac{\cS(k,\theta)}{1- \epsilon D(k,\theta)\Delta t}
+\: , \label{eq:implicit_st} \end{equation}
+
+\noindent 
+其中 $D$ 表示 $\cS$ 对 $N$ 的导数中的对角项 \citep[Eqs. 4.1 through 4.10]{art:WAM88}，$\epsilon$ 定义该格式的偏置。最初实现时取 $\epsilon = 0.5$，以得到二阶精度格式。现在采用 $\epsilon = 1$，因为它更适合谱平衡范围内的大时间步长 \citep{pro:HA98,art:HA01}，并能使谱积分更加平滑。改变 $\epsilon$ 对平均波浪参数影响很小，但会使下述动态时间步进更经济。
+
+半隐式格式在动态时间步进框架内应用 \citep{tol:JPO92}。在该格式中，对全局时间步长 $\Delta t_g$ 的积分可根据净源项 $\cS$、作用量密度最大变化量 $\Delta N_m$ 以及区间 $\Delta t_g$ 中剩余的时间，分成若干动态时间步长 $\Delta t_d$。在区间 $\Delta t_g$ 的积分中，第 $n^{\rm th}$ 个动态时间步长 $\Delta t_d^n$ 按三步计算：
+
+% ------ Dynamic s.t. int. scheme ------- %
+% eq:st_d_1
+% eq:st_d_2a
+% eq:st_d_2b
+% eq:st_d_3
+
+\begin{equation}
+\Delta t_d^n = 
+\min_{f<f_{hf}} \left [ \frac{\Delta N_m}{|\cS|}
+\left ( 1 + \epsilon D \frac{\Delta N_m}{|\cS|} \right ) ^{-1}
+\right ] \: , \label{eq:st_d_1}
+\end{equation} \begin{equation}
+\Delta t_d^n = \max \: \left [ \: \Delta t_d^n \: , \: 
+\Delta t_{d,\min} \right ] \: , \label{eq:st_d_2a}
+\end{equation} \begin{equation}
+\Delta t_d^n = \min \: \left [ \: \Delta t_d^n \: , \: 
+\Delta t_g - \sum_{i=1}^{n-1} \Delta t_d^i
+ \: \right ] \: , \label{eq:st_d_2b}
+\end{equation}
+
+\noindent
+其中 $\Delta t_{\min}$ 是用户定义的最小时间步长，用来避免时间步长过小。相应的新谱 $N^n$ 为
+
+\begin{equation}
+N^n = \max\: \left [ \: 0 \: , \: N^{n-1} + 
+\left ( \frac{\cS \Delta t_d}{1 - \epsilon D \Delta t_d} \right )
+\: \right ] \: . \label{eq:st_d_3}
+\end{equation}
+
+
+作用量密度最大变化量 $\Delta N_m$ 由参数化作用量密度变化量 $\Delta N_p$ 和滤波后的相对变化量 $\Delta N_r$ 确定：
+
+% eq:st_d_4
+% eq:st_d_5
+% eq:st_d_6
+% eq:st_d_7
+
+\begin{equation}
+\Delta N_m (k,\theta) = \min \: \left [ \:
+\Delta N_p (k,\theta) \: , \: \Delta N_r (k,\theta) 
+\: \right ] \: , \label{eq:st_d_4}
+\end{equation} \begin{equation}
+\Delta N_p (k,\theta) = X_p \: \frac{\alpha}{\pi} \:
+\frac{(2\pi)^4}{g^2} \: \frac{1}{\sigma k^3}
+\: , \label{eq:st_d_5}
+\end{equation} \begin{equation}
+\Delta N_r (k,\theta) = X_r \; \max \: \left [ \: 
+N(k,\theta) \: , \: N_f \: \right ] \: , \label{eq:st_d_6}
+\end{equation} \begin{equation}
+N_f = \max \: \left [ \: \Delta N_p (k_{\max},\theta) \: , 
+\: X_f \: \max_{\forall k,\theta} \left \{ N(k,\theta) \right \}
+\: \right ] \: , \label{eq:st_d_7} \end{equation}
+
+\noindent 
+其中 $X_p$、$X_r$ 和 $X_f$ 是用户定义常数（见表~\ref{tab:st_d_p}），$\alpha$ 是 {\sc pm} 谱能级（设为 $\alpha =
+0.62\times 10^{-4}$），$k_{\max}$ 为最大离散波数。式~(\ref{eq:st_d_5}) 中的参数化谱形在深水中对应于众所周知的一维频率谱高频形状
+$F(f) \propto f^{-5}$。式~(\ref{eq:st_d_7}) 中滤波水平与最大参数化变化量之间的联系用于保证：在波能极小的情况下，动态时间步长仍保持在合理大小。积分稳定性的最后一道保护措施是：在式~(\ref{eq:st_d_2a}) 决定 $\Delta
+t_d^n$ 的条件下，将作用量密度的离散变化限制到最大参数化变化量
+(\ref{eq:st_d_5})。在这种情况下，式~(\ref{eq:st_d_2a}) 像 WAM 模型中一样成为限制器。限制器的影响可参见
+\cite{art:HJ99,art:HJ01}、\cite{art:HA01} 和 \cite{tol:GAOS02} 等文献中的详细讨论。
+
+% tab:st_d_p
+
+\begin{table} 
+\begin{center} \begin{tabular}{|l|c|c|c|c|} \hline \hline
+                 & $X_p$     & $X_r$             & $X_f$ &
+$\Delta t_{d,\min}$      \\ \hline
+\wam\ 等效值 & $\frac{\pi}{24}10^{-3}\Delta t$
+ & $\infty (\geq 1)$ & --    & $\Delta t_g$  \\ 
+ 建议值       & 0.1-0.2  & 0.1-0.2 & 0.05 & $\approx 0.1 \Delta t_g$ \\  
+默认设置  &  0.15    &   0.10  & 0.05 & -- \\ \hline \hline
+\end{tabular} \end{center}
+\caption{源项积分格式中的用户定义参数}
+\label{tab:st_d_p} \botline \end{table}
+
+动态时间步长对每个网格点分别计算，因此只会在谱快速变化的网格点增加额外计算量。源项会在每个动态时间步长重新计算。
+
+\ws{} 可在不使用线性增长项的情况下编译。在这种情况下，只有当谱中已有一些能量时，波浪才能增长。在持续低风速的小尺度应用中，模式部分区域的波能可能完全消失。为保证风速增大时仍能发生波浪增长，\ws{} 中提供了所谓的播种选项（编译时选择）。若选择播种选项，则要求播种频率 $\sigma_{\rm seed} = \min(\sigma_{\max}, 2\pi
+f_{hf})$ 处的能级至少包含一个最小作用量密度：
+
+% ------ Spectral seeding ------- %
+% eq:seed
+
+\begin{eqnarray}
+N_{\min}(k_{seed},\theta) & = & 
+        6.25 \times 10^{-4} \frac{1}{k_{\rm seed}^3 \: \sigma_{\rm seed}}
+        \max \left [ \: 0. \: , \: \cos^2 ( \theta - \theta_w ) \right ]
+                             \nonumber \\ & & \hspace{5mm}
+        \min \left [ \: 1 \: , \: \max \left ( \: 0 \: , \: 
+        \frac{|u_{10}|}{X_{\rm seed} g \sigma_{\rm seed}^{-1}}-1 
+\: \right ) \: \right ] \: , \label{eq:seed} \end{eqnarray}
+
+\noindent
+其中 $g \sigma_{\rm seed}^{-1}$ 近似为最高离散谱频率对应的平衡风速。该最小作用量分布与风向对齐，在低风速时趋于零，在大风速下与积分限制器
+(\ref{eq:st_d_5}) 成正比。$X_{\rm seed} \geq 1$ 是用户定义参数，用于将播种移向更高频率。当风速达到最高离散频率对应平衡风速的 $X_{\rm seed}$ 倍时开始播种；当风速再增大一倍时达到完全强度。模式默认设置包含播种算法，并取 $X_{\rm seed} = 1$。
+
+在模式 3.11 版中，引入了浪区物理参数化。此类物理过程，特别是水深诱导破碎，其作用时间尺度远小于深水和浪区之外有限水深物理过程的时间尺度。为在较大时间步长下保证合理行为，模式从 SWAN 模型引入了一个额外的可选限制器；该限制器也可用于替代对浪区破碎的显式建模。该限制器类似于式~(\ref{eq:BJ78_Miche}) 中水深受限波浪破碎源项里的 Miche 型最大波高。在该限制器中，最大波能 $E_m$ 计算为
+
+% ------ Surf zone limiter ------ %
+% eq:MLIM
+
+\begin{equation}
+E_m = \frac{1}{16} [ \gamma_{lim}  \tanh ( \bar{k} d ) / \bar{k} ] ^2
+\:\:\: , \label{eq:MLIM} 
+\end{equation}
+
+\noindent
+其中 $\gamma_{lim}$ 是与式~(\ref{eq:BJ78_Miche}) 中 $\gamma_M$ 类似的因子，但需注意 $\gamma_M$ 代表单个波，而 $\gamma_{lim}$ 代表有效波高。对于单色波，\cite{art:Miche44} 的原始表达式对应于 $\gamma_{lim} = 0.94$，并将 $H_s$ 替换为波高 $H$。这里将这一思想用于随机波。在浅水中，该限制器使 $H_s$ 小于 $\gamma_{lim} d$。若总谱能量 $E$ 大于最大能量 $E_m$，则通过因子 $E/E_m$ 简单地重标定整个谱来应用该限制器，这大体沿用了 \cite{art:EB96} 的论证，并在 \para\ref{sec:DB1} 中使用。
+
+该限制器可在模式编译时打开或关闭，且 $\gamma_{lim}$ 可由用户调整。默认值设为 $\gamma_{lim} = 1.6$，因为确实曾记录到接近 $d$ 的 $H_{rms}$ 值；因此取 $H_s/H_{rms}$ 的比值为 1.4 时，使用 1.6 允许这种大陡度还有一定超出余量。注意，该限制器只应作为“安全阀”使用；因此，如果显式模拟浪区破碎或白冠源项，它应比这些源项中的破碎判据更宽松。
+
+此外，该限制器并不能保证谱的所有部分都现实。事实上，与 Komen 等人的耗散项一样，使用平均波数会使存在涌浪时出现不现实的陡峭短波。该限制器未来可扩展为利用按频率的部分谱积分来限制波陡，以确保所有尺度的波确实都不过陡。
+
+\vssub
+\subsection{~冰源项积分} \label{sub:icesource}
+\vssub
+
+由于冰中的衰减和散射可能非常强（尽管它们是线性的），将冰项
+$S_{\mathrm{ice}}=S_{\mathrm{id}}+S_{\mathrm{is}}$ 单独积分较为方便。它包括一个耗散项
+\begin{equation}
+S_{\mathrm{id}}/\sigma  = \beta_{\mathrm{id}} N ,
+\end{equation}
+以及一个形如
+\begin{equation}
+ \frac{S_{\mathrm{is}}(k,\theta)}{\sigma} =  \int_0^{2\pi}\beta_{\mathrm{is}} [N(k,\theta')-N(k,\theta)] d\theta'  ,
+ \end{equation}
+的散射项，其中散射系数 $\beta_{\mathrm{is}}$ 先验上是入射方向 $\theta'$ 与散射方向 $\theta$ 之差以及冰 floe 形状的函数。一般而言，方向谱 $N(k,.)$ 是含 {\F NTH}（方向数）个分量的向量，源项也是同样大小的向量，并由矩阵乘积 $S/\sigma = M N(k,.)$ 给出，其中
+$M$ 是一个正的对称 {\F NTH} 乘 {\F NTH} 方阵，其分量由 $\beta_{\mathrm{id}}$ 的值给出。
+矩阵 $M$ 可容易地对角化为
+\begin{equation}
+ M  =  V D V^T  ,
+ \end{equation}
+其中 $D$ 是包含全部特征值的对角矩阵，$V$ 是特征向量数组，
+$V^T$ 为其转置。因此，冰源项对应的分裂波作用量方程
+ \begin{equation}
+\frac{\p}{\p t} \frac{N}{c_g}   = \frac{S_{\mathrm{id}}}{\sigma c_g} ,
+ \end{equation}
+可对每个特征向量 $V_i$ 的作用量 $N_i$（特征值为 $\lambda_i$）重写为
+  \begin{equation}
+\frac{\p}{\p t} \frac{N_i}{c_g}   = \frac{\beta_{\mathrm{id}} + \lambda_i}{\sigma c_g} N_i ,
+ \end{equation}
+其精确解为
+   \begin{equation}
+ {N_i}(t+\Delta t_g)   = N_i(t) \exp \left[ (\beta_{\mathrm{id}} + \lambda_i) +\Delta t_g\right].
+ \end{equation}
+ 
+在所有情况下，与各向同性谱对应的特征向量都有特征值 $\lambda=\beta_{\mathrm{id}}$。对于各向同性后向散射，其他特征值均等于 $(\beta_{\mathrm{id}} + \beta_{\mathrm{is}})$。对这两个特征空间的分解将解简化为
+%---------------------%
+% Step : Source terms %
+%---------------------%
+% eq:exact_st_ice
+\begin{equation}
+ N(t+\Delta t_g) = \exp(\beta_{\mathrm{id}} \Delta t_g) \overline{N}(t)  + \exp \left[\left(\beta_{\mathrm{id}} + \beta_{\mathrm{is}}\right) \Delta t_g\right] \left[N(t)-\overline{N}(t)\right]
+, \label{eq:exact_st_ice} \end{equation}
+其中 $\overline{N}$ 是对所有方向的平均。因此，对于空间均匀场，谱会在时间尺度 $1/(\beta_{\mathrm{id}})$ 上以指数形式趋向各向同性。

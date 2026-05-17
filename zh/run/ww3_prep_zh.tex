@@ -1,0 +1,25 @@
+\vsssub
+\subsubsection{输入场预处理器} \label{sec:ww3prep}
+\vsssub
+
+\proddefH{ww3\_prep}{w3prep}{ww3\_prep.ftn}
+\proddeff{输入}{ww3\_prep.inp}{传统配置文件。}{10} (App.~\ref{sec:config051})
+\proddefa{mod\_def.ww3}{模式定义文件。}{11}
+\proddefa{'user input'\opt}{见下文示例。}{user}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{level.ww3\opt}{水位文件。}{12}
+\proddefa{current.ww3\opt}{流场文件。}{12}
+\proddefa{wind.ww3\opt}{风场文件。}{12}
+\proddefa{ice.ww3\opt}{冰场文件。}{12}
+\proddefa{data0.ww3\opt}{同化数据（`mean'）。}{12}
+\proddefa{data1.ww3\opt}{同化数据（`1-D spectra'）。}{12}
+\proddefa{data2.ww3\opt}{同化数据（`2-D spectra'）。}{12}
+
+\vspace{\baselineskip} 
+\vspace{\baselineskip} 
+
+\noindent 
+注意，可选输出文件专用于 {\file ww3\_shel} 和
+{\file ww3\_multi}，但实际波浪模式例程不会处理这些文件。因此，如果波浪模式例程在其他程序壳或集成程序中使用，则不需要这些文件。不过，读写这些文件的例程与系统无关，因此可用于基本波浪模式的定制应用。这些文件的读写由子程序 {\F w3fldg}
+（{\file w3fldsmd.ftn}）执行。关于更多文档和文件格式，请参考该例程。
+\pb

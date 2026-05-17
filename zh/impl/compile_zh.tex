@@ -1,0 +1,78 @@
+\vssub
+\subsection{~可选环境设置}
+\vssub
+
+编译启用 NetCDF 的 \ws{} 程序需要 NetCDF 4.1.1 或更高版本。还需要设置以下环境变量：
+\begin{clist}
+\cit {NETCDF\_CONFIG} {NetCDF-4 nc-config 工具程序的路径。}
+\end{clist}
+{\file nc-config} 工具程序用于确定编译所需的合适编译和链接标志。
+使用命令
+\command{\code nc-config --version} 检查已安装 Fortran-NetCDF 库的版本。同时还要求 NetCDF-4 安装在编译时启用 NetCDF-4 API。使用 \command{\code nc-config --has-nc4} 检查已安装的 NetCDF 是否启用了 NetCDF-4 API。
+
+\vspace{\baselineskip}
+\noindent
+若要在（三角形非结构网格的显式/隐式）区域分解选项中使用 PDLIB 编译 WAVEWATCH III，需要将环境变量 {\code METIS\_PATH} 设置为 {\code Metis} 和 {\code ParMetis} 的编译路径；它们应使用与 WW3 相同的编译器编译。
+
+\vspace{\baselineskip}
+\noindent
+关于模式并行版本（OpenMP 和 \mpi{} 版本）还需说明两点。首先，在准备可于 \mpi{} 环境中运行的可执行程序时可能会出现复杂情况。这些复杂情况在附录~\ref{app:mpi} 中讨论。其次，\omp{} 代码应只使用指令方式编译，也就是说，不要使用会自动对代码进行线程化的编译器选项。
+
+
+
+\vssub
+\subsection{~编译和链接} \label{sec:comp}
+\vssub
+
+\vspace{\baselineskip} \noindent
+首次编译前，必须使用脚本 {\file w3\_setup} 设置 \ws{} 环境，并把模式目录路径作为参数传入。该脚本提供若干选项，用于定义编译器选项以及位于 {\dir bin} 目录中的 switch 文件。例如，\command{w3\_setup /home/user/WW3/model -c <comp> -s <switch>} 中，{\code <comp>} 关键字可以是 {\code mpt}、{\code intel}、{\code gfortran}、{\code pgi}，表示优化编译选项；也可以是 {\code mpt\_debug}、{\code intel\_debug}、{\code gfortran\_debug}、{\code pgi\_debug}，表示调试编译选项。如果需要依赖系统的选项，可通过修改脚本 {\file cmplr.env} 完成。不同集群的一些旧 comp/link 模板仍然可用，但不推荐使用。{\code <switch>} 关键字可以是已提供 switch 文件的后缀，也可以是你自己的后缀。运行该脚本会创建以下三个脚本/文件：
+
+\begin{flist}
+\fit{comp}  {编译器脚本。该脚本基于 {\file comp.tmpl}，并使用给定的编译器及其选项定义。}
+\fit{link}  {链接器脚本。该脚本基于 {\file link.tmpl}，并使用给定的链接器及其选项定义。}
+\fit{switch}{包含预处理器 {\file w3adc} 可识别开关列表的文件。从 {\code switch\_<switch>} 复制而来。}
+\end{flist}
+
+\vspace{\baselineskip}
+
+环境文件 {\file wwatch3.env} 会被创建；如果它已经存在，则会被更新。用于代码预处理器的辅助 FORTRAN 程序默认会使用 GNU FORTRAN 编译器编译，该编译器可能不同于为 \ws{} 程序提供的编译器。
+
+
+\vspace{\baselineskip} \noindent
+编译 \ws{} 最简单的方法是使用脚本 {\file w3\_automake}，由它自动检测要编译哪些程序并完成编译。它会强制将前处理和后处理程序编译为串行实现，而其他程序则依据 OpenMP、MPI 或混合配置中的开关决定。如果 netCDF 库设置正确，专用于 netCDF 的程序也会被编译。对 SCRIPNC、PDLIB、OASIS、ESMF、TRKNC 和 TIDE 关键字也会进行同样测试，以便以最佳方式管理程序编译。例如，\command{w3\_automake}，或只编译少数程序时使用 \command{w3\_automake ww3\_grid ww3\_shel ww3\_ounf}；编译后的程序都会存放在 {\dir exe} 目录中，并附带所用 switch、comp 和 link 文件的副本。
+
+\vspace{\baselineskip} \noindent
+如果程序编译出现问题，日志文件会存放在临时目录中；串行模式使用 {\dir tmp\_SEQ}，MPI 等分布式模式使用 {\dir tmp\_MPI}，OMP 使用 {\dir tmp\_OMP}，混合模式使用 {\dir tmp\_HYB}。每个程序通常有三个日志文件：
+
+\begin{flist}
+\fit{\code ww3\_<prog>.l} {完整程序，只保留基于开关匹配到的代码行，并在末尾包含编译命令行。}
+\fit{\code ww3\_<prog>.out} {警告消息。}
+\fit{\code ww3\_<prog>.err} {错误消息。}
+\end{flist}
+
+若要从 \ws{} 框架中移除所有用户创建的文件，可以使用脚本 {\file w3\_clean}；仅清理 {\dir model} 目录时使用 \command{w3\_clean -m}，清理完整 ww3 仓库时使用 \command{w3\_clean -c}。
+
+
+\vssub
+\subsection{~详细编译}
+\vssub
+
+\ws{} 的编译通过 {\dir bin} 目录中的脚本 {\file w3\_make} 完成\footnote{~注意，在运行 {\file w3\_make} 之前，需要按本节余下部分的说明进行若干用户干预。}。如果不带参数使用该脚本，将编译 \ws{} 的所有基本程序。也可以在编译命令中给出要编译的程序名。例如，\command{w3\_make ww3\_grid ww3\_strt} 只会编译网格预处理器和初始条件程序。{\file w3\_make} 使用上一节介绍的多个脚本。图~\ref{fig:make} 给出了图示说明。如有必要，脚本 {\file w3\_make} 会使用脚本 {\file make\_makefile.sh} 生成 makefile。{\file make\_makefile.sh} 根据文件 {\file switch} 中的程序开关（见 \para\ref{sec:switches}）生成要链接的模块列表，并检查所有所需源文件的模块依赖。如果自上次调用 {\file w3\_make} 以来开关发生了变化，{\file w3\_new} 会用于 `touch' 相关源代码，或删除相关目标文件。makefile 完成后，标准 \unix{} make 工具用于编译和链接程序。makefile 不直接调用 \fortran{} 编译器，而是调用预处理器和编译脚本 {\file ad3} 与 {\file comp}，以及链接脚本 {\file link}。脚本 {\file ad3} 使用文件名扩展名判断需要执行的操作。扩展名为 {\file .ftn} 的文件由 {\code w3adc} 处理；扩展名为 {\file .f} 或 {\file .f90} 的文件则直接发送到脚本 {\code comp}。尽管用户可以交互式尝试其中若干脚本，通常只需要运行 {\file w3\_make}。
+
+\input{zh/impl/fig_make_zh}
+
+\vspace{\baselineskip}
+
+\begin{center}
+\rule[1mm]{55mm}{1.0mm} 警告 \rule[1mm]{55mm}{1.0mm} \\
+\vspace{\baselineskip}
+\parbox{120mm}{辅助脚本 {\file w3\_make} 等使用的是 \ws{} 主目录下 {\file ./bin} 目录中的 {\file switch}、{\file comp} 和 {\file link} 文件，{\it 不是}本地目录中的文件。} \\ \vspace{\baselineskip} \rule[1mm]{55mm}{1.0mm} 警告
+  \rule[1mm]{55mm}{1.0mm}
+\end{center}
+
+
+\noindent
+完成适当修改或复制入适当示例脚本之后，即可编译并链接 \ws{} 的（部分）程序。首次编译程序时，建议逐个编译程序组成部分，以避免冗长的错误消息，并在 {\file comp} 中设置错误捕获。一个好的起点是编译简单测试代码 {\F ctest}。首先进入目录 {\dir work}，并通过输入 \command{ln3 ctest} 创建到该例程源代码的链接。创建该链接是为了便于稍后加入错误，以测试或设置脚本 {\file comp} 中的错误捕获。输入命令 \command{ad3\_test ctest} 可以查看预处理器 {\file w3adc} 的内部工作方式；该命令会显示实际源代码如何由 {\file ctest.ftn}、包含文件和程序开关构造而成。接下来，可通过输入 \command{ad3 ctest 1} 测试该子程序的编译；它会同时调用预处理器 {\file w3adc} 和编译脚本 {\file comp}。该行末尾的 1 会激活测试输出。如果省略它，该命令应只产生一行输出，用于标识正在处理的例程。如果 {\file ad3} 按预期工作，会生成目标文件 {\file obj/ctest.o}。如果初始设置时提出了请求，则可在暂存目录中找到源代码和清单文件（{\file ctest.f} 与 {\file ctest.l}）。如果 {\file comp} 检测到编译错误，也会保留清单文件。此时，谨慎做法是在 work 目录中的 {\file ctest.ftn} 中加入错误和警告，测试脚本 {\file comp} 的错误捕获。错误捕获在 {\file comp} 文档中有较详细讨论。测试 {\file comp} 并移除 {\file ctest.ftn} 中的错误之后，可以删除到 work 目录的链接以及文件 {\file obj/ctest.o}。
+
+单个例程成功编译后，下一步是尝试编译并链接一个完整程序。可以输入 \command{w3\_make ww3\_grid} 来编译网格预处理器。如果编译看起来成功，并且输入文件已经安装（见上文），可以在 work 目录中输入 \command{ww3\_grid} 测试网格预处理器。如果输入文件已经安装，work 目录中会存在指向输入文件 {\file ww3\_grid.inp} 的链接，网格预处理器会运行并把输出发送到屏幕。网格预处理器的输出文件会出现在 work 目录中。首次编译某个程序时，操作系统可能找不到可执行程序。如果发生这种情况，尝试输入 \command{rehash}，或打开一个新的 shell 继续工作。通过这种方式，所有单独程序都可以被编译和测试。若要清理所有临时文件（如清单）以及测试运行的数据文件，输入 \command{w3\_clean}。注意，{\file w3\_make} 只检查 switch 文件是否发生变化。如果用户修改了编译和链接脚本 {\file comp} 与 {\file link} 中的编译选项，建议强制重新编译整个程序。可以在调用 {\file w3\_make} 之前输入 \command{w3\_new all {\rm or} w3\_new} 来实现。如果编译无明显原因地失败，这样做也可能有用。
+

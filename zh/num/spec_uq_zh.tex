@@ -1,0 +1,47 @@
+\vssub
+\subsubsection{~三阶格式 (UQ)}
+\opthead{UQ}{\ws}{H. L. Tolman}
+
+\noindent
+$\theta$ 空间中的 \uq{} 格式采用与物理空间格式类似的方式实现，区别在于封闭的方向空间不需要边界条件。$k$ 空间中的可变网格间距需要对格式作若干修改，如 \cite[{Appendix}]{art:Leo79} 所述。于是式~(\ref{eq:quick_1}) 至
+(\ref{eq:quick_4}) 变为
+
+% ------ QUICKEST scheme for k space---------- %
+% eq:quick_1k        Basic flux
+% eq:quick_2k        Boundary value
+% eq:quick_3k        Divergence
+% eq:quick_4k        CFL number
+
+\begin{equation}
+\cF_{m,-} = \left [ \dot{k}_{g,b} \: N_b \: \right ]^n_{i,j,l}
+\: , \label{eq:quick_1k}\end{equation} \begin{equation}
+\dot{k}_{g,b} = 0.5 \: \left ( \dot{k}_{g,m-1} + \dot{k}_{g,m} 
+\: \right )  \: , \label{eq:quick_1ak}
+\end{equation} \begin{equation}
+N_b = \frac{1}{2} \left [ \rule[0mm]{0mm}{\baselineskip} \: 
+(1+C)N_{i-1} + (1-C)N_i \: \right ] - \:
+\frac{1-C^2}{6} \: {\cal CU} \: \Delta k^2_{m-1/2}, \label{eq:quick_2k} \end{equation} \begin{equation}
+{\cal CU} =  \left \{ \begin{array}{ccc}
+\frac{1}{\Delta k_{m-1}}
+\left [ \frac{N_{ m }-N_{m-1}}{\Delta k_{m-1/2}} - 
+        \frac{N_{m-1}-N_{m-2}}{\Delta k_{m,-3/2}} \right ]
+               & \mbox{for} & \dot{k}_b \geq 0 \\
+\frac{1}{\Delta k_m}
+\left [ \frac{N_{m+1}-N_{ m }}{\Delta k_{m+1/2}} -
+       \frac{N_{ m }-N_{m-1}}{\Delta k_{m-1/2}} \right ]
+               & \mbox{for} & \dot{k}_b   <  0
+\end{array} \right . \: , \label{eq:quick_3k}
+\end{equation} \begin{equation}
+C = \frac{\dot{k}_{g,b} \: \Delta t}{\Delta k_{m-1/2}}
+\: , \label{eq:quick_4k} \end{equation}
+
+\noindent
+其中 $\Delta k_m$ 是网格点 $m$ 处的离散谱带或单元宽度，$\Delta k_{m-1/2}$ 是计数器为 $m$ 和 $m-1$ 的网格点之间的距离。若使用式~(\ref{eq:quick_4k}) 的 \cfl{} 数，则可像式~(\ref{eq:ult_1}) 至
+(\ref{eq:ult_4}) 那样应用 \ult{} 限制器。在低波数和高波数边界处，通量仍用一阶迎风方法估计，边界条件采用上文为一阶格式定义的条件。$k$ 空间中的最终格式为
+
+% eq:1uq_k_tot
+
+\begin{equation}
+N_{i,j,l,m}^{n+1} = N_{i,j,l,m}^n 
+ + \frac{\Delta t}{\Delta k_m} \left [ \cF_{m,-} - \cF_{m,+} \right ]
+\: , \label{eq:uq_k_tot} \end{equation}

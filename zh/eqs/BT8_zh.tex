@@ -1,0 +1,55 @@
+\vsssub
+\subsubsection{~$S_{mud}$：黏性浮泥耗散（D\&L）} \label{sec:BT8}
+\vsssub
+
+\opthead{BT8}{NRL/SWAN}{M. Orzech and E. Rogers}
+
+\noindent
+\ws\ 中实现了两种黏性流体浮泥导致的波浪阻尼公式，它们基于 NRL 的 SWAN 代码中较早的实现。
+与冰导致的波浪阻尼（第 \ref{sec:ICE1} 节）类似，二者都依赖复波数的概念
+（式 (\ref{eq:waveno})）。二者都把泥层视为黏性流体，并假定泥层厚度可与其 Stokes
+边界层厚度相比。第一种公式（\cite{art:DL78}；下文称 D\&L）为数值解。
+第二种公式（\cite{art:Ng00}；下文称 Ng）为解析渐近解，因此计算通常比 D\&L 快得多。
+对于 \cite{art:RH09} 使用的泥沙特性范围，这些特性基于现场测量（和估计），两种方法
+会产生非常相似的结果。
+
+在每种情况下，泥沙诱导耗散都会加入式~(\ref{eq:bal_plane}) 中其他源/汇项的贡献。
+
+\begin{equation}\label{eq:dmud1}
+  {S_{mud}} = 2  k_i {C_{g,mud}},
+\end{equation}
+
+\noindent
+其中 $k_i=imag({k_{mud}})$，${C_{g,mud}}$ 为受浮泥修正后的波群速。
+
+上式来自初始振幅为 $a_0$ 的单一波列的指数衰减：
+\begin{equation}\label{eq:dmud2}
+ a=a_0e^{-k_ix}.
+\end{equation}
+
+\noindent
+两种方法都通过求解修正色散关系来工作，其中要求解的波数 ${k_{mud}}$ 为复数。
+D\&L 方法对这一色散关系使用迭代过程。细节见 \cite{art:DL78} 的第 2 节和附录 B。
+{\code BT9}（Ng）的专门说明见下一节。
+
+要使用（D\&L）程序启用黏性浮泥效应，用户需在开关参数文件中指定 {\code BT8}。
+
+当使用开关 {\code IC1}、{\code IC2}、{\code IC3}、{\code BT8} 或 {\code BT9}
+启用任一新的冰和泥沙源函数时，{\file ww3\_shel} 会预期 8 个新场的输入说明
+（5 个冰场，随后 3 个泥沙场）。这些说明位于 ``water levels'' 信息之前。新场也可通过
+{\file ww3\_shel.inp} 指定为均匀场。泥沙参数依次为泥沙密度（kg/m$^3$）、泥层厚度（m）
+和泥沙黏性（m$^2$/s）。
+
+关于如何使用新的泥沙源函数，用户可参考回归测试 {\file ww3\_tbt1.1} 和
+{\file ww3\_tbt2.1} 中的示例。
+
+\textrm{\textit{\underline{代码限制}}}：对于 {\file ww3\_multi}，必要的泥沙和冰强迫场
+接口目前只在使用 namelist 类型输入文件时实现。对于泥沙，虽然会计算 ${k_r}$，但其
+影响不会传回主程序；唯一的影响来自 ${k_i}$（耗散）。${k_r}$ 的完整实现已经可用于
+IC3，并将在模型未来版本中提供。
+
+\textrm{\textit{\underline{物理限制}}}：1) 两个模型（{\code BT8}、{\code BT9}）
+都忽略了泥层中的弹性。2) 尚不支持泥沙的非 Newton 响应（例如触变性流体）。
+3) 泥层厚度不应解释为总泥厚，而应解释为流态化泥层的厚度。在实践中，该值众所周知
+很难确定（\cite{art:RH09}）。幸运的是，由于 \ws\ 支持泥沙参数的非定常和非均匀输入，
+可以通过与泥层数值模型耦合来处理第 (2) 和第 (3) 项；这不需要对 \ws\ 代码作额外修改。

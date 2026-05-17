@@ -1,0 +1,219 @@
+\vsssub
+\subsubsection{~模块中的参数设置}
+\vsssub
+
+若干模块包含内部使用的参数设置。这里仅列出通常可使用或会影响模式行为的
+参数设置。
+
+\vspace{\baselineskip} \noindent
+物理和数学常数：\hfill {\file constants.ftn}
+\begin{vlist}
+\vit{grav  }{rp}{重力加速度 $g$。
+                \hfill (m s$^{-2}$)}
+\vit{dwat  }{rp}{水密度。 \hfill(kg m$^{-3}$)}
+\vit{dair  }{rp}{空气密度。 \hfill(kg m$^{-3}$)}
+\vit{nu\_air}{rp}{空气运动黏度 \hfill (m$^2$ s$^{-1}$)}
+\vit{nu\_water}{rp}{水的运动黏度 \hfill (m$^2$ s$^{-1}$)}
+\vit{sed\_sd}{rp}{泥沙比重 \hfill (--)}
+\vit{kappa }{rp}{von Karman 常数 \hfill (--)}
+\vit{pi    }{rp}{$\pi$。}
+\vit{tpi   }{rp}{$2\pi$。}
+\vit{hpi   }{rp}{$0.5\pi$。}
+\vit{tpiinv}{rp}{$(2\pi)^{-1}$。}
+\vit{hpiinv}{rp}{$(0.5\pi)^{-1}$。}
+\vit{rade  }{rp}{从弧度到角度的转换因子。}
+\vit{dera  }{rp}{从角度到弧度的转换因子。}
+\vit{radius}{rp}{地球半径。 \hfill (m)}
+\vit{g2pi3i}{rp}{$g^{-2} (2\pi)^{-3}$。}
+\vit{g1pi1i}{rp}{$g^{-1}(2\pi)^{-1}$。}
+\end{vlist}
+
+\noindent
+波浪模式初始化模块：\hfill {\file w3initmd.ftn}
+\begin{vlist}
+\vit{critos}{rp}{仅用于输出的资源所占临界比例
+                     （触发警告输出）。}
+\vit{wwver }{cp}{主程序版本号。}
+\vit{switches}{cp}{取自 {\file bin/switch} 的开关。}
+\end{vlist}
+
+\noindent
+I/O 模块（{\file mod\_def.ww3}）：\hfill {\file w3iogrmd.ftn}
+\begin{vlist}
+\vit{vergrd}{cp\opt}{文件 {\file mod\_def.ww3} 的版本号。}
+\vit{idstr }{cp\opt}{文件的 ID 字符串。}
+\end{vlist}
+
+\noindent
+I/O 模块（{\file out\_grd.ww3}）：\hfill {\file w3iogomd.ftn}
+\begin{vlist}
+\vit{verogr}{cp\opt}{文件 {\file out\_grd.ww3} 的版本号。}
+\vit{idstr }{cp\opt}{文件的 ID 字符串。}
+\end{vlist}
+
+\noindent
+I/O 模块（{\file out\_pnt.ww3}）：\hfill {\file w3iopomd.ftn}
+\begin{vlist}
+\vit{veropt}{cp\opt}{文件 {\file out\_pnt.ww3} 的版本号。}
+\vit{idstr }{cp\opt}{文件的 ID 字符串。}
+\vit{acc   }{cp}{输出点被移动到网格点之前允许的相对偏移下限。}
+\end{vlist}
+
+\noindent
+I/O 模块（{\file track\_o.ww3}）：\hfill {\file w3iotrmd.ftn}
+\begin{vlist}
+\vit{vertrk}{cp\opt}{文件 {\file track\_o.ww3} 的版本号。}
+\vit{idstri}{cp\opt}{文件 {\file track\_i.ww3} 的 ID 字符串。}
+\vit{otype }{cp}{数组维度。}
+\end{vlist}
+
+\noindent
+I/O 模块（{\file restart.ww3}）：\hfill {\file w3iorsmd.ftn}
+\begin{vlist}
+\vit{verini}{cp\opt}{文件 {\file restart.ww3} 的版本号。}
+\vit{idstr }{cp\opt}{文件的 ID 字符串。}
+\end{vlist}
+
+\noindent
+I/O 模块（{\file nest.ww3}）：\hfill {\file w3iobcmd.ftn}
+\begin{vlist}
+\vit{verbpt}{cp\opt}{文件 {\file nest.ww3} 的版本号。}
+\vit{idstr }{cp\opt}{文件的 ID 字符串。}
+\end{vlist}
+
+\noindent
+I/O 模块（{\file partition.ww3}）：\hfill {\file w3iosfmd.ftn}
+\begin{vlist}
+\vit{vertrt}{cp\opt}{文件 {\file partition.ww3} 的版本号。}
+\vit{idstr }{cp\opt}{文件的 ID 字符串。}
+\end{vlist}
+
+\noindent
+多网格模式输入更新：\hfill {\file wmupdtmd.ftn}
+\begin{vlist}
+\vit{swpmax}{ip}{从输入网格向波浪模式网格转换输入时，为使映射匹配而允许
+                 进行的最大外推扫描次数。}
+\end{vlist}
+
+\noindent
+若干例程包含用 parameter 语句建立的插值表，包括
+
+\vspace{\baselineskip} \noindent
+求解色散关系：\hfill {\file w3dispmd.ftn}
+\begin{vlist}
+\vit{nar1d }{ip}{插值表维度。}
+\vit{dfac  }{rp}{最大无量纲水深 $kd$。}
+\vit{ecg1  }{ra}{根据频率和水深计算群速的表。}
+\vit{ewn1  }{ra}{同上，波数。}
+\vit{n1max }{i }{表中的最大索引。}
+\vit{dsie  }{r }{无量纲频率增量。}
+\end{vlist}
+
+\noindent
+\gmd\ 的浅水四波相互作用查找表：\hfill {\file w3snl3md.ftn}
+\begin{vlist}
+\vit{nkd   }{ip}{存储数组中的无量纲水深个数。}
+\vit{kdmin }{rp}{表中的最小相对水深。}
+\vit{kdmax }{rp}{表中的最大相对水深。}
+\vit{lammax}{rp}{$\lambda$ 或 $\mu$ 的最大值。}
+\vit{delthm}{rp}{最大角度间隔 $\theta_{12}$（$\degree$）。}
+\end{vlist}
+
+\noindent
+非线性滤波器的浅水查找表：\hfill {\file w3snlsmd.ftn}
+\begin{vlist}
+\vit{nkd   }{ip}{存储数组中的无量纲水深个数。}
+\vit{kdmin }{rp}{表中的最小相对水深。}
+\vit{kdmax }{rp}{表中的最大相对水深。}
+\vit{abmax }{rp}{$a_{34}$ 的最大值。}
+\end{vlist}
+
+\noindent
+Tolman and Chalikov 1996 中 $\beta$ 的查找表：\hfill {\file w3src2md.ftn}
+\begin{vlist}
+\vit{nrsiga}{ip}{数组维度（$\sigma_a$）。}
+\vit{nrdrag}{ip}{数组维度（$C_d$）。}
+\vit{sigamx}{rp}{最大无量纲频率 $\tilde{\sigma}_a$。}
+\vit{dragmx}{rp}{最大拖曳系数 $C_d$}
+\end{vlist}
+
+\noindent
+WAM-4 / ECWAM 中 \ldots 的查找表：\hfill {\file w3src3md.ftn}
+\begin{vlist}
+\vit{kappa  }{rp}{von K{\'a}rm{\'a}n 常数。}
+\vit{nu\_air}{rp}{空气黏度。}
+\vit{itaumax}{ip}{应力维度大小。}
+\vit{jumax  }{ip}{风速维度大小。}
+\vit{iustar }{ip}{ustar 维度大小。}
+\vit{ialpha }{ip}{Charnock 维度大小。}
+\vit{ilevtail}{ip}{尾部能级维度大小。}
+\vit{umax   }{rp}{表中的最大风速。}
+\vit{tauwmax}{rp}{表中的最大 ustar。}
+\vit{eps1   }{rp}{应力收敛用小量。}
+\vit{eps2   }{rp}{应力收敛用小量。}
+\vit{niter  }{ip}{应力表中的迭代次数。}
+\vit{xm     }{ip}{粗糙度参数化中 TAUW/TAU 的幂次。}
+\vit{jtot   }{ip}{尾部离散中的点数。}
+\end{vlist}
+
+\noindent
+Ardhuin et al. 2010 的查找表：\hfill {\file w3src3md.ftn}
+
+由前两组参数组合而成。 \\
+
+\noindent
+底摩擦中的误差函数表：\hfill {\file w3sbt4md.ftn}
+\begin{vlist}
+\vit{sizeerftable}{ip}{erf 函数表的大小。}
+\vit{xerfmax}{rp }{erf(x) 表中 x 的最大值。}
+\vit{wsub   }{rpa}{3 点 Gauss-Hermitte 求积的权重。}
+\vit{xsub   }{rpa}{3 点 Gauss-Hermitte 求积的 x 值。}
+\end{vlist}
+
+\noindent
+部分模式参数使用 parameter 语句设置。
+
+\vspace{\baselineskip}
+\noindent
+源项计算和积分：\hfill {\file w3srcemd.ftn}
+\begin{vlist}
+\vit{offset}{rp\opt}{式~(\ref{eq:implicit_st}) 中的偏移量 $\epsilon$。}
+\end{vlist}
+
+\noindent
+辅助数据存储：\hfill {\file w3adatmd.ftn}
+\begin{vlist}
+\vit{mpibuf}{ip}{\mpi\ 数据转置中使用的缓冲区数量。}
+\end{vlist}
+
+\noindent
+部分服务例程包含可用于影响模式输出等行为的参数。
+
+\vspace{\baselineskip}
+\noindent
+数组 I/O，包括文本输出：\hfill {\file w3arrymd.ftn}
+\begin{vlist}
+\vit{icol  }{ip\opt}{设置输出的最大列数（当前设为 80）。}
+\vit{nfrmax}{ip\opt}{设置谱打印图中的最大频率数（当前设为 50）。}
+\end{vlist}
+
+\noindent
+自动单元号分配：\hfill {\file wmunitmd.ftn}
+\begin{vlist}
+\vit{unitlw}{ip}{要考虑的最低单元号。}
+\vit{unithg}{ip}{要考虑的最高单元号。}
+\vit{inplow, inphgh}{}{}
+\vit{      }{ip}{输入文件单元号范围。}
+\vit{outlow, outhgh}{}{}
+\vit{      }{ip}{输出文件单元号范围。}
+\vit{scrlow, scrhgh}{}{}
+\vit{      }{ip}{临时文件单元号范围。}
+\end{vlist}
+
+\noindent
+生成谱公告：\hfill {\file w3bullmd.ftn}
+\begin{vlist}
+\vit{nptab, nfld, npmax, bhsmin, bhsdrop, dhsmax,}{}{}
+\vit{dptmx, ddmmax, ddwmax, agemin}{}{}
+\vit{}{i/rp}{公告大小以及各类滤波值的设置。}
+\end{vlist}

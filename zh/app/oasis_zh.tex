@@ -1,0 +1,104 @@
+\pagestyle{myheadings} \setcounter{page}{1} \setcounter{footnote}{0}
+
+\section{~使用 OASIS 进行海洋-海冰-波浪-大气耦合} \label{app:coupling}
+\newcounters
+
+\vssub
+\subsection{~引言} \label{sec:couplingA}
+\vssub
+
+\ws\ 已经与 OASIS3-MCT 建立接口，以允许与大气和/或海洋模式进行耦合模拟。
+OASIS（Ocean Atmosphere Sea Ice Soil）\footnote{https://verc.enes.org/oasis/}
+是由 CERFACS 和 CNRS 开发的耦合软件 \citep{art:VAL13}，注意该缩写中没有
+波浪。当前 OASIS3-MCT 版本与 MCT（Model Coupling Toolkit）
+\citep{art:LJO05,art:JLO05} 建立接口；MCT 由 Argonne National Laboratory
+开发。OASIS 耦合器也与 Los Alamos National Laboratory 开发的 SCRIP 库
+建立接口。有关如何使用 OASIS 耦合器的全部信息都在 OASIS 用户指南中。
+这里仅补充 OASIS 在 \ws\ 中使用的信息。\\
+
+简而言之，OASIS3-MCT ...
+
+\begin{itemize}
+  \item ... 已完全并行化
+  \item ... 没有可执行程序（启动耦合模拟时不需要给它分配进程）
+  \item ... 能够交换 2D 和 3D 场
+  \item ... 能够并行交换场
+  \item ... 支持非结构网格
+  \item ... 使用名为 \textit{namcouple} 的输入文件，该文件允许在不重新编译
+        代码的情况下改变耦合特性（交换时间、插值类型、交换场数量）...
+\end{itemize}
+
+\vssub
+\subsection{~与 OASIS3-MCT 建立接口} \label{sec:couplingB}
+\vssub
+
+为了与另一个模式通信，分量模式（海洋、波浪、海冰或大气）需要包含若干
+对 OASIS3-MCT 耦合库的专门调用。为了在 \ws\ 中使用这些 OASIS 函数，
+我们创建了 4 个新模块：
+\begin{itemize}
+\item {\file w3oacpmd.ftn}，包含大气和海洋耦合通用函数的模块。这些函数在
+      时间循环之前、{\code ww3\_shel} 程序中调用。
+\item {\file w3ogcmmd.ftn}、{\file w3igcmmd.ftn} 和 {\file w3agcmmd.ftn}，
+      分别包含波浪-海洋耦合、波浪-海冰耦合和波浪-大气耦合专用函数的模块。
+      这些函数在时间循环中调用。
+\end{itemize}
+
+\vssub
+\subsection{~使用 OASIS3-MCT 编译} \label{sec:couplingB}
+\vssub
+
+为使用或不使用这些耦合函数，创建了 5 个开关：
+
+\begin{itemize}
+\item 开关 {\code COU}，用于执行耦合：读取 {\file ww3\_shel.inp} 输入文件，
+      并定义交换变量数量和交换时间。
+\item 开关 {\code OASIS}，用于初始化 OASIS 耦合器 {\file w3oacpmd.ftn}
+\item 开关 {\code OASACM} 和/或 {\code OASOCM} 和/或 {\code OASICM}，
+      用于向/从大气模式 {\file w3agcmmd.ftn} 和/或海洋模式
+      {\file w3ogcmmd.ftn} 和/或海冰模式 {\file w3igcmmd.ftn} 发送/接收
+      耦合场
+\end{itemize}
+
+为了允许使用 OASIS，应使用以下开关编译 \ws。对于与大气环流模式耦合：
+\command{COU OASIS OASACM}
+与海洋环流模式耦合：
+\command{COU OASIS OASOCM}
+与海冰模式耦合：
+\command{COU OASIS OASICM}
+同时与海洋和大气环流模式耦合：
+\command{COU OASIS OASACM OASOCM}
+
+只有程序 {\code ww3\_shel} 使用 OASIS 库编译，所有其他程序可照常使用。\\
+
+由于耦合机制无法提供强迫场的未来值，因此不能使用风和流强迫场的时间插值
+开关。根据耦合类型，大气耦合必须设置开关 {\code WNT0}，海洋耦合必须设置
+开关 {\code CRT0}。
+
+\vssub
+\subsection{~启动耦合模拟} \label{sec:couplingC}
+\vssub
+
+以 Intel Mpi 为例，启动耦合模拟需要：
+
+\begin{itemize}
+\item WW3 的输入文件：{\file ww3\_shel.inp} 和常规 *.ww3 文件。
+\item OASIS 的输入文件：{\file namcouple}
+\item 海洋/海冰/大气模式的输入文件：{\file files depends on the model}
+\end{itemize}
+
+启动耦合模拟时，{\file mpirun} 命令应按如下方式使用：
+
+{\code mpirun -np \$nbre\_cores\_WW3 exe\_WW3 : -np \$nbre\_cores\_OA exe\_OA}
+
+\vssub
+\subsection{~限制} \label{sec:couplingD}
+\vssub
+
+还有一些限制尚未处理，将在后续版本中处理：
+
+\begin{itemize}
+\item 与 OASIS 的耦合只为 ww3\_shel 程序编码，尚未用于 {\code ww3\_multi}
+\item 在 WW3 套件中，有两个版本的 SCRIP，一个用于 OASIS，一个用于
+      {\code ww3\_multi}
+\item ...
+\end{itemize}

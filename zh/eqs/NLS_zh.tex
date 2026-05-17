@@ -1,0 +1,93 @@
+\vsssub
+\subsubsection{~$S_{nl}$：非线性滤波器} \label{sec:NLS}
+\vsssub
+
+\opthead{NLS}{\ws}{H. L. Tolman}
+
+\noindent
+当式~（\ref{eq:resonance}）和（\ref{eq:snl_dia}）中的 \dia\ 使用一个 $\lambda_{nl}$ 足够小的四元组，使所得四元组\emph{不能}被离散谱网格解析时，\dia\ 的数值形式就对应于一个简单的扩散张量。如果对该张量进行滤波，使它只作用于谱的高频尾部，就得到一个守恒滤波器；它保留非线性相互作用的所有守恒性质 \citep{tol:MMAB08b,tol:OMOD11}。该滤波器可作为非线性相互作用参数化的一部分使用。例如，\cite{tol:OMOD11} 的图 5 和图 6 显示，它在某些 \gmd\ 配置中能有效去除高频谱噪声。由于四元组不被谱网格解析这一点至关重要，定义四元组的滤波器自由参数便是四元组 3 和 4 在离散频率网格中的相对偏移量（$\alpha_{34}$，$0 < \alpha_{34} < 1$），并由此计算 $\lambda_{nl}$：
+
+%----------------------------%
+% Nonlinear filter           %
+%----------------------------%
+% eq:nls_a34
+
+\begin{equation}
+\lambda_{nl} = \alpha_{34} (X_{\sigma}-1) , \label{eq:nls_a34}
+\end{equation}
+
+\noindent 
+其中 $X_{\sigma}$ 是离散频率网格的递增因子，通常 $X_{\sigma}=1.1$[式~（\ref{eq:sigma_grid}）]。采用 \ws\ 的原生谱描述，四元组分量 $i$ 处的谱密度变化 $\delta N_i$ 可写成离散扩散方程的形式 \citep[第 294 页]{tol:OMOD11}：
+
+% eq:nls_dist
+% eq:nls_S
+
+\begin{equation}
+\left ( \begin{array}{l} \delta N_3 \\ \delta N_1 \\ \delta N_4 
+\end{array} \right ) = 
+N_1 \: \left ( \begin{array}{c} 0 \\ 1 \\ 0 \end{array} \right ) +
+N_1 \:  \frac{S \Delta t}{N_1}
+\left ( \begin{array}{r} 1 \\ -2 \\ 1 \end{array} \right )
+ , \label{eq:nls_dist}
+\end{equation}
+其中
+\begin{equation}
+S = \frac{C_{nlf} \: k^4 \sigma^{12} }{(2\pi)^9 \: g^4 \: c_g }
+\left [ \frac{N_1^2}{k_1^2}  \left ( \frac{N_3}{k_3}+\frac{N_4}{k_4} \right ) 
+               - 2 \frac{N_1}{k_1} \frac{N_3}{k_3} \frac{N_4}{k_4} \right ]
+, \label{eq:nls_S}
+\end{equation}
+
+\noindent 
+其中 $C_{nlf}$ 是滤波器中所用 \dia\ 的比例常数。 \dia\ 会为两个镜像四元组（$S_a$ 和 $S_b$）产生变化 $S$。采用 \js\ 风格滤波器（$\Phi$）使平滑器只局限于较高频率：
+
+% eq:nls_filter
+
+\begin{equation}
+\Phi(f) = \exp \left [ -c_1 \left ( \frac{f}{c_2 f_p} \right ) ^ {-c_3}
+               \right ] ,
+\label{eq:nls_filter}
+\end{equation}
+
+\noindent
+其中 $c_1$ 到 $c_3$ 是可调参数。后面这三个参数需要选择为使 $\Phi(f_p) \approx 0$、$\Phi(f > 3f_p) \approx 1$，并且在频率略高于 $f_p$ 时 $\Phi \approx 0.5$。这可通过设定
+\begin{equation}
+c_1 = 1.25, \:\:\:  \:\:\: c_2 = 1.50, \:\:\:  \:\:\: c_3 = 6.00. 
+\label{eq:nls_f_parms}
+\end{equation}
+实现。
+
+ 
+考虑变化 $S_{a,b}$ 在邻近离散谱网格点上的再分配后，两个四元组相互作用的有效无量纲强度（$\tilde{S}_{a,b}$）变为
+
+\begin{equation}
+\tilde{S}_a = \Phi(f) M_1 S_a \Delta t / N_1
+, \:\:\:
+\tilde{S}_b = \Phi(f) M_1 S_b \Delta t / N_1
+, \label{eq:nls_tilde_s}
+\end{equation}
+
+\noindent 
+其中 $N_1$ 是四元组中心分量处的作用量密度，$M_1$ 是用于考虑贡献在离散谱网格上再分配的因子 \citep[详见][]{tol:OMOD11}。为了把该 \dia\ 转换为稳定的扩散滤波器，$|\tilde{S}_{a,b}|$ 应限制为 $\tilde{S}_{\max} \approx 0.5$ \citep[例如][]{bk:Fle88}。最大变化按下式分配到两个四元组上：
+
+\begin{equation}
+\tilde{S}_{m,a} = 
+   \frac{|\tilde{S}_a|\tilde{S}_{\max}}{|\tilde{S}_a|+|\tilde{S}_b|}
+ , \:\:\:
+\tilde{S}_{m,b} = 
+   \frac{|\tilde{S}_b|\tilde{S}_{\max}}{|\tilde{S}_a|+|\tilde{S}_b|}
+ ,
+\label{eq:nls_limit_2D}
+\end{equation}
+
+\noindent
+并将归一化变化 $\tilde{S}_a$ 和 $\tilde{S}_b$ 限制为
+
+\begin{equation}
+- \tilde{S}_{m,a} \leq \tilde{S}_a \leq \tilde{S}_{m,a}, \:\:\:
+- \tilde{S}_{m,b} \leq \tilde{S}_b \leq \tilde{S}_{m,b}.
+\label{eq:nls_limit}
+\end{equation}
+
+\noindent 
+因此，守恒非线性滤波器的自由参数为式~（\ref{eq:nls_a34}）中的 $\alpha_{34}$、式~（\ref{eq:nls_S}）中的 $C_{nlf}$、式~（\ref{eq:nls_limit_2D}）中的 $\tilde{S}_{\max}$，以及式~（\ref{eq:nls_filter}）中的 $c_1$ 到 $c_3$。用户可通过 {\file ww3\_grid.inp} 中的名称列表 {\F snls} 调整所有这些参数（参数分别为 {\F a34}、{\F fhfc}、{\F dnm}、{\F fc1}、{\F fc2} 和 {\F fc3}）。注意，该滤波器是在 $S_{nl}$ 参数化之外额外应用的，但并不替代它。因此，它与前几节所述完整的 $S_{nl}$ 参数化配合使用。

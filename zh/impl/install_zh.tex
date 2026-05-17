@@ -1,0 +1,152 @@
+\vssub
+\subsection{~发行方式}\label{sec:install}
+\vssub
+
+\noindent 到 5.16 版为止，\ws{} 的公开发布版以 tarball 形式发布。6.07 版公开发布之后，\ws{} 将转向开放开发范式，源代码通过 Github 分发。
+
+\vssub
+\subsection{~安装}
+\vssub
+
+克隆源代码：
+\command{ git clone https://github.com/NOAA-EMC/WW3 }
+公开发布版可通过检出标签获得：
+\command{ git checkout VERTAG }
+其中 VERTAG 是公开发布标签，例如 v6.07。
+
+\vssub
+\subsection{~设置}
+\vssub
+
+克隆 \ws{} 仓库之后，需要执行两个步骤。第一步是运行脚本 {\file model/bin/w3\_setup}；该脚本会编译辅助程序，并设置环境文件 {\file wwatch3.env}，该文件会本地存放在 bin 目录中。此文件设置默认 C 和 FORTRAN 编译器选项，这些选项只由预处理器使用。除特殊情况外，可以直接使用该默认设置。单独运行该脚本会给出完整用法；若要执行设置，还需提供 source\_dir，即 {\file model} 目录的位置。如果从顶层目录运行：
+\command{ ./model/bin/w3\_setup model }
+
+可以通过重新运行 {\file w3\_setup} 程序或手工编辑设置文件来修改设置。\ws{} 的 `home' 目录只能通过编辑或删除本地 {\file wwatch3.env} 来更改。
+
+注意，旧版本的 \ws{} 曾要求定义环境位置。一个高级选项是在用户环境变量 {\code WWATCH3\_ENV} 中定义 {\file wwatch3.env} 的路径；现在已不再需要。此外，也不再提供全局安装选项。
+
+设置 \ws{} 的第二步是运行脚本 {\file /model/bin/ww3\_from\_ftp.sh}，以获取未存储在 git 仓库中的二进制文件或大型文件。从顶层目录运行：
+\command{./model/bin/ww3\_from\_ftp.sh}
+该脚本有三个提示需要用户输入。第一个询问顶层目录路径，第二个询问是否删除复制得到的 tar 文件（通常回答 n，即否），最后一个询问是否保留该脚本使用的文件夹（通常回答 n，即否）。
+
+\vssub
+\subsection{~目录结构}
+\vssub
+
+克隆 \ws{} 仓库之后，顶层目录中可见以下目录。
+
+\begin{dlist}
+\dit{manual   }{手册目录。}
+\dit{model    }{模式源代码、构建脚本等。}
+\dit{regtests }{\ws{} 可执行程序。}
+\dit{guide    }{\ws{} 指南。}
+\dit{smc\_docs }{SMC 网格的文档和文件。}
+\end{dlist}
+
+\noindent \ws{} 的 `model' 目录中存在以下目录。
+
+\begin{dlist}
+\dit{tools }{原始辅助程序（源代码等）。}
+\dit{bin }{用于编译和链接的可执行程序与 shell 脚本。}
+\dit{ftn }{源代码和 makefile。}
+\dit{inp }{输入文件。}
+\dit{nml }{Namelist 输入文件。}
+\end{dlist}
+
+\noindent 编译代码后，会在 `model' 目录中生成以下目录。
+
+\begin{dlist}
+\dit{exe }{\ws{} 可执行程序。}
+\dit{mod }{模块文件。}
+\dit{obj }{目标文件。}
+\end{dlist}
+
+\noindent
+
+{\dir tools} 目录包含各种附加工具，具体内容见实际目录。其中包括贡献的 {\it Matlab} 代码、{\it IDL} 工具、{\it bash} 脚本，以及 {\it GrADS} 和 {\it FORTRAN} 程序。
+
+设置 \ws{} 时，安装流程会首先处理辅助程序的 {\it FORTRAN} 代码，使用设置文件 {\file wwatch3.env} 中定义的编译器。注意，这些代码仍采用固定格式的 {\fortran-77}。可执行程序存储在 {\dir bin} 目录中。关于这些程序的更详细说明（包括运行可执行程序的说明），可在上述源代码文件包含的文档中找到。编译这些程序后，若干 \unix{} shell 脚本和辅助文件会安装到 {\dir bin} 目录中。
+
+\begin{flist}
+\fit{w3adc.f }{\ws{} 的 {\fortran} 预处理器。}
+\fit{w3prnt.f}{打印文件（源代码），包括页码和行号。}
+\fit{w3list.f}{生成通用源代码清单。}
+
+\fit{w3split.f}{从点输出后处理器的谱输出中生成谱公告，用以识别一个谱内的各个波浪场（见 \para\ref{sec:ww3outp}）。这是一段旧代码，已被直接从 {\file ww3\_outp} 生成公告的方式取代。这里保留它仅出于历史原因。}
+
+\end{flist}
+
+{\dir bin} 目录包含用于管理 \ws{} 框架的各种 \unix{} 脚本。这些脚本的用法在 \para\ref{sec:comp} 中说明。注意，以下脚本会从 \ws{} 环境设置文件获取设置信息，该文件由 {\code WWATCH3\_ENV} 定义；它既可以由读取本地 {\file wwatch3.env} 的 {\file w3\_setenv} 定义，也可以由用户环境文件定义。
+
+\vspace{\baselineskip} \noindent
+使用的主程序：
+
+\begin{flist}
+\fit{install\_ww3\_tar }{从 tar 文件安装 \ws{} 的脚本。}
+\fit{w3\_setup        }{创建/编辑 \ws{} 环境设置文件的脚本。默认设置文件为 {\file {\dir bin}/.wwatch3.env}。switch 和编译器通过参数给出（见选项）。}
+\fit{w3\_clean        }{清理 \ws{} 目录的脚本，通过删除编译或测试运行生成的文件完成清理。提供 3 个清理级别（见选项）。}
+\fit{w3\_make         }{使用 makefile 编译并链接 \ws{} 组件的脚本。可在参数中给出程序列表。}
+\fit{w3\_automake      }{根据 switch 文件内容，在 MPI、OMP 或 HYB 中分别自动编译串行程序和分布式程序的脚本。可在参数中给出程序列表。}
+\fit{w3\_new          }{在结合 makefile 使用时，触碰所有正确的源代码文件，以处理编译器开关变化的脚本。}
+\fit{ww3\_gspl.sh     }{自动使用 {\file ww3\_gspl} 程序的脚本（见 \para\ref{sub:ww3gspl}）。}
+\fit{arc\_wwatch3\_tar}{将 \ws{} 的版本归档到目录 {\dir arc} 中的程序。}
+\fit{ww3\_from\_ftp.sh  }{下载 git 未提供的所有二进制文件的脚本。}
+\end{flist}
+
+\noindent
+提供的示例文件：
+
+\begin{flist}
+\fit{switch\_{\it xxx} }{用户或开发者提供的预处理器开关示例（\para\ref{sec:switches}）。}
+\end{flist}
+
+\noindent
+被调用的子程序：
+
+\begin{flist}
+\fit{w3\_setenv        }{基于 {\file {\dir bin}/.wwatch3.env} 设置环境的脚本。由所有辅助程序调用。}
+\fit{comp.tmpl        }{与 {\file cmplr.env} 配合使用的编译脚本模板 {\file comp}。}
+\fit{link.tmpl        }{与 {\file cmplr.env} 配合使用的链接脚本模板 {\file link}。}
+\fit{cmplr.env        }{在 intel、mpt、gnu、pgi 上测试过的编译器选项，包含优化和调试选项；与 comp.tmpl 和 link.tmpl 配合使用。}
+\fit{make\_makefile.sh}{根据文件 {\file switch} 中的选择生成 makefile 的脚本。}
+\fit{ad3              }{对给定源代码文件运行预处理器 {\file w3adc} 和编译脚本 {\file comp} 的脚本。}
+\fit{ad3\_test        }{{\file ad3} 的测试版本，显示对原始源文件的修改。该脚本不编译代码。}
+\fit{all\_switches    }{生成源代码文件中存在的所有 {\code w3adc} 开关列表。}
+\fit{find\_switch     }{查找包含编译器开关（或任意字符串）的 \ws{} 源代码文件的脚本。}
+\fit{sort\_switch     }{对 switch 文件中的开关排序。}
+\fit{sort\_all\_switches}{搜索 \ws{} 中所有 switch 文件并调用 {\file sort\_switch} 的脚本。}
+
+\end{flist}
+
+
+\noindent
+额外程序：
+
+\begin{flist}
+\fit{comp.{\it xxx}   }{用于高级设置的编译脚本 {\file comp}。}
+\fit{link.{\it xxx}   }{用于高级设置的链接脚本 {\file link}。}
+\fit{make\_MPI        }{分别编译 MPI 和非 MPI 程序的脚本（未来版本中废弃，请使用 {\file w3\_automake}）。}
+\fit{make\_OMP        }{分别编译 OpenMP 和单线程程序的脚本（未来版本中废弃，请使用 {\file w3\_automake}）。}
+\fit{make\_HYB        }{分别编译混合 MPI-OpenMP 程序和单线程程序的脚本（未来版本中废弃，请使用 {\file w3\_automake}）。}
+\fit{ln3              }{将源代码文件符号链接到工作目录的脚本（未使用）。}
+\fit{list             }{使用 {\file w3prnt} 打印源代码清单的脚本（未使用）。}
+\fit{w3\_source       }{为任意 \ws{} 程序元素生成真正 \fortran{} 源代码的脚本（未使用）。}
+\fit{WW3\_switch\_process}{从源文件处理 switch 的 Perl 脚本（未使用）。}
+\end{flist}
+
+
+安装到 {\dir bin} 目录后，若干 GrADS 脚本会安装到 {\dir tools} 目录中。
+
+\begin{flist}
+\fit{cbarn.gs         }{用于显示色标的半标准 GrADS 脚本。}
+\fit{colorset.gs      }{定义阴影所用颜色的脚本。}
+\fit{profile.gs}      {显示 {\file ww3\_multi} 生成的剖析数据的脚本。}
+\fit{source.gs}       {用于谱和源项组合绘图的脚本（二维极坐标或笛卡尔图，可为彩色或黑白）。}
+\fit{1source.gs}      {绘制单个源项的脚本。}
+\fit{spec.gs}         {绘制谱的脚本。}
+\fit{spec\_ids.gen}   {谱/源项脚本使用的数据文件。}
+\end{flist}
+
+
+
+\pb

@@ -1,0 +1,190 @@
+\vsssub
+\subsubsection{网格输出 NetCDF 后处理器} \label{sec:ww3ounf}
+\vsssub
+
+\proddefH{ww3\_ounf}{w3ounf}{ww3\_ounf.ftn}
+\proddeff{输入}{ww3\_ounf.nml}{Namelist 配置文件。}{10} (App.~\ref{sec:config132})
+\proddefa{ww3\_ounf.inp}{传统配置文件。}{10} (App.~\ref{sec:config131})
+\proddefa{mod\_def.ww3}{模式定义文件。}{20}
+\proddefa{out\_grd.ww3}{原始网格输出数据。}{20}
+\proddefa{NC\_globatt.inp}{附加全局属性（已弃用）}{994}
+\proddefa{ounfmeta.inp}{用户定义的元数据属性}{60}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{\opt  .nc}{NetCDF 文件}{}
+
+
+\vspace{\baselineskip}
+
+\noindent
+当文件中只放入一个场时，每种数据类型对应的缩写场名（来自 ww3\_outf 的文件扩展名）见第~\pageref{tab:fields} 页表~\ref{tab:fields}。
+
+\noindent
+\paragraph{元数据的用户配置：}
+
+\noindent
+默认元数据（属性）会为每个 WW3 输出变量生成到输出 netCDF 文件中。如有需要，用户可通过名为 `ounfmeta.inp' 的输入文本文件覆盖已有元数据，或配置额外元数据。
+
+
+\noindent
+`ounfmeta.inp' 文件可用于覆盖或配置以下内容：
+\begin{itemize}
+  \item 修改/扩展网格输出变量的 netCDF 属性。
+  \item 修改/扩展“全局”netCDF 属性。
+  \item 定义/重新定义坐标参考系统。
+  \item 定义用于为分区参数输出变量生成属性的模板字符串。
+\end{itemize}
+
+\noindent
+ounfmeta.inp 文件中的条目通过带有关键字标记的\emph{节}给出。空行和注释行（以 \texttt{\$} 开头）会被忽略。注意：所有关键字和 `Field Name ID' 字符串（例如 \texttt{HS}）均不区分大小写。所有 netCDF 属性名区分大小写。
+
+\noindent
+\paragraph{修改/添加 WW3 网格输出场的属性：}
+
+\noindent
+输出场通过 META 关键字选择，其后可跟整数对 \texttt{GroupNum} 和 \texttt{ParamNum}，也可跟 \texttt{FldTag} 字符串；这些值对应于 ww3\_shel.nml 或 ww3\_shel.inp 中的 `Output field parameter definitions table'。任一种形式后面都可跟一个可选整数值 \texttt{IFC}，用于在多分量场中选择分量（例如 WND 和 CUR 输出场中的 U、V 分量）。
+
+\begin{verbatim}
+  META  <GroupNum ParamNum>  |  <FldTag>  [IFC]
+    attr_name  = attr_value
+    attr_name  = attr_value
+    extra_attr = extra_value [type]
+    extra_attr = extra_value [type]
+  ... repeated as many times as required.
+\end{verbatim}
+
+
+\noindent
+每个 \texttt{attr\_name} 对应一个已有变量属性，可以是以下属性之一（括号中给出替代内部名称）：
+\begin{itemize}
+ \item  \texttt{standard\_name (varns)} [string]：CF 标准名称。
+ \item  \texttt{long\_name (varnl)} [string]：描述性长名称。
+ \item  \texttt{globwave\_name (varng)} [string]：可选 GlobWAVE 名称。
+ \item  \texttt{direction\_reference} 或 \texttt{dir\_ref (varnd)} [string]：方向场的可选参考框架。
+ \item  \texttt{comment (varnc)} [string]：可选注释。
+ \item  \texttt{units} [string]：场的单位。
+ \item  \texttt{valid\_min (vmin)} [float]：数据的最小有效值。
+ \item  \texttt{valid\_max (vmax)} [float]：数据的最大有效值。
+ \item  \texttt{scale\_factor (fsc)} [float]：数据缩放因子，仅当变量类型为 SHORT 时使用。
+\end{itemize}
+
+\noindent
+任何其他属性名均被认为是可选的“额外”属性。该额外属性可带有可选的 `type' 关键字，用于指定元数据的变量类型。若未提供类型，则默认为字符类型。有效类型为 \texttt{[c, r, i]} 之一，分别表示字符/字符串、实数/浮点或整数值。注意：以空格分隔的字符串额外字段应加引号。
+
+\noindent
+\paragraph{修改“全局”元数据：}
+
+\noindent
+全局元数据（即与文件关联，而非与某个特定变量关联）可用特殊的 \texttt{META global} 关键字组合指定：
+
+\begin{verbatim}
+  META global [nodefault]
+    extra_attr = extra_value [type]
+    extra_attr = extra_value [type]
+\end{verbatim}
+
+\noindent
+可选关键字 \texttt{nodefault} 会抑制默认 WW3 全局元数据的输出。
+
+\noindent
+\paragraph{修改/定义坐标参考系统：}
+
+
+\noindent
+可用 \texttt{CRS} 关键字为所有网格输出场指定“坐标参考系统”（CRS）。至少必须指定 \texttt{grid\_mapping\_name} 属性。若定义了 CRS 节，所有输出场都会添加一个 \texttt{grid\_mapping} 属性，引用 CRS 变量。\texttt{crs\_vaname} 将在输出文件中创建为一个标量 NF90\_CHAR 变量。
+
+\begin{verbatim}
+  CRS <crs_varname>
+    grid_mapping_name = <mapping name>
+    attr = value
+    attr = value
+\end{verbatim}
+
+\noindent
+对于普通经纬度网格和旋转极点网格，ww3\_ounf 会生成合适的坐标参考系统，但可使用 CRS 关键字覆盖。
+
+
+\noindent
+\paragraph{分区参数模板字符串}
+
+\noindent
+分区输出的元数据指定方式略有不同；一个元数据条目用于某一场的所有分区。元数据通过\emph{模板字符串}针对特定分区编号专门化。内置模板字符串有两个：\texttt{SPART} 和 \texttt{IPART}。它们分别提供“字符串”描述（例如 `wind sea'、`primary swell' 等）或整数分区编号（1、2、3 等）。可在元数据属性值中用被 \texttt{< ... >} 包围的模板名引用它们，例如 \texttt{<SPART>}。
+
+\noindent
+也可以在 ounfmeta.inp 文件中用 \texttt{TEMPLATE} 关键字提供用户定义的分区参数模板字符串，如下所示：
+
+\begin{verbatim}
+  TEMPLATE <template-name>
+    String for partition 0
+    String for partition 1
+    String for partition 2
+    String for partition 3
+    ... etc
+\end{verbatim}
+
+\noindent
+若指定带有尾随下划线的 \texttt{<template-name>}，则会提供以下划线分隔（\texttt{\_}）而不是以空格分隔的字符串（这对 netCDF `standard name' 值很有用）。
+
+
+\noindent
+\paragraph{ounfmeta.inp 文件示例：}
+\begin{verbatim}
+   $ Lines starting with dollars are comments.
+   $ The line starts a meta-data section for the depth field
+   META DPT
+     standard_name = depth
+     long_name = "can be quoted string"
+     comment = or an unquoted string
+     vmax = 999.9
+
+   $ Next one is HSig (group 2, field 1)
+   META 2 1
+     varns = "sig. wave height"
+     varnl = "this is long name"
+
+   $ Next one is second component of wind. It also sets an
+   $ "extra" meta data value (height - a float)
+   META WND 2
+     standard_name = "v-wind"
+     height = 10.0 "r"
+
+   $ User defined partitioned parameters template strings:
+   TEMPLATE PARTSTR
+     wind wave
+     primary swell
+     secondary swell
+
+   $ Use partition templates in partitioned Hs field:
+   $ (SPART and IPART are built-in)
+   META PHS
+     standard_name = "<SPART_>_sigificant_wave_height"
+     long_name = "<PARTSTR>"
+     partition_number = "<IPART>"
+
+   $ Coordinate reference system:
+   CRS crs
+     grid_mapping_name = "latitude_longitude"
+     semi_major_axis = 6371000.0 f
+     inverse_flattening = 0 f
+
+   $ Global metadata:
+   META global
+     institution = UKMO
+     comment "space seperated strings should be quoted" c
+     version = 1.0 r
+
+\end{verbatim}
+
+
+\noindent
+\paragraph{添加“forecast variables”：}
+使用 ww3\_ounf.nml 输入文件时，可向输出 netCDF 文件添加可选辅助“forecast variables”（见 ww3\_ounf.nml）。当 \texttt{FCVARS = T} 时，将生成以下变量：
+\begin{itemize}
+ \item \texttt{forecast\_reference\_time}：与当前预报的“分析”关联的时间。对于跨多天拆分的文件很有用，因为它允许把某一特定时刻的预报追溯到其分析时间或起始时间。
+ 
+ \item \texttt{forecast\_period}：自关联的 \texttt{forecast\_reference\_time} 起经过的时间段（单位为秒）。
+\end{itemize}
+
+\noindent
+\texttt{forecast\_reference\_time} 默认为 ww3\_ounf.nml 中指定的 \texttt{TIMESTART}。不过，模式运行可能包含某种后报时段；在这种情况下，\texttt{forecast\_reference\_time} 应设置为合适的分析时间。此外，如果调用 ww3\_ounf 时使用的 \texttt{TIMESTART} 与模式起始时间不同，则需要显式指定正确的 \texttt{forecast\_reference\_time}，以确保 \texttt{forecast\_period} 计算正确。
+
+\pb

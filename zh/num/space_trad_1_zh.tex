@@ -1,0 +1,44 @@
+\addcontentsline{toc}{subsubsection}{\strut \hspace{24mm} 一阶格式}
+
+\vspace{\baselineskip} 
+\vspace{\baselineskip} 
+\noindent {\bf 一阶格式}
+
+\opthead{PR1}{\ws}{H. L. Tolman}
+
+\noindent
+模式中包含了一个简单而低成本的一阶迎风格式，主要用于 \ws\ 开发过程中的测试。为保证作用量的数值守恒，采用通量或控制体积形式。在 $\phi$ 空间中，计数器为 $i$ 和 $i-1$ 的网格点之间的通量 $(\cF_{i,-})$ 计算为
+
+% ------ First order scheme ------- %
+% eq:1up_xy_1        Basic flux
+% eq:1up_xy_2        Boundary velocity
+% eq:1up_xy_3        Upstream value
+
+\begin{equation}
+\cF_{i,-} = \left [ \: \dot{\phi}_b \: \cN_u \: \right ]^n_{j,l,m}
+\: , \label{eq:1up_xy_1} \end{equation} \begin{equation}
+\dot{\phi}_b = 0.5 \: \left ( \dot{\phi}_{i-1} + \dot{\phi}_i 
+\: \right )_{j,l,m} \: , \label{eq:1up_xy_2}
+\end{equation} \begin{equation}
+\cN_u = \left \{ \begin{array}{ccc}
+\cN_{i-1} & \mbox{for} & \dot{\phi}_b \geq 0 \\
+\cN_i     & \mbox{for} & \dot{\phi}_b   <  0
+\end{array} \right . \: , \label{eq:1up_xy_3}
+\end{equation}
+
+\noindent
+其中 $j$、$l$ 和 $m$ 分别为 $\lambda$、$\theta$ 和 $k$ 空间中的离散网格计数器，$n$ 为离散时间步计数器。$\dot{\phi}_b$ 表示点 $i$ 与 $i-1$ 之间“单元边界”处的传播速度，下标 $u$ 表示“上游”网格点。在陆海边界处，$\dot{\phi}_b$ 由海点处的 $\dot{\phi}$ 代替。点 $i$ 与 $i+1$ 之间的通量 $(\cF_{i,+})$ 通过把 $i-1$ 替换为 $i$、把 $i$ 替换为 $i+1$ 得到。$\lambda$ 空间中的通量以类似方式计算，只需改变相应的网格计数器和增量。时间 $n+1$ 的“作用量密度” $(\cN^{n+1})$ 估计为
+
+% eq:1up_xy_tot
+
+\begin{equation}
+\cN_{i,j,l,m}^{n+1} = \cN_{i,j,l,m}^n
+  + \frac{\Delta t}{\Delta \phi   } \left [ \cF_{i,-} - \cF_{i,+} \right ]
+  + \frac{\Delta t}{\Delta \lambda} \left [ \cF_{j,-} - \cF_{j,+} \right ]
+\: , \label{eq:1up_xy_tot}
+\end{equation}
+
+\noindent
+其中 $\Delta t$ 为传播时间步长，$\Delta \phi$ 和 $\Delta \lambda$ 分别为纬度和经度增量。在陆地上取 $\cN=0$ 时，式 (\ref{eq:1up_xy_1}) 至 (\ref{eq:1up_xy_3})，并且仅在海点上应用式 (\ref{eq:1up_xy_tot})，会自动调用所需边界条件。
+
+注意，式~(\ref{eq:1up_xy_tot}) 表示该格式的二维实现，因此需要在式~(\ref{eq:dtpl}) 中使用实际平流矢量的范数。还需注意，这意味着完整方程的 CFL 判据通常比把 $\lambda$ 和 $\phi$ 传播分开处理的格式更严格；下文讨论的三阶格式即采用后者。对于两个方向网格间距相等的网格，一阶格式的最大时间步长比三阶格式小 $1/\sqrt{2}$ 倍。

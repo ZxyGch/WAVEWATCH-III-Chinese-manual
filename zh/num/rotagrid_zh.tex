@@ -1,0 +1,29 @@
+\vssub
+\subsubsection{~旋转网格} \label{sub:num_space_rotagrid}
+\opthead{RTD}{\ws\ (MetOffice)}{J.-G. Li}
+
+\noindent
+旋转网格是一种纬度-经度（lat-lon）网格，通过沿经度 $\lambda_{p}$ 旋转北极，使其在标准纬度-经度系统中移到纬度 $\phi_{p}$ 的新位置得到。选择新的极点位置，是为了可将目标模式区域放在旋转赤道区域附近，从而得到间距更均匀的经纬度网格。因此，旋转网格也称为\emph{赤道网格}。例如，UK Met Office 使用的 North Atlantic and European wave (NAEW) 模式采用位于 37.5N、177.5E 的旋转极点，使英国伦敦（\textasciitilde{}51.5N 0.0E）几乎位于旋转赤道上。与同一区域中的标准经纬度网格相比，该旋转网格可在 NAEW 区域内提供间距均匀得多的经纬度网格。
+
+在 \ws\ 中，旋转网格以对原始经纬度网格最小修改的方式实现。实际上，在模式内部旋转网格的处理就像标准经纬度网格一样。若要建立并运行旋转网格模式配置，用户应选择规则经纬度网格并使用 {\code RTD} 开关。旋转极点位置通过输入文件 {\bf ww3\_grid.inp} 中 {\code ROTD} namelist 下的 {\code PLAT} 和 {\code PLON} 变量设置（见第~\ref{sec:config011} 节）。如果极点设置为 {\code PLAT = 90.0}、{\code PLON = -180.0}，则该网格按标准经纬度系统处理。
+
+风、流和冰文件等模式输入文件应映射到旋转网格上。为方便在标准经纬度网格框架中嵌套，提供给旋转网格以及从旋转网格输出的边界条件数据，使用以标准网格北向为参考的谱和标准经纬度网格点值；这些值会在 \ws\ 内部转换为旋转网格经纬度。{\bf ww3\_shel.inp} 或 {\bf ww3\_shel.nml} 中的二维谱输出位置列表也用标准经纬度指定。
+
+当从标准网格嵌套到旋转网格模式时，外层和内层网格对应的模式可执行文件都应在编译时设置 {\code RTD} 开关。当从旋转网格嵌套到标准网格模式时，内层（标准）网格模式不需要用 {\code RTD} 编译。
+
+输出到单向嵌套内层网格边界点的谱按附录~\ref{app:nest} 所述传递。输出边界条件在输入文件中定义（见 {\bf ww3\_grid.inp}，第~\ref{sec:config011} 节），形式为以内层网格坐标给出的一系列直线。如果内层网格为旋转网格，则其极点位置必须在外层网格的 {\code ROTB} namelist 下定义为数组元素 {\code BPLAT(\sl{n})} 和 {\code BPLON(\sl{n})} 的值。数组索引 {\sl{n}} 是边界条件文件 {\file nest{\sl{n}}.ww3} 的索引（{\sl{1:9}}）。
+
+旋转网格的模式方向输出和 x-y 矢量输出可通过把 {\bf ww3\_grid.inp} 的 ROTD namelist 中 UNROT 变量设为 True，转换为标准网格北向参考。采用该设置后，对于点输出经纬度位置，所有方向值如风向、流向和二维谱都会转换为标准经纬度取向。用于反旋转网格化场的函数应用在 {\bf ww3\_ounf}、{\bf ww3\_outf} 和 {\bf ww3\_grib} 中。运行 {\bf ww3\_ounf} 和 {\bf ww3\_ounp} 时，生成的 netCDF 文件将包含变量属性 direction\_reference，用于说明使用的是标准（真北）方向参考系还是旋转网格方向参考系。由 {\bf ww3\_ounf} 生成的网格化 netCDF 文件还包含 \emph{standard\_latitude} 和 \emph{standard\_longitude} 二维数组，用于描述旋转模式单元中心在标准经纬度参考系中的位置。
+
+如果用户希望使用 {\bf ww3\_bound} 或 {\bf ww3\_bounc} 边界处理程序为旋转极点网格生成边界条件，需要注意这些程序的输入谱始终预期在\emph{标准极点}上表述。
+
+模块 {\bf w3servmd.ftn} 中提供了六个用于旋转网格转换的子程序：
+\begin{vlist}
+\vit{w3spectn}{}{Turns wave spectrum anti-clockwise by AnglD}
+\vit{w3acturn}{}{Turns wave action(k,nth) anti-clockwise by AnglD}
+\vit{w3thrtn}{}{Turns direction parameters anti-clockwise by AnglD}
+\vit{w3xyrtn}{}{Turns x-y vector parameters anti-clockwise by AnglD}
+\vit{w3lltoeq}{}{Convert standard into rotated lat/lon plus AnglD}
+\vit{w3eqtoll}{}{Reverse of w3lltoeq, but AnglD unchanged}
+\end{vlist}
+这些子程序是自包含的，可从模式中提取出来，用于旋转网格文件的前处理或后处理。已有一些基于这些子程序开发的转换工具，但尚未包含在 \ws\ 中。旋转网格模式（NAEW）的示例见回归测试 \emph{regtests/ww3\_tp2.11}。用户可在 \emph{smc\_docs/Rotated\_Grid.pdf} 中找到更多信息，或联系 Jian-Guo Li 获取帮助（\url{Jian-Guo.Li@metoffice.gov.uk}）。

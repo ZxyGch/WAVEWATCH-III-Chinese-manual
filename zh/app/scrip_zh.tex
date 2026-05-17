@@ -1,0 +1,177 @@
+\pagestyle{myheadings} \setcounter{page}{1} \setcounter{footnote}{0}
+
+\section{~非规则网格的镶嵌方法} \label{app:scrip}
+\newcounters
+
+\vssub
+\subsection{~引言} \label{sec:scripA}
+\vssub
+
+\noindent
+\ws\ 3.14 版 \citep{tol:MMAB09a} 引入了多网格能力。该能力已在上文
+（\para\ref{sub:two_way}）说明。从模式版本 4 起，可以选择使用不规则网格
+或非结构网格，分别见 \para\ref{sub:num_space_curv} 和
+\para\ref{sub:num_space_tri}。遗憾的是，\para\ref{sub:two_way} 中描述的
+方法并不通用，因为它们只面向规则网格。在 \WWver{} 中实现了一些新能力，
+以便在多网格方法中容纳不规则和非结构网格。
+
+\cite{tol:OMOD08b} 中从低等级网格向高等级网格通信的核心组成部分，是通过
+空间插值在更高空间分辨率上提供边界数据。对 \WWver{}，该技术通过调用
+\ws\ 版本 4 中由 T. Campbell 实现的网格搜索工具（GSU）而得到推广。该
+例程的辅助组成部分也进行了其他推广。
+
+\cite{tol:OMOD08b} 中从高等级网格向低等级网格通信的核心组成部分，是一个
+守恒重映射操作：较大（低等级）网格单元的谱密度基于与其重叠的较小
+（高等级）网格单元的谱密度更新，并按每个较小单元覆盖较大单元的面积比例
+加权，同时要注意一个较小单元可能与多个较大单元重叠。对 \WWver{}，该技术
+通过调用外部软件包 SCRIP-WW3 得到推广，该软件包如下所述。重映射权重存储
+在 FORTRAN ``derived data type'' 数组中。重映射例程的辅助组成部分也进行
+了推广，例如用于计算到边界距离的逻辑、处理掩膜点和陆地点等。
+
+\vssub
+\subsection{~SCRIP-WW3} \label{sec:scripB}
+\vssub
+
+SCRIP-WW3 软件包改编自 \cite{man:Jones98} 的 {\F SCRIP}（Spherical
+Coordinate Remapping and Interpolation Package）软件包，这里称为
+SCRIP-LANL。SCRIP-WW3 基于 SCRIP-LANL v1.5。SCRIP-LANL 与 SCRIP-WW3 的
+主要差别在于，前者是一个独立代码，使用 NetCDF 文件作为用户接口；后者则
+经过修改以在 \ws\ 内部运行，并通过系统内存通信。此外，SCRIP-WW3 只使用
+守恒重映射功能，而 SCRIP-LANL 还有许多其他可选用途，例如双线性重映射。
+
+SCRIP 中使用的守恒重映射基于 \cite{art:Jones99}。在这种方法中，对每个
+源网格/目标网格对，都会沿每个网格中的所有单元计算线积分，同时跟踪与另一
+网格的交点，从而得到网格之间的重叠面积。该方法设计用于球面坐标系（而不
+是把纬度和经度当作笛卡尔系统中的 x 轴和 y 轴），并包含处理经度环绕
+（所谓 ``branch cut''）以及包含极点的单元的专门逻辑。它也允许使用非结构
+网格，并支持任意数量的单元角点。网格角点坐标必须按逆时针方向追踪网格
+单元外边界的顺序给出。该软件允许一阶或二阶重映射；SCRIP-WW3 中会计算
+两者的权重。目前，\ws\ 中只实现了一阶重映射：\cite{art:Jones99} 指出，
+从细网格映射到粗网格时，使用二阶方法几乎没有优势。
+
+\vssub
+\subsection{~SCRIP 操作} \label{sec:scripC}
+\vssub
+
+通过在 {\file switch} 文件中包含 {\F SCRIP} 可激活 SCRIP-WW3。如果用户
+试图在没有该开关的情况下，在 {\file ww3\_multi} 中使用不规则或非结构
+网格，将产生错误信息并终止程序。{\file ww3\_shel}（传统单向嵌套）不需要
+SCRIP-WW3；只使用规则网格的 {\file ww3\_multi} 也不需要 SCRIP-WW3，因为
+代码中保留了原始重映射方法用于此目的。SCRIP-WW3 源文件保存在单独目录
+{\dir /ftn/SCRIP/} 中，因为它是经过修改的第三方软件。使用 {\F SCRIP}
+开关时，构建系统（{\file ww3\_make}）会自动编译该目录中的文件，并将其
+链接到 {\file ww3\_multi}。
+
+用户也可选择将 {\F SCRIPNC} 开关与 {\F SCRIP} 一起使用。该功能需要
+NetCDF。有关在 \ws\ 中使用 NetCDF 的说明见 \para\ref{sec:comp} 和文件
+{\file w3\_make}。激活 {\F SCRIPNC} 后，对每个源网格/目标网格对都会创建
+一个 NetCDF 文件，例如 {\file rmp\_src\_to\_dst\_conserv\_002\_001.nc}，
+其中 {\file 002} 和 {\file 001} 分别表示源网格和目标网格；网格编号由
+{\file ww3\_multi} 分配，并显示在该程序的屏幕输出中。这个 {\file .nc}
+文件包含 \ws\ 重映射所需的全部信息。通过添加 {\F T38} 开关，可在
+{\file .nc} 文件中包含有关重映射的额外诊断信息。注意：{\file switch}
+应包含 {\F `SCRIP SCRIPNC'} 或 {\F `SCRIP'}；只使用 {\F SCRIPNC} 而不使用
+{\F SCRIP} 会导致编译错误。
+
+虽然并非必需，SCRIP-WW3 也可用于规则网格之间的重映射。对于球面（经纬度）
+网格，使用 SCRIP-WW3 可能会有轻微差异，因为 SCRIP-WW3 基于真实距离计算
+面积，而非 SCRIP 方法使用经纬度度数。
+
+\vssub
+\subsection{~优化和常见问题} \label{sec:scripD}
+\vssub
+
+SCRIP-WW3 例程未并行化。因此，如果使用许多进程运行 {\file ww3\_multi}，
+每个进程都会对所有权重执行相同计算。对于点数很多的网格之间的重映射，
+这会使 {\file ww3\_multi} 的准备阶段耗时较长，例如 3 到 10 分钟；对例行
+业务使用而言，这可能代价过高。为处理这一问题，SCRIP-WW3 已经过调整，
+允许使用先前一次 {\file ww3\_multi} 应用中计算出的重映射权重。如果
+{\file ww3\_multi} 找到适当的 {\file .nc} 文件，它将直接从这些文件读取
+重映射数据，而不调用 SCRIP。当然，如果自上次运行后有任何网格发生变化，
+或者使用了移动网格，就不应使用预计算权重。
+
+另一个功能是为方便用户而提供的：如果在运行目录中找到名为
+{\file SCRIP\_STOP} 的文件，{\file ww3\_multi} 会在创建 {\file .nc} 文件后
+终止。{\file SCRIP\_STOP} 的内容并不重要；它可以是空文件。使用该功能时，
+重映射操作会分配到各个进程：{\file rmp\_src\_to\_dst\_conserv\_002\_001.nc}
+由进程 1 创建，{\file rmp\_src\_to\_dst\_conserv\_003\_001.nc} 由进程 2
+创建，依此类推；在使用相当多网格的情况下，这会显著改善性能。为说明这一
+点，该功能面向两种操作模式：模式 A）预先计算权重，此时存在
+{\file SCRIP\_STOP} 且 {\file .nc} 文件不存在。模式 B）使用预计算权重，
+此时不存在 {\file SCRIP\_STOP} 且 {\file .nc} 文件存在。如果两类文件
+（由于意外）同时存在于工作目录中，{\file ww3\_multi} 将报错失败。在一个
+假想的业务场景中，第一次运行使用模式 A，而同一网格集合的所有后续运行使用
+模式 B。可扩展性受最昂贵的重映射对限制，也就是说负载平衡是一个问题。
+如果某个案例计算 12 个重映射对，且每个重映射对需要 1/12 的计算时间，
+加速比将为 12。另一个同样有 12 个重映射对的案例中，如果其中一个重映射
+对占用 50\% 的计算时间，则加速比只有 2。注意，使用与重映射对数量相等的
+进程数可最大化资源利用；多余进程不会被使用。
+
+为了进一步说明用户可用的选项，考虑一个具有 9 个网格和 12 个重映射对的
+多网格系统，海点很多，每天运行两次、持续数月，总计 1000 次预报。用户可
+采用不同处理方式：
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 15mm \labelwidth 7mm
+             \rightmargin 5mm \itemsep 0mm \parsep 0mm}
+
+\item 使用 {\F SCRIP}、{\F SCRIPNC} 和 {\F MPI}，并使用
+{\file SCRIP\_STOP} 功能，权重计算将并行完成。第一次应用模式时，计算
+重映射权重（上面的模式 A）可能需要 5 到 10 分钟，执行模式预报（上面的
+模式 B）需要 20 分钟。对于第 2 到第 1000 次预报，只需要 20 分钟执行模式
+预报（模式 B）。
+
+\item 使用 {\F SCRIP}、{\F SCRIPNC} 和 {\file SCRIP\_STOP} 功能，但以串行
+模式创建 {\file .nc} 文件，并用 {\F MPI} 运行预报。第一次应用模式时，
+计算重映射权重可能需要 20 分钟，执行模式预报需要 20 分钟。对于第 2 到
+第 1000 次预报，只需要 20 分钟执行模式预报。
+
+\item 使用 {\F SCRIP}、{\F SCRIPNC} 和 {\F MPI}，但不使用
+{\file SCRIP\_STOP} 功能，权重计算不会并行完成，并且由于通信开销，甚至
+会比串行运行更慢。第一次应用模式时，计算重映射权重可能需要 40 分钟，
+执行模式预报需要 20 分钟。对于第 2 到第 1000 次预报，只需要 20 分钟执行
+模式预报。
+
+\item 使用 {\F SCRIP} 和 {\F MPI}，在 12 个处理器上运行，权重计算不会
+并行完成，会很慢，并且每次都需要重新计算。对于第 1 到第 1000 次预报，
+计算重映射权重可能需要 40 分钟，执行模式预报需要 20 分钟。
+
+\end{list}
+
+在某些情况下，SCRIP-WW3 会对一些点返回可疑值，从而在屏幕输出中产生警告
+信息。当这种情况只发生在少部分网格点上时，根据我们对 {\file .nc} 文件中
+诊断输出的分析经验，重映射权重是有效的，因为问题点位于边缘，而 \ws\ 不
+会使用这些权重。然而，当这种情况发生在很大一部分网格点上时，SCRIP-WW3
+很可能确实失败了。在这种情况下，\ws\ 会带错误信息停止。我们的经验是，
+这种情况最常发生在具有大量重合线段的重叠规则网格上。存在一种规避方法：
+可通过给其中一个网格添加人工偏移来修复。此前已经可以在 {\file ww3\_grid.inp}
+的网格描述中指定偏移，但由于该偏移意在表示真实量，因此这里的另一种人工
+偏移作为 namelist 选项单独实现。它是 {\F MISC} namelist 组下的
+{\code GSHIFT}。一个 namelist 示例为：{\code MISC GSHIFT = 1.0D-6}。
+较小的数值会产生较小的重网格化误差，但该数值必须足够大，才能真正产生
+预期的有益效果。我们建议通过试错确定该值，每次按 10 倍改变。
+
+\vssub
+\subsection{~限制} \label{sec:scripE}
+\vssub
+
+还有两个功能尚未处理，将在后续版本中处理：
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 15mm \labelwidth 7mm
+             \rightmargin 5mm \itemsep 0mm \parsep 0mm}
+\item 相同等级网格之间的通信仍限制为规则网格。如果其中一个网格是不规则
+  或非结构网格，{\file ww3\_multi} 将带错误信息终止。只要重叠的相同等级
+  网格全都是规则网格，非规则网格可以作为多网格系统的一部分存在。
+
+\item 用于定义输入场（例如风场）的 ``input grid''（或 ``{\F modid}''）
+  选项尚未针对不规则或非结构网格实现。如果尝试这样做，{\file ww3\_multi}
+  将带错误信息终止。应改用 ``native'' 输入网格选项。
+
+\end{list}
+
+\noindent
+\textrm{\textit{\underline{归属声明}: 本节由 E. Rogers 撰写。该工作的编码
+    和测试由 E. Rogers、M. Dutour、A. Roland、F. Ardhuin 和 K. Lind 完成。
+    H. Tolman 和 T. Campbell 提供了技术建议。}}
+
+%\bpage \pagestyle{empty}

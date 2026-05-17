@@ -1,0 +1,27 @@
+\vsssub
+\subsubsection{~$S_{bot}$：\js\ 底摩擦} \label{sec:BT1}
+\vsssub
+
+\opthead{BT1}{\js\ experiment}{H. L. Tolman}
+
+\noindent
+一种简单的底摩擦参数化是经验性的线性 \js\ 参数化 \citep{art:JONSWAP}，
+\wam\ 模型中也使用了该形式 \citep{art:WAM88}。采用 \cite{tol:JPO91b}
+的记号，该源项可写为
+
+%-------------------------%
+% JONSWAP bottom friction %
+%-------------------------%
+% eq:JONSWAP_bot
+
+\begin{equation}
+\cS_{bot}(k,\theta) = 2 \Gamma \: \frac{n-0.5}{gd} \: N(k,\theta)
+\: , \label{eq:JONSWAP_bot}
+\end{equation}
+
+\noindent
+其中 $\Gamma$ 为经验常数，对涌浪估计为 $\Gamma =
+-0.038\:\mbox m^2 \mbox s ^{-3}$ \citep{art:JONSWAP}，对风海估计为
+$\Gamma = -0.067\:\mbox m^2 \mbox s^{-3}$ \citep{art:BK83}。$n$ 是式
+(\ref{eq:cg}) 给出的相速与群速之比。$\Gamma = -0.067$ 的默认值可由用户通过修改
+{\F SBT1} namelist 参数 {\code GAMMA} 重新定义。

@@ -1,0 +1,122 @@
+\vssub
+\subsection{~引言} \label{sec:intro}
+\vssub
+
+在有限水深且平均流不为零的水体中，波浪或谱波分量通常用若干相位参数和
+振幅参数描述。相位参数包括波数向量 {\bk}、波数 $k$、方向
+$\theta$ 以及若干频率。若需要考虑平均流对波浪的影响，则要区分相对频率
+或本征（弧度）频率 $\sigma$ $(= 2 \pi f_r)$ 与绝对（弧度）频率
+$\omega$ $(= 2 \pi f_a)$：前者是在随平均流运动的参考系中观测到的，
+后者是在固定参考系中观测到的。按定义，方向 $\theta$ 垂直于波峰
+（或谱分量的波峰），并且与 {\bk} 的方向一致。这里给出的方程遵循几何光学
+近似；当水深和流场变化尺度远大于单个波浪尺度时，该近似在极限意义下是
+精确的\footnote{即使波高在半个波长内变化达 5 倍，几何光学近似仍可给出
+合理结果，这一点已在海底峡谷算例中得到说明 \citep{art:Mea07}。}。该近似
+忽略的绕射、散射和干涉效应，可以在事后作为源项加入波作用量方程。在这种
+缓变流和缓变水深近似下，可在局地采用准均匀（线性）波理论，从而得到下面
+的色散关系和多普勒型方程，用以关联各相位参数：
+
+%-----------------------------------%
+% dispersion and Doppler equations  %
+%-----------------------------------%
+% eq:disp
+% eq:doppler
+
+\begin{equation}
+\sigma ^2 = g k \tanh kd \: ,
+\label{eq:disp}
+\end{equation}
+\begin{equation}
+\omega = \sigma + {\bk} \cdot {\bf U} \: ,
+\label{eq:doppler}
+\end{equation}
+
+\noindent 
+其中 $d$ 为平均水深，{\bf U} 为流速（在单个波浪尺度上对水深和时间取平均）。
+水深和流场缓变的假设意味着海底地形具有大尺度变化，因此通常可以忽略波浪
+绕射。由波浪或波分量的相位函数给出 {\bk} 和 $\omega$ 的通常定义，意味着
+波峰数守恒 \citep[参见，例如][]{bk:Phi77,bk:Mei83}：
+
+%-----------------------------%
+% conservation of wave crests %
+%-----------------------------%
+% eq:wnconv
+
+\begin{equation}
+\frac{\partial {\bk}}{\partial t} + \nabla \omega = 0 \: .
+\label{eq:wnconv}
+\end{equation}
+
+%\noindent
+
+由式~(\ref{eq:disp}) 至式~(\ref{eq:wnconv}) 可以计算相位参数的变化率
+\citep[例如，相关方程此处不再列出][]{rep:Chr82,bk:Mei83,tol:JPO90}。
+
+%For monochromatic waves, the amplitude is described as the amplitude, the wave
+%height, or the wave energy. 
+对于不规则风浪，海面（随机）方差使用表面高程方差密度谱 $F$ 描述。在波浪
+模拟界，这通常称为“能量谱”。该谱 $F$ 是所有独立相位参数的函数，即
+$F({\bk},\sigma,\omega)$；此外，它还在大于单个波浪尺度的空间和时间尺度上
+变化，例如 $F({\bk},\sigma,\omega;\bx,t)$。然而，对于频率高于主导风海频率
+3 倍的短波 \citep{Leckler&al.2015}，能量与线性色散关系非常接近，因此
+式~(\ref{eq:disp}) 和式~(\ref{eq:doppler}) 将 {\bk}、$\sigma$ 与
+$\omega$ 关联起来。因此只有两个独立相位参数，局地瞬时谱成为二维谱。
+束缚波非线性贡献的影响可在 \ws\ 中按 \cite{art:Jan09} 的方法作为后处理加入。
+
+在 \ws\ 中，基本谱为波数--方向谱 $F(k,\theta)$。之所以选择该谱，是因为
+在可变水深下，就波浪增长和衰减的物理过程而言，它具有不变性特征。然而
+\ws\ 的输出采用更传统的频率--方向谱 $F(f_r,\theta)$。可通过直接的
+Jacobian 变换，由 $F(k,\theta)$ 计算不同形式的谱：
+
+%--------------------------------------------%
+% Jacobian transformation and group velocity %
+%--------------------------------------------%
+% eq:jac_fr
+% eq:jac_fa
+% eq:cg
+
+\begin{equation}
+F(f_r,\theta) = \frac{\partial k}{\partial f_r} F(k,\theta) =
+\frac{2\pi}{c_g} F(k,\theta) \: ,
+\label{eq:jac_fr}
+\end{equation}
+\begin{equation}
+F(f_a,\theta) = \frac{\partial k}{\partial f_a} F(k,\theta) =
+\frac{2\pi}{c_g}
+\left ( 1 + \frac{{\bk}\cdot{\bf U}}{k c_g}\right )^{-1}
+F(k,\theta) \: ,
+\label{eq:jac_fa}
+\end{equation}
+\begin{equation}
+c_g = \frac{\partial \sigma}{\partial k} = n \frac{\sigma}{k}
+\; , \;
+n = \frac{1}{2} + \frac{kd}{\sinh 2kd} \; ,
+\label{eq:cg}
+\end{equation}
+
+\noindent 
+其中 $c_g$ 为群速。由这些谱中的任意一种，都可以通过对方向积分生成一维谱；
+而按定义，对整个谱积分得到总方差 $E$（在波浪模拟界通常称为波能）。
+
+在无流情况下，波包的方差（能量）是守恒量。在有流情况下，由于流对波浪平均
+动量传递做功，某一谱分量的能量或方差不再守恒
+\citep{art:LHS61,art:LHS62}。然而，从一般意义上说，波作用量
+$A \equiv E/\sigma$ 是守恒的 \citep[例如][]{art:Whi65,art:BG68}。
+因此，波作用量密度谱 $N(k,\theta) \equiv F(k,\theta)/\sigma$ 是本模型中
+优先采用的谱。于是波浪传播可描述为
+
+%--------------------------------------%
+% Most general action balance equation %
+%--------------------------------------%
+% eq:balance0
+
+\begin{equation}
+\frac{D N}{D t} = \frac{S}{\sigma} \: ,
+\label{eq:balance0}
+\end{equation}
+
+\noindent 
+其中 $D/Dt$ 表示全导数（随波分量运动），$S$ 表示谱 $F$ 的源项和汇项的
+净效应。由于式~(\ref{eq:balance0}) 左端通常描述不含散射的线性传播，
+非线性波浪传播效应（即波--波相互作用）和部分波浪反射体现在 $S$ 中。
+传播项和源项将在以下各节分别讨论。

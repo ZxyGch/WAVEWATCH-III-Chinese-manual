@@ -1,0 +1,90 @@
+\vssub
+\subsection{~传播}
+\vssub
+
+在数值模型中，需要采用平衡方程（\ref{eq:balance0}）的 Euler 形式。该平衡
+方程既可以写成输运方程形式（速度位于导数之外），也可以写成守恒形式
+（速度位于导数之内）。前一种形式只适用于向量波数谱 $N(\bk;\bx,t)$；后一种
+形式则可针对任意谱表达推导出有效方程，只要前述相应的 Jacobian 变换表现
+良好即可 \citep[例如][]{tol:GAOS98b}。此外，与输运方程不同，守恒方程保持
+总波能/作用量守恒。当方程用于数值模型时，这是一个重要特性。\ws\ 中使用的
+谱 $N(k,\theta;\bx,t)$ 的平衡方程为（为简化记号，下文将该谱简写为 $N$）：
+
+%----------------------------------%
+% Plain-grid propagation equations %
+%----------------------------------%
+% eq:bal_plane
+% eq:x_dot
+% eq:k_dot
+% eq:theta_dot
+
+\begin{equation}
+\frac{\partial N}{\partial t} + \nabla_x \cdot {\bf\dot{x}}N +
+\frac{\partial}{\partial k} \dot{k}N +
+\frac{\partial}{\partial \theta} \dot{\theta}N =
+\frac{S}{\sigma} \: , \label{eq:bal_plane}
+\end{equation}
+\begin{equation}
+{\bf \dot{x}} = {\bf c}_g + {\bf U} \: , \label{eq:x_dot}
+\end{equation}
+\begin{equation}
+\dot{k} = - \frac{\partial \sigma}{\partial d}
+\frac{\partial d}{\partial s} - {\bk} \cdot
+\frac{\partial {\bf U}}{\partial s} \: , \label{eq:k_dot}
+\end{equation}
+\begin{equation}
+\dot{\theta} = - \frac{1}{k} \left [
+\frac{\partial \sigma}{\partial d} \frac{\partial d}{\partial m}
++ {\bk} \cdot \frac{\partial {\bf U}}{\partial m}
+\right ] \: , \label{eq:theta_dot}
+\end{equation}
+
+\noindent
+其中 ${\bf c}_g = (c_g \sin \theta, c_g \cos \theta)$，$s$ 是沿
+$\theta$ 方向的坐标，$m$ 是垂直于 $s$ 的坐标。式~(\ref{eq:bal_plane})
+适用于 Cartesian 坐标。对于大尺度应用，该方程通常转换为由经度 $\lambda$
+和纬度 $\phi$ 定义的 spherical 坐标，同时保持局地方差的定义
+\citep[即单位表面积上的方差，如][]{art:WAM88}：
+
+%---------------------------------%
+% Spherical propagation equations %
+%---------------------------------%
+% eq:bal_sphere
+% eq:phi_dot
+% eq:lambda_dot
+% eq:theta_g_dot
+
+\begin{equation}
+\frac{\partial N}{\partial t} +
+\frac{1}{\cos \phi} \frac{\partial}{\partial \phi} \dot{\phi}
+    N \cos \theta +
+\frac{\partial}{\partial \lambda} \dot{\lambda}N +
+\frac{\partial}{\partial k} \dot{k} N +
+\frac{\partial}{\partial \theta} \dot{\theta}_g N
+= \frac{S}{\sigma} \: ,\label{eq:bal_sphere}
+\end{equation}
+\begin{equation}
+\dot{\phi} = \frac{c_g \cos \theta + U_\phi}{R}
+\: , \label{eq:phi_dot}
+\end{equation}
+\begin{equation}
+\dot{\lambda} =  \frac{c_g \sin \theta + U_\lambda}{R \cos \phi}
+\: , \label{eq:lambda_dot}
+\end{equation}
+\begin{equation}
+\dot{\theta}_g = \dot{\theta} -
+\frac{c_g \tan \phi \cos \theta}{R}
+\: , \label{eq:theta_g_dot}
+\end{equation}
+
+\noindent
+其中 $R$ 是地球半径，$U_\phi$ 和 $U_\lambda$ 是流速分量。
+式~(\ref{eq:theta_g_dot}) 包含沿大圆传播的修正项，并使用 $\theta$ 的
+Cartesian 定义；其中 $\theta = 0$ 对应从西向东传播的波。\ws\ 可使用
+Cartesian 或 spherical 坐标运行。注意，岛屿等未解析障碍物也可纳入方程。
+在 \ws\ 中，这是在数值格式层面完成的，见第~\ref{sub:num_obst} 节。
+同样，波长尺度上的水深变化可通过第~\ref{sec:BS1} 节所述的散射源项引入。
+
+最后，Cartesian 坐标和 spherical 坐标都可以用多种方式离散，包括四边形
+（矩形网格、曲线网格或 SMC 网格）和三角形。这一部分在
+第~\ref{chapt:num} 章中讨论。

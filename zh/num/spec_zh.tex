@@ -1,0 +1,42 @@
+\vssub
+\subsection{~谱内传播} \label{sub:spec}
+\vssub
+\subsubsection{~一般概念}
+\vsssub
+
+数值分步算法的第三步考虑折射和残余（流致）波数偏移。无论空间网格离散和坐标系统如何，该步骤中要求解的方程为
+
+%-----------------------------------%
+% Step : Intra-spectral propagation %
+%-----------------------------------%
+% eq:step_intra
+% eq:k_dot_g
+
+\begin{equation}
+\frac{\p N}{\p t} + \frac{\p}{\p k} \, \dot{k}_g N +
+\frac{\p}{\p \theta} \, \dot{\theta}_g N = 0
+\: , \label{eq:step_intra} \end{equation} \begin{equation}
+\dot{k}_g  = \frac{\p \sigma}{\p d} 
+    \frac{{\bf U} \cdot \nabla_x d}{c_g}  -
+    {\bf k} \cdot \frac{\p {\bf U}}{\p s}
+\: , \label{eq:k_dot_g} \end{equation}
+
+\noindent
+其中 $\dot{k}_g$ 是相对于网格的波数速度，$\dot{\theta}_g$ 由 (\ref{eq:theta_g_dot}) 和 (\ref{eq:theta_dot}) 给出。该方程在 $\theta$ 空间中不需要边界条件，因为模式按定义使用完整（闭合）的方向空间。然而，在 $k$ 空间中需要边界条件。在低波数处，假定离散区域之外不存在波作用量。因此，假定在离散低波数边界处没有作用量进入模式。在高波数边界处，跨离散边界的输运按式~(\ref{eq:tail_N_k}) 给出的参数化谱形计算。计算 $\dot{\theta}$ 时所需的水深导数主要使用中心差分确定。不过，对于靠近陆地的点，只使用海点的一侧差分。
+
+$\theta$ 空间中的传播可能在显式数值格式中造成实际问题，因为对于极浅水中的长波，或由于强流切变，折射速度可能变得极大。类似地，$k$ 空间中的传播在极浅水中也会遇到类似问题。为避免因折射而需要极小时间步长，对 $\theta$ 空间和 $k$ 空间中的传播速度 (\ref{eq:theta_dot}) 进行滤波：
+
+% eq:theta_filter
+
+\begin{equation}
+\dot{\theta} = X_{rd}(\lambda,\phi,k)\left( \dot{\theta_d} + 
+\dot{\theta_c} + \dot{\theta_g} \right)\: , \label{eq:theta_filter} \end{equation}
+
+\noindent
+其中下标 $d$、$c$ 和 $g$ 分别指 (\ref{eq:theta_dot}) 中折射速度与水深、流和大圆相关的部分。滤波因子 $X_{rd}$ 对每个波数和位置分别计算，并被确定为使由\emph{水深}折射项导致的 $\theta$ 空间传播 \cfl{} 数不超过预设（用户定义）值（默认 0.7）。这对应于对某些低频波分量减小海底坡度。对于中纬度，受影响分量预期携带很少能量，因为它们位于极浅水中。携带显著能量的长波分量通常正向海岸传播，其能量无论如何都会被耗散。该滤波对短波以及靠近极点处也很重要。可通过减小谱内折射时间步长，并查看模式输出中的最大 CFL 数来测试该滤波的影响。这些最大 CFL 数在滤波应用之前计算。
+
+% \vspace{\baselineskip}
+% \centerline{\ldots ADD DYNAMIC TIME INTEGRATION \ldots}
+
+
+为适应非线性相互作用 $S_{nl}$ 的计算，谱空间始终采用常数方向增量和对数频率网格 (\ref{eq:sigma_grid}) 离散。可使用一阶、二阶和三阶格式，并在以下各节介绍。

@@ -1,0 +1,90 @@
+\vsssub
+\subsubsection{~$S_{ice}$：海冰阻尼（Shen et al.）} \label{sec:ICE3}
+\vsssub
+
+\opthead{IC3}{Clarkson U. Fortran-77 code}{E. Rogers, X. Zhao, S. Cheng, S. Zieger}
+
+\noindent
+第三种表示波-冰相互作用的方法来自\linebreak
+\cite{art:WS10}。该模型把海冰视为黏弹性层。${C_{ice,1}}$ 用于冰厚（m）；
+${C_{ice,2}}$ 用于黏性（$\mathrm{m^2\,s^{-1}}$）；${C_{ice,3}}$ 用于密度
+（$\mathrm{kg\,m^{-3}}$）；${C_{ice,4}}$ 用于有效剪切模量（Pa）；
+${C_{ice,5}}$ 不使用。一个示例设置为
+${C_{ice,1...4}}=[0.1, 1.0, 917.0, 0.0]$。
+
+在 \ws\ 第 4 版中，这一 $S_{ice}$ 方法（{\code IC3}）比 {\code IC1} 或 {\code IC2}
+昂贵得多。模型 5.16 版基本解决了这一问题。
+
+模型 5.16 版引入了 namelist {\F SIC3}。Namelist 参数汇总如下，其中一些参数会在
+后文进一步讨论。
+
+\begin{clist}
+\cit {IC3CHENG} {5.16 版新增的求解技术。默认值 = {\code TRUE}。}
+\cit {IC3HILIM} {冰厚的可选限制器。默认值=100（即默认不使用该选项）。}
+\cit {IC3KILIM} {耗散率 ${k_i}$ 的可选限制器。默认值=100（即默认不使用该选项）。}
+\cit {USECGICE} {设为 {\code TRUE} 时，模型将包含海冰对群速的影响。默认值 = {\code FALSE}。}
+\cit {IC3VISC} {若用户希望使用常数且均匀的有效黏性，现在可通过 namelist 设置。默认=N/A。}
+\cit {IC3ELAS} {同 {\code IC3VISC}，但用于有效弹性。默认=N/A。}
+\cit {IC3DENS} {同 {\code IC3VISC}，但用于海冰密度。默认=N/A。}
+\cit {IC3HICE} {同 {\code IC3VISC}，但用于冰厚。默认=N/A。}
+\cit {IC3MAXCNC} {可用于在某些冰况下切换到另一种耗散的参数（见下文）。默认=100（即不使用该选项）。正常范围为 0 到 1。}
+\cit {IC3MAXTHK} {同上。默认=100（即不使用该选项）。正常范围为 0 到 10 m。}
+\cit {IC2REYNOLDS} {与 IC2 非色散湍流边界层方案相关的参数。默认=1.5e+5。}
+\cit {IC2ROUGH} {同上。默认=0.02。}
+\cit {IC2SMOOTH} {同上。默认=7.0e+4。}
+\cit {IC2VISC} {同上。默认=2.0。}
+\cit {IC2TURB} {同上。默认=2.0。}
+\cit {IC2TURBS} {同上。默认=0.0。}
+\end{clist}
+
+{\code IC3CHENG} 选项是模型第 5 版新增的。设为 {\code TRUE} 时，模型将使用由
+S. Cheng 提供的替代求解技术。它有两个重要特点。第一，稳定性得到改善，因此不需要
+使用冰限制器，即 {\code IC3HILIM} 参数。第二，该方法要求四个海冰流变参数中的三个
+是定常且均匀的，并通过 namelist 参数输入（见下文）。
+
+若 {\code IC3CHENG} 设为 {\code FALSE}，建议用户使用冰厚限制器 {\code IC3HILIM}
+以保证稳定性（建议取 25 到 100 cm）。参数 {\code IC3KILIM} 曾在 \ws\ 某些早期
+开发版本中用于稳定且快速的计算，但现在已无必要，用户可忽略。
+
+在模型 4.18 版中，四个海冰流变参数（冰厚、有效黏性、有效弹性和冰密度）允许为
+非定常和非均匀场。这可通过 {\file ww3\_prep} 提供。或者，当使用 {\file ww3\_shel}
+且不需要非均匀输入时，可用 {\file ww3\_shel} 的 ``homogeneous'' 选项输入流变参数。
+模型 5.16 版新增了通过 namelist {\F SIC3} 指定四个海冰流变参数的选项。这里有两个
+限制：1) 若 {\code IC3CHENG} 设为 {\code FALSE} 且 {\code USECGICE} 设为
+{\code TRUE}，则不能使用 namelist 方法；2) 若 {\code IC3CHENG} 设为 {\code TRUE}，
+则三个流变参数（有效黏性、有效弹性和冰密度）必须使用 namelist 方法。若
+{\code IC3CHENG} 设为 {\code TRUE} 或 {\code USECGICE} 设为 {\code FALSE}，
+第四个海冰流变参数（冰厚）可由任一方法输入（namelist 或非 namelist）。模型会执行
+错误检查，以确保用户只用一种方法为每个参数指定输入（不会假定某种输入方法优先于另一种）。
+
+海冰修正后的 ${k_r}$ 通过左端的 $c_g$（群速）和 $c$（相速）计算纳入控制方程
+(\ref{eq:bal_plane})；例如 \citet[][以及后续未发表工作]{art:RH09}。波数和群速的
+修正可选择传回主程序，从而产生类似于水深地形导致的折射和变浅效应。不过，到目前为止，
+该功能只用于学术研究，而非现实情景的常规应用。\\
+
+要启用变浅效应，模型应使用 namelist 变量 {\code USECGICE = TRUE}。要启用折射效应，
+模型应使用开关 {\code REFRX} 编译。使用该开关时，模型基于包含海冰效应的相速空间梯度
+计算折射，而不是使用无冰的简化波浪色散关系。代码附带的回归测试 {\file ww3\_tic1.3}
+演示了这些效应。
+
+当冰厚为零时，使用 {\code IC3CHENG} 求解器得到的群速不会完全退化为开阔水面色散关系
+给出的群速。这是由计算 $c_g = \frac{\partial \sigma}{\partial k} =
+\frac{\Delta \sigma}{\Delta k} $ 时的数值误差造成的。如果启用这些效应，群速中的这些
+小差异会导致轻微的变浅和折射误差。发现冰厚为零时误差小于 10\%，且依赖频率。现在通过
+在冰厚恰为零时跳过求解器来避免这一问题。若冰厚接近但不恰为零，则这一差异可能仍可见。
+尚未测试 CHENG 解在其他参数（有效黏性、有效剪切模量）趋近零时的行为。对于相同海冰输入，
+{\code IC3CHENG} 设为 {\code FALSE} 与 {\code TRUE} 时的解之间，也已注意到虽小但
+实质性的差异。
+
+如上所述，{\code USECGICE = TRUE} 是产生变浅效应所必需的。不过，由于某些海冰流变
+会导致群速增大，建议用户谨慎使用这一选项。群速会影响 CFL 准则，这可能要求用户减小
+时间步长。对于不希望处理这一问题的用户，推荐使用 {\code USECGICE = FALSE}。
+
+在模型 5.16 版中，新增了一个非默认选项，使耗散参数化在某些冰况下发生改变。若冰浓度
+超过 {\code IC3MAXCNC} 且冰厚超过 {\code IC3MAXTHK}，则使用 {\code IC2} 耗散
+（更具体地说，是 {\code IC2} 的非默认、非色散边界层方案子选项），以替代
+\cite{art:WS10} 的基于色散的耗散估计。更多信息见 {\code IC2} 说明。由于该特性是
+非色散的，不应与 {\code USECGICE = TRUE} 一起使用。
+
+{\code IC3} 最早出现在 \ww\ 第 4 版中，最初的简单测试见 \cite{pro:RZ14}。随后它已
+用于 \cite{art:LKS15}、\cite{art:WHR16}、\cite{art:RTS16} 和 \cite{art:CRT17}。

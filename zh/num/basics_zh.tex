@@ -1,0 +1,92 @@
+Cartesian 坐标（\ref{eq:bal_plane}）或球坐标（\ref{eq:bal_sphere}）中的波作用量方程，是波浪模式的基本方程。不过，模式中使用的是这些方程的修正形式，其中：(a) 方程在可变波数网格上求解（见下文）；(b) 在选定数值格式中使用方程的修正形式，以正确描述离散方程的色散（见 \para\ref{sub:xy_prop}）；(c) 考虑岛屿等子网格障碍物（见 \para\ref{sub:xy_prop}）。
+
+
+\vssub
+\subsection{~谱离散} \label{sec:basic_num}
+\vsssub
+
+
+如果直接求解式 (\ref{eq:bal_plane}) 或式 (\ref{eq:bal_sphere})，在浅水中会出现有效谱分辨率降低 \citep[见][]{tol:GAOS98b}。如果方程在可变波数网格上求解，则可避免这种分辨率损失；该网格隐式包含了浅化导致的运动学波数变化。这样的波数网格对应于相对频率中空间和时间不变的网格 \citep{tol:GAOS98b}。相应的局地波数网格可由不变频率网格和色散关系 (\ref{eq:disp}) 直接计算，因此成为局地水深 $d$ 的函数。为便于经济地计算 $S_{nl}$，并让涌浪频率得到良好分离，采用频率间隔指数增长的频率离散，使变化的频率分辨率与局地频率成正比：
+
+%----------------------------%
+% Exponential frequency grid %
+%----------------------------%
+% eq:sigma_grid
+
+\begin{equation}
+\sigma_{m+1} = X_\sigma \, \sigma_m \: , \label{eq:sigma_grid}
+\end{equation}
+
+\noindent
+其中 $m$ 是 $k$ 空间中的离散网格计数器。$X_\sigma$ 由用户在程序输入文件中定义。传统上，在第三代模式的大多数应用中使用 $X_\sigma \simeq 1.1$。
+
+这里只针对 Cartesian 方程 (\ref{eq:bal_plane}) 讨论空间变化网格的影响。改写到球面网格是直接的。用 $\kappa$ 表示可变波数网格时，平衡方程变为
+
+%------------------------------%
+% general equations kappa-grid %
+%------------------------------%
+% eq:bal_f_grid
+% eq:sigma_dot
+
+\begin{equation}
+\frac{\p}{\p t} \frac{N}{c_g} +  
+\frac{\p}{\p x} \frac{\dot{x} N}{c_g} + 
+\frac{\p}{\p y} \frac{\dot{y} N}{c_g} + 
+\frac{\p}{\p \kappa} \frac{\dot{\kappa} N}{c_g} + 
+\frac{\p}{\p \theta} \frac{\dot{\theta} N}{c_g}  =
+\frac{S}{\sigma c_g} \: , \label{eq:bal_f_grid} \end{equation} \begin{equation}
+\dot{\kappa} \:\frac{\p k}{\p \kappa} =
+     c_g^{-1} \frac{\p \sigma}{\p d} \left (
+    \frac{\p d}{\p t} + {\bf U} \cdot \nabla_x d \: \right ) -
+    {\bf k} \cdot \frac{\p {\bf U}}{\p s}
+\: . \label{eq:sigma_dot}
+\end{equation}
+
+\noindent
+
+\vssub
+\subsection{~波作用量方程的分裂} \label{sec:basic_num}
+\vsssub
+
+在 \ws\ 中，式 (\ref{eq:bal_f_grid}) 使用分步法求解。第一步处理水深的时间变化以及相应的波数网格变化。如 \cite{tol:GAOS98b} 所讨论的，这一步可较低频率地调用。通过把水位（时间）变化的影响分离出去，网格变为不变网格，并且在剩余分步中水深可视为准定常。其他分步处理空间传播、谱内传播和源项。从 5.10 版开始，源项 $S$ 进一步分裂为非冰源项 $S_{no~ice}$ 和冰源项 $S_{ice}$。对于单个模式网格，{\code W3WAVE} 例程执行如下积分序列：
+\begin{itemize}
+ \item[1.] 更新水位
+ \item[2.] 谱内部分 1：在 $\Delta t_g/2$ 上积分 $\frac{\p}{\p t} \frac{N}{c_g} + \frac{\p}{\p \kappa} \frac{\dot{\kappa} N}{c_g} + \frac{\p}{\p \theta} \frac{\dot{\theta} N}{c_g}  =0 $
+ \item[3.] 空间传播：在 $\Delta t_g$ 上积分 $\frac{\p}{\p t} \frac{N}{c_g} +  
+\frac{\p}{\p x} \frac{\dot{x} N}{c_g} + 
+\frac{\p}{\p y} \frac{\dot{y} N}{c_g}  = 0$
+ \item[4.] 谱内部分 2：在 $\Delta t_g/2$ 上积分 $\frac{\p}{\p t} \frac{N}{c_g} + \frac{\p}{\p \kappa} \frac{\dot{\kappa} N}{c_g} + \frac{\p}{\p \theta} \frac{\dot{\theta} N}{c_g}  =0 $
+ \item[5.] 源项积分：在 $\Delta t_g$ 上积分 $\frac{\p}{\p t} \frac{N}{c_g}   = \frac{S_{no~ice}}{\sigma c_g}$
+ \item[6.] 冰源项积分：在 $\Delta t_g$ 上积分 $\frac{\p}{\p t} \frac{N}{c_g}   = \frac{S_{ice}}{\sigma c_g}$
+\end{itemize}
+在 $\Delta t_g \rightarrow 0$ 的极限下，这 6 个步骤的连续执行等价于在全局时间步长 $\Delta t_g$ 上积分式 (\ref{eq:bal_f_grid})。
+
+这种多步骤分裂允许同时进行高效的向量化和并行化。时间分裂还允许在模式不同分步中使用独立的部分时间步长或动态调整的时间步长。\ws\ 区分 4 种不同的时间步长。\label{dt_list}
+
+\begin{list}{xx}{\itemsep 0mm \parsep 0mm \rightmargin 5mm}
+
+\item[1)] “全局”时间步长 $\Delta t_g$ 是所有分裂子积分的公共步长。在这个意义上，它是能够得到物理上有意义解的最小时间步长，因为方程中的所有项都已积分。因此，它可作为评估模式输出或与其他模式耦合的时间步长；在多网格系统中，它也是网格间通信所采用的时间步长。对于强迫模式（而非耦合模式），输入风和流在该全局步长上插值。该时间步长由用户在 {\code ww3\_grid} 输入文件中给出，但模式内部可将其缩小，以满足所要求的输入或输出时刻。
+
+\item[2)] 第二种时间步长是空间传播时间步长。它不用于基于三角形的网格；对此类网格，在显式格式中，平流步长会在内部对每个谱分量调整。对于其他网格类型，用户在无流且网格不运动的假设下，为最低模式频率提供一个参考最大传播时间步长 $\Delta t_{p,r}$。对计数器为 $m$ 的频率，最大时间步长 $\Delta t_{p,m}$ 在模式内部计算为
+
+%-------------------------%
+% Time stepping equations %
+%-------------------------%
+% eq:dtpl
+
+\begin{equation}
+\Delta t_{p,m} = \frac{{\dot{x}}_{p,r}}{{\dot{x}}_{p,m}} \Delta t_{p,r}
+\: , \label{eq:dtpl} \end{equation}
+
+\noindent
+其中 $\dot{x}_{p,r}$ 为无流且网格不运动时最长波的最大平流速度，$\dot{x}_{p,m}$ 为频率 $m$ 的实际最大平流速度（包括流）。如果传播时间步长小于全局时间步长，则传播效应用多个连续的较小时间步长计算。这通常意味着最低频率会使用多个部分时间步，而最高频率在 $\Delta t_g$ 间隔内只需一次计算即可传播。后者可显著提高模式效率，特别是在使用高阶精度传播格式时。注意，$\Delta t_{p,m}$ 可定义为大于 $\Delta t_g$，这对有（强）流情形下的模式经济性可能有影响。
+
+\item[3)] 第三种时间步长是谱内传播时间步长。对于大尺度和深水网格，该时间步长通常可取为全局时间步长 $\Delta t_g$。对于浅水网格，在格式稳定性约束内，较小的谱内传播时间步长可允许更强的折射效应。注意，为提高数值精度，空间传播和谱内传播的调用顺序会交替。如果长周期涌浪发生强折射，这可能导致平均波浪参数出现明显起伏。可通过把该时间步长设为 $\Delta t_g$ 的偶数整数分数来避免这种情况。
+
+\item[4)] 最后一种时间步长是源项积分时间步长，它会针对每个独立网格点和每个全局时间步长 $\Delta t_g$ 动态调整（见 \para~\ref{sub:source}）。这使快速变化的风和波浪条件计算更准确，同时也使缓慢变化条件下的积分更经济。为限制计算时间，用户需定义最小时间步长。
+
+\end{list}
+
+\vspace{\baselineskip} \noindent 
+
+以下各节讨论分步法中的各个独立步骤，以及与之相关的若干问题。主要内容包括：\para\ref{sub:num_depth} 讨论水深时间变化的处理；\para\ref{sub:xy_prop} 讨论空间传播；\para\ref{sub:spec} 讨论谱内传播；第 \ref{sub:source} 和 \ref{sub:icesource} 节讨论非冰和冰源项的数值积分。其他小节讨论附加数值方法和技术，包括风和流的处理（\para\ref{sub:num_w_c}）、潮汐（\para\ref{sub:num_tide}）、时空极值计算（\para\ref{sub:space_time_ext}）、海冰处理（\para\ref{sub:num_ice}）、谱分区以及波系在空间和时间中的相应追踪（第 \ref{sub:num_part}、\ref{sub:num_track} 节），以及嵌套（\para\ref{sub:num_nest}）。

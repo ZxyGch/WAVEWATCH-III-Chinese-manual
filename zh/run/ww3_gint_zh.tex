@@ -1,0 +1,23 @@
+\vsssub
+\subsubsection{网格整合} \label{sub:ww3gint}
+\vsssub
+\proddefH{ww3\_gint}{w3gint}{ww3\_gint.ftn}
+\proddeff{输入}{ww3\_gint.inp}{传统配置文件。}{10} (App.~\ref{sec:config111})
+\proddefa{mod\_def.*}{基准网格和目标网格的 \ws{} 格式模式定义文件}{20}
+\proddefa{out\_grd.*}{基准网格的 \ws{} 格式网格场文件}{30+}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{out\_grd.*}{目标网格的 \ws{} 格式网格场文件}{30+}
+
+\vspace{\baselineskip}
+\noindent
+该后处理程序从若干重叠网格获取场数据，并生成统一的输出文件。不同的模式定义文件和场输出文件由与每个特定网格关联的唯一标识符识别。目前，该程序适用于曲线网格和直角网格。程序会写出一个权重文件 {\file WHTGRIDINT.bin}；在后续使用相同源网格和目标网格的运行中可读取该文件，从而在输入网格数量较多和/或目标网格分辨率较高时节省大量时间。
+
+\vspace{\baselineskip}
+\noindent
+网格整合程序可使用线性插值或最近邻插值。当分区输出用于谱重构时，建议使用后者。线性插值会导致分区扩散，从而产生虚假的能量线并人为增加总能量。
+\vspace{\baselineskip}
+\vspace{\baselineskip}
+\noindent
+注意，该程序可与网格拆分程序 {\file ww3\_gspl} 配合使用，并且 {\file ww3\_gspl.sh} 提供了为该程序生成模板输入文件的选项（见 \para\ref{sub:ww3gspl}）。
+
+\pb

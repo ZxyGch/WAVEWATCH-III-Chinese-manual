@@ -1,0 +1,21 @@
+\vsssub
+\subsubsection{用于 GrADS 的点输出后处理器} \label{sec:gxoutp}
+\vsssub
+
+\proddefH{gx\_outp}{gxoutp}{gx\_outp.ftn}
+\proddeff{输入}{gx\_outp.inp}{传统配置文件。}{10} (App.~\ref{sec:config181})
+\proddefa{mod\_def.ww3}{模式定义文件。}{20}
+\proddefa{out\_pnt.ww3}{原始点输出数据。}{20}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{ww3.spec.grads}{包含谱和源项的 GrADS 数据文件。}{30}
+\proddefa{ww3.mean.grads}{包含平均波浪参数的文件。}{31}
+\proddefa{ww3.spec.ctl}{GrADS 控制文件。}{32}
+
+\vspace{\baselineskip} 
+\noindent
+该后处理器用于生成数据文件，使 GrADS（见上一节）能够绘制谱和源项的极坐标图。为实现这一点，谱和源项被存储为“经度-纬度”网格。对于每个输出点，会为数据生成不同名称，通常为 {\F
+loc{\it nnn}}。当数据文件载入 GrADS 时，变量 {\F loc001} 将在第 1 层包含第一个请求输出点的谱网格，在第 2 层包含输入源项，依此类推。对于第二个输出点，数据存储在 {\F loc002} 中，依此类推。实际输出点名称通过控制文件 {\file ww3.spec.ctl} 传递给 GrADS。波高和环境数据从 {\file ww3.mean.grads} 获取。不过，用户无需了解 GrADS 数据文件和数据存储的细节。程序提供了 GrADS 脚本 {\file spec.gs}、{\file source.gs} 和 {\file 1source.gs}，用于从该后处理器的输出文件自动生成谱图。
+
+注意：为使 GrADS 脚本正常工作，输出点名称不应包含空格。
+
+\pb

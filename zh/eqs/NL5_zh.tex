@@ -1,0 +1,80 @@
+\vsssub
+\subsubsection{~$S_{nl}$：广义动力学方程（GKE）} \label{sec:NL5}
+\vsssub
+
+\opthead{NL5}{WAVEWATCH III}{Q. Liu, O. Gramstad, A. Babanin}
+
+\noindent
+\citet[][也称为动力学方程；式（\ref{eq:HKE}），下文记为 HKE]{art:Has62} 的 Boltzmann 积分形式描述了由于\emph{共振}四波相互作用（\ref{eq:resonance_2}），波能量如何在谱空间中重新分布。HKE 推导背后的一个重要假设是，作用量密度在缓慢的（“动力学”）时间尺度 \textit{O}$(1 / \varepsilon^{4} \sigma_0)$ 上演化，其中 $\varepsilon$ 和 $\sigma_0$ 分别是波场的典型波陡和频率 \citep{Annenkov2006}。因此，作为长时间极限，HKE 不包含来自\emph{非共振}相互作用（$\Delta \sigma \neq 0$）的贡献。
+
+例如，\citet{Janssen2003}、\citet{Annenkov2006} 和 \citet[][下文记为 GS13]{Gramstad2013} 已将 HKE 扩展到包含\emph{非共振}四波相互作用。这里实现的广义动力学方程（generalized kinetic equation, GKE）基于 GS13、\citet{Gramstad2016} 和 \citet[][下文记为 LGB21]{Liu2021JFM} 的工作。按照 GS13，GKE 写为
+%
+\begin{align}
+\frac{\mathrm{d} C_1}{\mathrm{d} t} &= 4 \Re \bigintssss \bigg[ T^2_{1, 2, 3, 4} \delta (\boldsymbol{\Delta k}) \/\mathrm{e}^{i\Delta \sigma t} I(t) \/  \bigg] \mathrm{d} \boldsymbol{k_{2, 3, 4}}, \label{eq:GKE}\\
+%
+I(t) &= \int_{0}^{t} \mathcal{F}_{1, 2, 3, 4} (\tau) \mathrm{e}^{-i\Delta \sigma \tau } \mathrm{d} \tau, \label{eq:GTINT}\\
+%
+\mathcal{F}_{1, 2, 3, 4} &= C_3 C_4 (C_1 + C_2) - C_1 C_2 (C_3 + C_4). \label{eq:GPROD}
+\end{align}
+%
+这里 $C_1 = C(\boldsymbol{k_1}) = g N(k, \theta) / k$ 为作用量谱，$T_{1, 2, 3, 4} = T(\boldsymbol{k_1}, \boldsymbol{k_2}, \boldsymbol{k_3}, \boldsymbol{k_4})$ 为相互作用系数 \citep{art:Kra94, art:Jan09}，$\Delta \boldsymbol{k} = \boldsymbol{k_1} + \boldsymbol{k_2} - \boldsymbol{k_3} - \boldsymbol{k_4}$ 为波数失配量，且 $\mathrm{d} \boldsymbol{k_{2,3,4}} = \mathrm{d} \boldsymbol{k_2} \mathrm{d} \boldsymbol{k_3} \mathrm{d} \boldsymbol{k_4}$。注意
+\begin{equation}
+S_{nl}(k, \theta) = \omega \frac{\mathrm{d} N}{\mathrm{d}t} \bigg\rvert_{nl} = \frac{\omega k}{g} \frac{\mathrm{d} C_1}{\mathrm{d} t}.
+\label{eq:GSnl}
+\end{equation}
+由上述方程可见，GKE 不仅包含非共振相互作用[HKE 中存在的 $\delta (\Delta \sigma)$ 在式（\ref{eq:GKE}）中被去除]，而且表明波场的演化取决于其先前的演化历史（即式（\ref{eq:GTINT}）中的 $I(t)$）。GKE 算法的完整细节见 GS13 和 LGB21。 \citet{Janssen2003} 的修正动力学方程也已在 GKE 框架中实现。名称列表 {\F SNL5} 中可用的参数汇总于表~\ref{tab:gke}。关于如何使用这一非线性项，可参考回归测试 {\code ww3\_ts1/input\_nl5\_growth} 和 {\code ww3\_ts1/input\_nl5\_gaussian}。
+
+% -------------------------------------------------------------------
+\begin{table}
+    \footnotesize
+    \begin{center}
+        \begin{tabular}{|l|p{8.cm}|l|}
+        \hline \hline
+        名称列表参数 & 说明 & 默认值\\
+        \hline
+        NL5DPT        & 水深（m）                                                               & 3000 \\
+        \hline
+        NL5OML        & 准共振截断因子 $\lambda_c$（\ref{eq:QuasiResQ}）                   & 0.10  \\
+        \hline
+        NL5KEV        & 所求解的方程 - {\code 0: GKE}（\ref{eq:GKE}）；{\code 1:} \citet{Janssen2003}  & 0     \\
+        \hline
+        NL5PMX        & \parbox{8.cm}{相位混合的周期数 $N_{pm}$ -\\ {\code \{0: 无相位混合；-1: $N_{pm} = 1 / b_T$\}}} & 100 \\
+        \hline \hline
+    \end{tabular}
+    \end{center}
+    %
+    \caption{{\F SNL5} 名称列表中包含的参数。}
+    \botline
+    \label{tab:gke}
+\end{table}
+% -------------------------------------------------------------------
+
+\paragraph{四元组筛选。} 为降低 GKE 的计算代价，我们只把满足
+%
+\begin{equation}
+\left \lbrace
+\begin{array}{rcl}
+\boldsymbol{k_1} + \boldsymbol{k_2} &=& \boldsymbol{k_3} + \boldsymbol{k_4}\\
+|\Delta \sigma| & \leq &\lambda_c \min (\sigma_1,\ \sigma_2,\ \sigma_3,\ \sigma_4)
+\end{array}
+\right.
+\label{eq:QuasiResQ}
+\end{equation}
+%
+的波数构型视为有效四元组。这里 $\lambda_c$ 是截断因子，用来滤除离共振很远、对谱演化贡献很小的四波组。对于给定的四元组，我们在波数网格点上选取 $\boldsymbol{k_1}$、$\boldsymbol{k_2}$ 和 $\boldsymbol{k_3}$，而 $\boldsymbol{k_4}$ 由（\ref{eq:QuasiResQ}）自然确定。除非另有说明，作用量密度 $C(\boldsymbol{k_4})$ 通过双线性插值获得 \citep{vanVledder2006}。当 $\boldsymbol{k_4}$ 落在谱网格之外时，我们假定
+\begin{equation}
+C(k_4) =
+\begin{cases}
+0 & \textnormal{ for } k_4 < k_{\min}\\
+C(k_{\max}) \left( \frac{k_4}{k_{\max}} \right)^{n/2 - 2} & \text{ for } k_4 > k_{\max}\\
+\end{cases},
+\label{eq:GBound}
+\end{equation}
+其中 $k_{\min}$ 和 $k_{\max}$ 分别是谱网格内的最小和最大波数，$n=-5$ 是频率谱规定的高频幂律[即 $E(f) \propto f^{n}$]。
+
+\paragraph{相位混合。} GKE 通常假定初始波相位完全不相关来求解，即采用 $I(t=0) = 0$ 的冷启动（GS13）。随着波场演化，非线性四波相互作用会导致偏离 Gaussian 性 \citep{Janssen2003}，产生非零的四阶累积量，因而产生非零的 $I(t)$。某些物理过程，例如破波 \citep[如][]{bk:Bab11}，可能在特定时刻使相位去相关（即相位重新混合）。GS13 和 \citet{Gramstad2016} 建议，可在 GKE 算法中通过每隔 $N_{pm}$ 个特征波周期[以 $T_{m0, -1}$ 表示；式（\ref{eq:Tm0m1}）]重启 GKE（令 $t=0$），同时保持作用量谱不变，来纳入这种效应。值得注意的是，相位重新混合也可用于\emph{抑制 GKE 在长期模拟中的数值不稳定性}（见 LGB21）。目前为 $N_{pm}$ 提供了两种选项：$N_{pm}$ 可以是固定常数[$N_{pm} \sim \textit{O} (10^2)$]；也可以通过采用 $N_{pm} = 1 / b_T$ 显式依赖主导破波概率 $b_T$，其中 $b_T$ 按 \citet{art:BBY01}，用式（\ref{eq:bt}）估算。
+
+\paragraph{源项积分。} 第三代谱波浪模型通常采用半隐式或隐式积分格式，根据源项计算时间步长 $\Delta t$ 内作用量密度的变化 $\Delta N$；这需要对角项 $D(k, \theta) = \partial \mathcal{S} (k, \theta) / \partial N(k, \theta)$[式（\ref{eq:implicit_st}）；见第~\ref{sub:source} 节]。由于（\ref{eq:GKE}）中的时间积分 $I(t)$ 显式依赖波谱演化历史[以作用量乘积项 $\mathcal{F}_{1,2,3,4} (\tau)$ 表示]，计算 GKE 的对角项 $D(k, \theta)$ 即使并非不可能，也非常困难。为绕过这一问题，当 $S_{nl}$ 基于 GKE 时，我们采用 \citet{tol:JPO92} 的显式动态时间步进方案[即式（\ref{eq:implicit_st}）中的 $\epsilon = 0$]进行源项积分。
+
+\paragraph{\textit{\underline{代码限制：}}} GKE 的计算代价极高，因此目前只能用于 WW3 的单网格点版本（例如时长受限测试）。由于 i）包含准共振相互作用，以及 ii）使用显式源项积分方案，GKE 运行大约比 WRT（第~\ref{sec:NL2} 节）昂贵 5--10 倍。
+% <TODO> - regtest

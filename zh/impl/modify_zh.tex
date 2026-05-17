@@ -1,0 +1,42 @@
+\vssub
+\subsection{~修改源代码} \label{sec:mod}
+\vssub
+
+显然，可以通过编辑 {\dir ftn} 目录中的源代码文件来修改源代码。不过，通常从工作目录 {\dir work} 修改源代码文件更方便。这可以通过在 {\dir ftn} 和 {\dir work} 目录之间生成链接来完成。输入 \command{ln3 filename} 即可生成这样的链接，其中 {\code filename} 是源代码文件或 include 文件的名称，可以带正确扩展名，也可以不带。建议从工作目录中操作，原因有几项。首先，由于输入文件也有类似链接，程序可以从同一目录测试。其次，该目录中还提供了指向相关 switch、编译和链接程序的链接。第三，它便于跟踪哪些文件已被修改（也就是说，只有已创建链接的那些文件可能被修改过）。最后，如果 work 目录中的文件（链接）被意外删除，源代码不会消失。
+
+修改源代码本身很直接。向已有子程序添加新开关，或添加新模块，则需要修改自动编译脚本。如果向已有模块添加新的子程序，则不需要修改。如果向 \ws{} 添加新模块，则需要执行以下步骤，才能将其纳入自动编译：
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 15mm \labelwidth 7mm
+             \rightmargin 5mm \itemsep 0mm \parsep 0mm}
+\item 将文件名添加到 {\file make\_makefile.sh} 的 2.b 和 2.c 节，以确保该文件在正确条件下包含进 makefile。
+\item 相应修改该脚本的 3.b 节，以确保检查正确的模块依赖。注意，依赖关系是针对目标代码检查的，因此允许文件中存在多个模块名或不一致的模块名。
+\item 交互式运行脚本，确认 makefile 已更新。
+\end{list}
+
+\noindent
+纳入细节见实际脚本。向编译系统添加新开关需要以下操作：
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 15mm \labelwidth 7mm
+             \rightmargin 5mm \itemsep 0mm \parsep 0mm}
+\item 将开关放入所需源代码文件。
+\item 如果该开关属于新的开关组，则向 {\file w3\_new} 添加新的 `keyword'。
+\item 如有必要，更新 {\file w3\_new} 中需要 touch 的文件。
+\item 使用该开关和/或 keyword 更新 {\file make\_makefile.sh}。
+\end{list}
+
+\noindent
+只有当开关用于选择程序组成部分时，才需要进行这些修改。对于测试输出等，只需简单地把开关添加到源代码中即可。最后，向额外子程序添加一个旧开关需要以下操作：
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 15mm \labelwidth 7mm
+             \rightmargin 5mm \itemsep 0mm \parsep 0mm}
+\item 更新 {\file w3\_new} 中需要 touch 的文件。
+\end{list}
+
+如果修改了 \ws{}，保留旧版本代码和编译脚本的副本会很方便。为简化这一点，提供了一个归档脚本（{\file arc\_wwatch3}）。该脚本生成 {\file tar} 文件，可由安装程序 {\file install\_wwatch3} 重新安装。归档文件收集在目录 {\dir arc} 中。归档文件名可以包含用户定义的标识符（如果未使用标识符，名称将与原始 \ws{} 文件相同）。输入 \command{arc\_wwatch3} 调用归档程序。
+\noindent
+该脚本的交互式输入是自明的。可以将对应的 {\file tar} 文件复制到 \ws{} 主目录，将其改名为安装程序期望的文件名，然后运行安装程序，从而重新安装归档文件。
+
+对于使用 NCEP svn 仓库的共同开发者，代码更改应遵循 \citep{\guideref} 中概述的最佳实践。

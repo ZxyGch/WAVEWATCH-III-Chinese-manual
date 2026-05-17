@@ -1,0 +1,86 @@
+\vsssub
+\subsubsection{~$S_{db}$：Battjes and  Janssen 1978} \label{sec:DB1}
+\vsssub
+
+\opthead{DB1 / MLIM}{Pre-WAM}{J. H. G. M. Alves}
+
+\noindent
+\ws\ 中实现水深诱导破碎算法，旨在把模型适用范围扩展到浅水环境；在此类环境中，
+波浪破碎以及其他水深诱导变形过程会变得重要。
+
+因此采用 \citet[][下文记为 BJ78]{pro:BJ78} 的方法。该方法基于如下假设：随机波场中
+所有超过某一阈值高度的波都会破碎，而该阈值高度定义为海底地形参数的函数。对于随机
+波场，满足这一准则的波所占比例由浪区波高的统计描述确定（即 Rayleigh 型分布，并在
+依赖水深的最大波高处截断）。
+
+BJ78 提出的破碎波部分谱能量密度耗散总体速率 $\delta$，可利用与湍急水跃中耗散的类比
+估计为
+
+%-------------------------------%
+% Battjes Janssen surf breaking %
+%-------------------------------%
+% eq:BJ78_base
+
+\begin{equation}
+\delta = 0.25 \: Q_b \: f_m \: H_{\max}^2  , \label{eq:BJ78_base}
+\end{equation}
+
+\noindent
+其中 $Q_b$ 是随机波场中破碎波的比例，$f_m$ 是平均频率，$H_{\max}$ 是随机波场中
+单个分量在不破碎情况下能够达到的最大高度（反过来说，高于该高度的所有波都会破碎）。
+在 BJ78 中，最大波高 $H_{\max}$ 用 Miche 型准则 \citep{art:Miche44} 定义：
+
+% eq:BJ78_Miche
+
+\begin{equation}
+\bar{k} H_{\max} = \gamma_M \tanh ( \bar{k} d )
+ , \label{eq:BJ78_Miche}
+\end{equation}
+
+\noindent
+其中 $\gamma_M$ 为常数因子。该方法也会移除超过限制波陡的深水波能量。这可能导致
+深水波耗散被重复计算。另一种方式是使用 McCowan 型准则定义 $H_{\max}$，即简单的
+常数比：
+
+% eq:BJ78_McC
+
+\begin{equation}
+H_{\max} = \gamma \: d  , \label{eq:BJ78_McC}
+\end{equation}
+
+\noindent
+其中 $d$ 为局地水深，$\gamma$ 是由破碎波现场和实验室观测得到的常数。该方法只表示
+水深诱导破碎。虽然也存在把 $H_{\max}$ 写为局地水深简单函数的更一般破碎准则
+\citep[e.g.,][]{art:TG83}，但应注意，系数 $\gamma$ 指的是随机波场中单个破碎波的
+最大高度。\cite{art:M1894} 计算得到，孤立波在平底上传播时的极限波高水深比为 0.78，
+该值目前仍在工程应用中作为保守准则使用。\cite{pro:BJ78} 得到的平均值为
+$\gamma = 0.73$。\cite{art:Nel94, art:Nel97} 对礁上波浪传播的较新分析则建议
+取 0.55。
+
+破碎波比例 $Q_b$ 按在 $H_{\max}$ 处截断的 Rayleigh 型分布确定（即所有已破碎波都具有
+等于 $H_{max}$ 的高度），得到如下表达式：
+
+% eq:BJ78_Qb
+
+\begin{equation}
+\frac{1 - Q_b}{-\ln Q_b} = \left ( \frac{H_{rms}}{H_{\max}} \right ) ^{2}
+ , \label{eq:BJ78_Qb}
+\end{equation}
+
+\noindent
+其中 $H_{rms}$ 为均方根波高。在当前实现中，隐式方程 (\ref{eq:BJ78_Qb}) 通过迭代
+求解 $Q_b$。假设总谱能量耗散 $\delta$ 分布于整个谱上，因此不改变谱形
+\citep{art:EB96}，即可得到如下水深诱导破碎耗散源函数：
+
+% eq:BJ78
+
+\begin{equation}
+\cS_{db} (k,\theta) = - \alpha \frac{\delta}{E} F(k,\theta)
+       = - 0.25 \: \alpha \: Q_b \: f_m \frac{H_{\max}^2}{E} F(k,\theta)
+ , \label{eq:BJ78}
+\end{equation}
+
+\noindent
+其中 $E$ 为总谱能量，$\alpha = 1.0$ 为可调参数。用户可以在式~(\ref{eq:BJ78_Miche})
+和 (\ref{eq:BJ78_McC}) 之间选择，并调整 $\gamma$ 和 $\alpha$。默认设置为
+式~(\ref{eq:BJ78_McC})、$\gamma = 0.73$ 和 $\alpha = 1.0$。

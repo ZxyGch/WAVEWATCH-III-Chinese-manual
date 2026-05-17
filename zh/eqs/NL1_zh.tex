@@ -1,0 +1,204 @@
+
+\noindent
+
+
+共振非线性相互作用发生在四个波分量（四波组）之间，其波数向量
+$\bk$、$\bk_1$、$\bk_2$ 和 $\bk_3$ 满足
+% eq:resonance
+\begin{equation} \left .
+\begin{array}{ccc}
+  \bk + \bk_1 & = & \bk_2 + \bk_3     \\
+  f_r + f_{r,1}& =& f_{r,2} +  f_{r,3} 
+\end{array} \:\:\: \right \rbrace \:\:\: , \label{eq:resonance}
+\end{equation}
+
+非线性四波相互作用理论最初是针对谱 $F(f_r ,\theta)$ 建立的。为保证
+该谱上的 $S_{nl}$ 具有守恒性质（该谱可视为模型的“最终产品”），本源项
+使用式~(\ref{eq:jac_fr}) 的转换，针对 $F(f_r,\theta)$ 而不是
+$N(k,\theta)$ 计算。
+
+\vsssub
+\subsubsection{~$S_{nl}$：离散相互作用近似（\dia）} \label{sec:NL1}
+\vsssub
+
+\opthead{NL1}{\wam\ model}{H. L. Tolman}
+
+
+
+在 \dia 中，对于每个分量 $\bk$，只使用 2 个四波组构型；而完整积分本应包含
+数以千计的构型。这 2 个四波组造成的相互作用会经过缩放，使其给出向低频
+方向能量通量的正确量级。
+
+DIA 使用的两个四波组均采用
+% eq:resonance
+\begin{equation} \left .
+\begin{array}{ccc}
+  \bk_1 & = & \bk\\
+  f_{r,2}  & = & (1+\lambda)f_{r}    \\
+  f_{r,3}  & = & (1-\lambda)f_{r} 
+\end{array} \:\:\: \right \rbrace \:\:\: , \label{eq:DIAchoice}
+\end{equation}
+其中 $\lambda$ 为常数，通常取 0.25。二者仅在相互作用角的选择上不同，
+即在下式中分别取正号或负号：
+\begin{equation} \left .
+\begin{array}{ccc}
+  \theta_{2,\pm}  & = & \theta \pm \delta_{\theta,2}   \\
+ \theta_{3,\pm}  & = & \theta \mp  \delta_{\theta,3}   \\
+ \end{array} \:\:\: \right \rbrace \:\:\: , \label{eq:DIAangles}
+\end{equation}
+其中 $\delta_{\theta,2}$ 和 $\delta_{\theta,3}$ 只是 $\lambda$ 的函数，
+由相互作用波数沿“8 字形”几何给出，即
+\begin{eqnarray}
+\cos(\delta_{\theta,2})&=&(1-\lambda)^4+4-(1+\lambda)^4)/[4(1-\lambda)^2], \\
+\sin(\delta_{\theta,3})&=&\sin(\delta_{\theta,2}) (1-\lambda)^2/(1+\lambda)^2.
+\end{eqnarray}
+
+因此，对于任意 $\bk$，一个四波组选择 $\bk_{2,+}$ 和 $\bk_{3,+}$，
+另一个四波组选择其镜像 $\bk_{2,-}$、$\bk_{2,-}$。由于两个 DIA 选定
+的四波组中共有 3 个不同分量参与相互作用，任一离散谱分量
+$(f_r,\theta)$ 实际上会参与 6 个四波组，并与另外 12 个分量
+$(f_r',\theta')$ 直接交换能量。由于 $f'_r$ 和 $\theta'$ 的取值通常不
+恰好落在其他离散分量上，谱密度用双线性插值获得，因此每个源项值
+$S_{nl}(\bk)$ 都包含与 48 个其他离散分量的直接能量交换。计算时，将
+$\bk$ 分别作为四波组中的 $\bk$、$\bk_{2,+}$、$\bk_{2,-}$、
+$\bk_{3,+}$ 和 $\bk_{3,-}$ 角色，得到相应的贡献。也就是说，若不显式写出
+双线性插值，完整源项为
+\begin{eqnarray} 
+S_{\mathrm{nl}}(\bk) &=& -2  \left[\delta S_{\mathrm{nl}}(\bk,\bk_{2,+},\bk_{3,+})+\delta S_{\mathrm{nl}}(\bk,\bk_{2,-},\bk_{3,-})\right] \nonumber  \\
+ & & + \delta  S_{\mathrm{nl}}(\bk_4,\bk,\bk_5) + \delta  S_{\mathrm{nl}}(\bk_6,\bk,\bk_7)  \\
+     & &        +   \delta S_{\mathrm{nl}}(\bk_8,\bk_9,\bk) + \delta S_{\mathrm{nl}}(\bk_{10},\bk_{11},\bk) . \label{eq:diasum}
+\end{eqnarray}
+其中，四波组 $(\bk_4,\bk_4,\bk,\bk_5)$ 的几何形态由
+$(\bk,\bk,\bk_{2,+},\bk_{3,+})$ 通过因子 $(1+\lambda)^2$ 的伸缩并旋转
+$\delta_{\theta,2}$ 角得到；$(\bk_6,\bk_6,\bk,\bk_7)$ 具有相同伸缩，
+但旋转方向相反；$(\bk_8,\bk_8,\bk_9,\bk)$ 通过因子 $(1-\lambda)^2$
+伸缩并旋转 $-\delta_{\theta,3}$ 角得到；而
+$(\bk_{10},\bk_{10},\bk_{11},\bk)$ 采用相同伸缩因子并取相反旋转角。
+
+
+基本贡献 $\delta  S_{\mathrm{nl}}(\bk_l,\bk_m,\bk_n)$ 由下式给出：
+%----------------------------%
+% Nonlinear interactions DIA %
+%----------------------------%
+% eq:snl_dia
+
+\begin{equation}
+\delta S_{\mathrm{nl}}(\bk_l,\bk_m,\bk_n) =  \frac{C}{g^4} f_{r,l}^{11} \left [ F_l^2 \left ( \frac{F_m}{(1+\lambda)^4} +
+        \frac{F_n}{(1-\lambda)^4} \right ) - \frac{2 F_l F_m F_n}{(1-\lambda^2)^4} \right] ,
+      \label{eq:snl_dia}
+\end{equation}
+其中谱密度为 $F_l = F(f_{r,l} ,\theta_l)$ 等。$C$ 是比例常数，经调谐用于
+再现反向能量级联。不同源项包的默认值见表~\ref{tab:snl_par}。
+
+
+% tab:snl_par
+
+\begin{table} \begin{center}
+ \begin{tabular}{|l|c|c|} \hline
+                    & $\lambda$ &     $C$      \\ \hline
+ST6                 &      0.25      & $3.00 \; 10^7$  \\ \hline
+\wam-3              &      0.25      & $2.78 \; 10^7$  \\ \hline
+ST4 (Ardhuin et al.)&      0.25      & $2.50 \; 10^7$  \\ \hline
+Tolman and Chalikov &      0.25      & $1.00 \; 10^7$  \\ \hline
+\end{tabular} \end{center}
+\caption{\dia\ 中输入--耗散包的默认常数。}
+\label{tab:snl_par} \botline \end{table}
+
+该参数化是针对深水条件建立的，并在共振条件中使用相应的色散关系。对于浅水，
+该表达式按因子 $D$ 缩放（不过仍使用深水色散关系）：
+
+%------------------%
+% Depth factor DIA %
+%------------------%
+% eq:snl_shal
+
+\begin{equation}
+D = 1 + \frac{c_1}{\bar{k}d} \left [ 1 - c_2 \bar{k} d
+\right ] e^{-c_3 \bar{k} d} \: . \label{eq:snl_shal}
+\end{equation}
+
+\noindent
+这些常数的推荐（默认）值为 $c_1=5.5$、$c_2=5/6$ 和 $c_3=1.25$
+\citep{art:Hea85a}。上横线记号表示对谱进行直接平均。对任意参数 $z$，
+谱平均定义为
+
+%--------------------------%
+% Definition spectral mean %
+%--------------------------%
+% eq:zbar
+% eq:etot
+
+\begin{equation}
+\bar{z} = E^{-1} \int_{0}^{2\pi} \int_{0}^{\infty}
+z F(f_r,\theta) \; d f_r \; d\theta \: , \label{eq:zbar}
+\end{equation}
+\begin{equation}
+E = \int_{0}^{2\pi} \int_{0}^{\infty}
+F(f_r,\theta) \; d f_r \; d\theta \: . \label{eq:etot}
+\end{equation}
+
+\noindent
+然而，出于数值原因，平均相对水深估计为
+
+%------------%
+% kd for DIA %
+%------------%
+% eq:kd_num
+% eq:k_hat
+
+\begin{equation}
+\bar{k} d = 0.75 \hat{k} d \: , \label{eq:kd_num}
+\end{equation}
+
+\noindent
+其中 $\hat{k}$ 定义为
+
+\begin{equation}
+\hat{k} = \left ( \overline{1/\sqrt{}k} \right )^{-2} \: .
+\label{eq:k_hat}
+\end{equation}
+
+\noindent
+式~(\ref{eq:snl_shal}) 的浅水修正只适用于中等水深。因此，平均相对水深
+$\bar{k}d$ 不允许小于 0.5（与 \wam\ 中相同）。上述所有常数均可由用户在
+模型输入文件中重新设置（见 \para\ref{sub:ww3grid}）。
+
+\vsssub
+\subsubsection{~$S_{nl}$：Gaussian Quadrature Method（\dia）} \label{sec:GQM}
+\vsssub
+
+\opthead{NL1 , but with a negative IQTYPE}{TOMAWAC model, M. Benoit}{adaptation to WW3 by S. Siadatmousavi \& F. Ardhuin}
+
+\noindent
+将 namelist 参数 IQTYPE 改为负值，会用 Gaussian Quadrature Method
+\cite{Lavrenov2001} 替代 DIA 参数化，从而可以对 $S_{\mathrm{nl}}$
+进行精确但快速的计算。更多细节见 \cite{Gagnaire-Renou2009}。
+
+
+所使用的四波组构型对应于对 $f_1$、$f_2$ 和 $\theta_1$ 的三重积分；其他
+所有频率和方向均由共振条件（\ref{eq:resonance}）给出，唯一的不确定性
+在于角度 $\theta_2$，它可以像 DIA 中一样用符号指标 $s$ 定义。从
+\cite{Lavrenov2001} 的式 (A4) 出发，并按 \cite{Gagnaire-Renou2009}
+式 (2.25) 的写法，源项为
+\begin{equation}
+S_{\mathrm{nl}}(\sigma,\theta) =  8 \sum_s \int_{\sigma_1=0}^\infty \int_{\theta_1=0}^{2 \pi} \int_{\sigma_2=0}^{(\sigma+\sigma_1)/2}  T  \frac{F_2 F_3 (F \sigma_1^4 + F_1 \sigma^4) - F F_1 (F_2 \sigma_3^4 + F_3 \sigma_2^4)}{\sqrt{B}\sqrt{((\left| \bk+\bk_1 \right|/g- \sigma_3^2)^2-\sigma_2^4} } {\mathrm d}\sigma_1 {\mathrm d}\theta_1 {\mathrm d}\sigma_2 ,
+      \label{eq:snl_gqm}
+\end{equation}
+其中 $B$ 由 Lavrenov (2001) 的式 (A5) 给出，且
+\begin{equation}
+T(\bk,\bk_1,\bk_2,\bk_3) = \frac{\pi g^2 D^2(\bk,\bk_1,\bk_2,\bk_3) }{4 \sigma \sigma_1 \sigma_2 \sigma_3}
+\end{equation}
+其中 $D(\bk,\bk_1,\bk_2,\bk_3)$ 由 \cite{Webb1978} 的式 (A1) 给出。
+
+该三重积分使用求积函数计算，以更好地解析分母中奇异性的影响。因此，它被
+替换为三个维度上的加权求和。
+
+与 DIA 相比，该方法不使用双线性插值，而是在频率和方向上使用最近邻。
+此外，源项通过遍历四波组构型的循环计算，从而可基于耦合系数取值以及
+与 $\bk$ 对应频率处的能级进行筛选。在该循环内，会对所有 4 个相互作用
+分量计算源项贡献，因此任何筛选仍保持能量、作用量、动量等守恒。（也许可以
+认为这会使计算量增加 4 倍，但其好处可能是能更恰当地处理高频边界；这一点
+仍有待验证。同样的问题也出现在 DIA 中：当我们遍历谱分量时本就会计算这些
+角色，为什么还要让波数 $\bk$ 扮演四波组中其他成员的角色？）
+
+如果采用非常激进的筛选，可能需要对源项重新缩放。

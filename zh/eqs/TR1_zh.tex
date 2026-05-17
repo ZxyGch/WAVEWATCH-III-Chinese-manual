@@ -1,0 +1,74 @@
+\vsssub
+\subsubsection{~$S_{tr}$：三波非线性相互作用（LTA）} \label{sec:TR1}
+\vsssub
+
+\opthead{TR1}{SWAN}{A. Van der Westhuysen}
+
+非线性三波相互作用采用 \cite{rep:Eld96} 的 LTA 模型描述。该随机模型基于
+\cite{art:MS93} 的 Boussinesq 型确定性方程。这些确定性方程经过系综平均，并通过
+零四阶累积量假设截断空间演化方程层级，从而得到一维谱和双谱演化方程组。谱演化方程
+中出现的双谱被分解为双振幅和双相位。对应谱峰频率 $\sigma_p$ 自相互作用的双相位，
+参数化为局地 Ursell 数的函数：
+
+\begin{equation}
+   \beta(\sigma_p,\sigma_p) = -\frac{\pi}{2} + \frac{\pi}{2}\tanh\left( \frac{0.2}{Ur} \right),
+   \label{eq:biphase}
+\end{equation}
+
+\noindent
+其中基于谱的 Ursell 数 $Ur$ 为
+
+\begin{equation}
+   Ur = \frac{g}{8\sqrt{2} \pi^2} \frac{H_s {T_{m01}}^2}{d^2}\  .
+   \label{eq:ursell}
+\end{equation}
+
+双振幅通过对双谱演化方程作空间积分得到，这使双振幅成为空间局地函数。该结果给出的
+双振幅表达式包含一个空间缓变分量和一个快速振荡分量，后者被忽略。利用推导得到的
+双相位和双振幅表达式，可求解谱演化方程（单方程模型）。为了进一步降低计算成本，
+所有相互作用三波组的完整集合只用\textit{自和相互作用}集合表示，即频率为 $\sigma$
+的分量同相同频率的分量相互作用，并与频率为 $\sigma + \sigma = 2\sigma$ 的分量交换
+能量通量。频率为 $\sigma$ 的分量受到三波相互作用影响的最终表达式由两个贡献组成：
+一个向 $\sigma$ 增加能量通量（从 $1/2 \sigma$ 传来的通量），另一个从 $\sigma$
+扣除能量通量（传向 $2 \sigma$ 的通量）。针对弧频率调整后的实现表达式为：
+
+\begin{equation}
+   S_{\rm nl3} (\sigma,\theta) = S^-_{\rm nl3} (\sigma,\theta) + S^+_{\rm nl3}
+   (\sigma,\theta)  ,
+   \label{eq:snl3}
+\end{equation}
+
+\noindent
+其中
+
+\begin{equation}
+  S^+_{\rm nl3} (\sigma,\theta) = \max [0,\alpha_{\rm EB} 2 \pi c c_g J^2 |\sin\beta| \left \{ E^2(\sigma/2,\theta) -
+  2 E(\sigma/2,\theta) E(\sigma,\theta) \right \}]  ,
+  \label{eq:snl3plu}
+\end{equation}
+
+\noindent
+且
+
+\begin{equation}
+  S^-_{\rm nl3} (\sigma,\theta) = -2 S^+_{\rm nl3} (2\sigma,\theta)\  .
+  \label{eq:snl3min}
+\end{equation}
+
+\noindent
+由于把能量通量从 $\sigma$ 转移到 $2\sigma$ 时存在 Jacobian，到达 $2\sigma$ 的通量
+密度为离开 $\sigma$ 的一半（因此式 (\ref{eq:snl3min}) 中出现因子 2）。描述非线性
+范围 $0 \leq Ur \leq 1$ 中自相互作用的相互作用系数 $J$ 由 \citep{art:MS93} 给出：
+
+\begin{equation}
+   J = \frac{k^2_{\sigma/2} (gd + 2 c^2_{\sigma/2})}
+      {k_\sigma d (gd + \frac{2}{15} gd^3 k^2_\sigma - \frac{2}{5} \sigma^2
+        d^2)}\ \:\:\:  .
+   \label{eq:intcoef}
+\end{equation}
+
+\noindent
+LTA 公式沿方向谱的每个传播方向实现，从而给出一种各向同性、方向上解耦的三波相互作用
+表示。比例系数取 $\alpha_{\rm EB}$ = 0.05。此外，LTA 给出的结果对相互作用计算到的
+最高频率选择相当敏感，这里记为 $f_{max,EB}$。\citep{rep:Eld95} 建议把相互作用计算
+到平均频率的 2.5 倍（$f_{max,EB} = 2.5 f_{m01}$）。

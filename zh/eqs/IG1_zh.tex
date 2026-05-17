@@ -1,0 +1,46 @@
+\vsssub
+\subsubsection{~二阶谱和自由次重力波} \label{sec:IG1}
+\vsssub
+
+\opthead{IG1}{\ws}{F. Ardhuin}
+
+\noindent 
+警告：{\it 已发现非结构网格中 IG 波源存在一个错误。稍后将提供使用较旧代码版本的模式补丁。}
+
+第 \ref{sec:intro} 节中使用的线性色散关系能很好近似大部分波能，但在高频谱区也存在不可忽略的部分，典型频率高于风海波峰频率的三倍 \citep[e.g.][]{rep:Lec13}。在浅水中，谱的另一种强非线性部分出现在很低频率处，称为次重力波。
+
+在平底上水平均匀条件下，低频和高频非线性分量都可利用摄动理论由线性波谱估计 \citep[e.g.][]{art:Has62}。此外，均匀波场的非线性演变用这种“线性化谱”描述更为合适。因此，使用这种“线性化谱”工作，并在模式结果后处理时转换为包含非线性分量的可观测谱，是一种实用做法。执行该转换的一种方法是 \cite{art:Kra94} 提出的正则变换。该变换的性质由 \cite{art:Jan09} 进一步研究，并在 ECMWF 版本 WAM 模式中实现用于后处理。
+
+P. Janssen 编写的正则变换代码已与 \ws\ 接口。使用 {\code IG1} 开关并在 {\F SIG1} namelist 中设置参数 {\code IGADDOUTP = 2} 时，该守恒能量的正则变换将用于输出点谱。如果 {\code IGADDOUTP = 1}，则按理论 \citep[e.g.][]{art:Has62} 在模式谱上叠加二阶谱。该选项不守恒能量，而且由于忽略了二阶谱中的准线性项，在高频处并不一致 \citep{art:Jan09}。
+
+然而，与测量资料比较时，应注意不同观测装置对谱中非线性部分有不同响应。特别是，随波面运动的浮标也会把谱线性化，而二阶压力场与二阶表面高程之间并不满足线性波所用的关系。因此，正则变换只适用于在固定位置测量高程的波高仪。
+
+当波场不均匀时，波浪的非线性性质会导致不同模态之间的能量交换。在浅水中，这通常导致能量向次重力波转移，这些波在岸线附近释放并作为自由波传播。{\code IG1} 开关允许用若干方法参数化该效应。与需要以很高空间分辨率求解破波带内双谱演变的完整水动力解相比，这些参数化非常粗略 \citep[e.g.][]{art:HB97}。默认 namelist 设置对应 \cite{art:Aea14} 提出的参数化，并在 6.06 版中做了小幅调整。$\widehat{E}_{IG}(f)$ 定义中的幂次从 $f^{1.5}$ 改为 $f^{1.0}$，相应常数从 0.015 调整为 0.013。
+
+在实际中，自由次重力波能量通过 $S_{ref}$ 源项加入，即把 {\code SIG1} namelist 的 {\code IGSOURCE} 设为 1 或 2。
+
+第一种方法由 {\code IGSOURCE =1} 激活，二阶谱可使用 Hasselmann 摄动（{\code IGMETHOD = 1}）或正则变换（{\code IGMETHOD} 的任何其他值）计算，如 \cite{art:Jan09} 所述。该方法可能得到更好的 IG 波能方向分布，但仍在测试中。第二种方法由 {\code IGSOURCE = 2} 激活，自由 IG 谱由以下表达式给出：
+
+\begin{eqnarray}
+ A_{IG} & =&    H_s T_{m0,-2}^2\label{eq:IGfit0}, \\
+\widehat{E}_{IG}(f)& = & 1.2 \alpha_1^2 \frac{k g^2}{c_g 2 \pi f} \frac{(A_{IG}/4)^2}{\Delta_f}  
+\left[\min( 1., 0.013\mathrm{Hz}/ f)\right]^{1.0}, \label{eq:IGfit1} \\
+ \widehat{E}_{IG}(f,\theta) & = & \widehat{E}_{IG}(f) / (2 \pi ),
+\label{eq:fit2} 
+\end{eqnarray}
+
+\noindent
+其中平均周期定义为 $ T_{m0,-2} =\sqrt{m_{-2}/m_{0}}$，各阶矩为
+
+\begin{equation}
+ m_n= \int_{f_{min}~\mathrm{Hz}}^{0.5~\mathrm{Hz}} E(f) f^n {\mathrm d}f,\label{eq:mn}
+\end{equation}
+
+\noindent
+经验系数 $\alpha_1$ 的量级为 $10^{-3}$~s$^{-1}$，由 {\code SIG1} namelist 参数 {\code IGEMPIRICAL} 设置。定义 $ T_{m0,-2}$ 所用的最小频率 $f_{min}$ 由 namelist 参数 {\code IGMAXFREQ} 设置；它也是施加该能量源的 IG 频带的最高频率。此外，在该频带内，可把海岸处的 IG 能量叠加到已有能量之上，也可把已有能量重置为零。后一种行为是默认设置，由 {\code IGBCOVERWRITE = 1} 控制。若选择其他设置（{\code IGBCOVERWRITE = 0}），结果对允许的最大岸线反射系数（{\F REF1} namelist 中的 {\code REFRMAX} 参数）非常敏感。
+
+最后，也可在超过 $f_{min}$ 的频率上加入 IG 能量；这是默认行为，通过设置 {\code IGSWELLMAX = TRUE} 激活。对于 IG 波场的这一部分，IG 波源现在被减小 4 倍，该因子目前硬编码在 {\file w3ref1md.ftn} 中。它应与由 {\F REF1} namelist 参数 {\code REFRMAX} 定义的最大反射一起调整。在当前版本中，{\code IGSWELLMAX = TRUE} 选项在非结构网格上工作效果不好。因此建议这些网格使用 {\code IGSWELLMAX = FALSE}，但这会不幸地导致 IG 频带与涌浪-风海频带之间出现谱隙。
+
+
+
+

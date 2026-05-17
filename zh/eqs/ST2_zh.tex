@@ -1,0 +1,348 @@
+\vsssub
+\subsubsection{~$S_{in} + S_{ds}$：Tolman 和 Chalikov 1996} \label{sec:ST2}
+\vsssub
+
+\opthead{ST2}{\ws}{H. L. Tolman}
+
+\noindent 
+\cite{tol:JPO96} 的源项包由 \cite{art:CB93} 和 \cite{art:Cha95} 的输入源项以及两个耗散分量组成。输入源项写为
+
+%----------------------------%
+% Chalikov an Belevich input %
+%----------------------------%
+% eq:CB93_gen
+
+\begin{equation}
+\cS_{in}(k,\theta) = \sigma \, \beta \, N(k,\theta)
+\: , \label{eq:CB93_gen} \end{equation}
+
+\noindent
+其中 $\beta$ 是无量纲风--浪相互作用参数，可近似为
+
+% eq:CB93_beta
+
+\begin{equation}
+10^4 \beta = \left \{
+\begin{array}{ccrcl}
+-a_1\toa^2 -a_2          &,&             & \toa & < -1     \\
+a_3\toa(a_4\toa-a_5)-a_6 &,&         -1 \leq & \toa & <\Omega_1/2 \\
+(a_4\toa-a_5)\toa        &,& \Omega_1/2 \leq & \toa & <\Omega_1   \\
+a_7\toa-a_8              &,&   \Omega_1 \leq & \toa & <\Omega_2   \\
+a_9(\toa-1)^2+a_{10}     &,&   \Omega_2 \leq & \toa &
+\end{array} \right . \label{eq:CB93_beta}
+\end{equation}
+
+\noindent
+其中
+
+% eq:CB93_oma
+
+\begin{equation}
+\toa= \frac{\sigma \; u_{\lambda}}{g} \cos(\theta-\theta_w)
+\label{eq:CB93_oma} \end{equation}
+
+\noindent
+为某一谱分量的无量纲频率，$\theta_w$ 为风向，$u_{\lambda}$ 为高度等于“表观”波长处的风速：
+
+% eq:CB93_lam
+
+\begin{equation}
+\lambda_a = \frac{ 2 \pi }{ k | \cos(\theta-\theta_w) | }
+\: . \label{eq:CB93_lam} \end{equation}
+
+\noindent
+式~（\ref{eq:CB93_beta}）中的参数 $a_1-a_{10}$ 和 $\Om_1,\Om_2$ 依赖高度 $z=\lambda_a$ 处的拖曳系数 $\CL$：
+
+% eq:omapar        Approximation parameters
+
+\begin{equation} \begin{array}{lcl}
+\Om_1=1.075+75\CL  &\Om_2=& 1.2+300\CL                     \\
+a_1=0.25+395\CL,    &a_3 =& (a_0-a_2-a_1)/(a_0+a_4+a_5)    \\
+a_2=0.35+150\CL,    &a_5 =& a_4\Om_1                       \\
+a_4=0.30+300\CL,    &a_6 =& a_0(1-a_3)                     \\
+a_9=0.35+240\CL,    &a_7 =&
+                     (a_9(\Om_2-1)^2+a_{10})/(\Om_2-\Om_1) \\
+a_{10}=-0.05+470\CL,&a_8 =& a_7\Om_1                       \\
+                    &a_0 =& 0.25 a_5^2/a_4
+\end{array} \label{eq:omapar} \end{equation}
+
+\noindent
+波浪模型以给定参考高度 $z_r$ 处的风速 $u_r$ 作为输入，因此 $u_\lambda$ 和 $\CL$ 需要作为参数化的一部分推导。除去贴近水面、适应水面的薄表层，平均风廓线接近对数形式：
+
+% eq:u_z
+
+\begin{equation}
+u_z = \frac{v_\ast}{\kappa} \ln \left ( \frac{z}{z_0} \right )
+\: , \label{eq:u_z}
+\end{equation}
+
+\noindent
+其中 $\kappa = 0.4 $ 是 Von K\`{a}rm\`{a}n 常数，$z_0$ 为粗糙度参数。该方程可按参考高度 $z_r$ 处的拖曳系数 $C_r$ 重写为 \citep{art:Cha95}
+
+% eq:C95C
+% eq:C95R
+% eq:C95Ca
+
+\begin{equation}
+C_r = \kappa^2 \left [ R - \ln(C) \right ] ^2
+\: , \label{eq:C95C} \end{equation} 其中 \begin{equation}
+R = \ln \left ( \frac{z_r g}{\chi \sqrt{\alpha} u_r^2} \right )
+\: , \label{eq:C95R} \end{equation}
+
+\noindent
+其中 $\chi = 0.2$ 为常数，$\alpha$ 是高频处常规定义的无量纲能量水平。对这些隐式关系的精确显式近似为
+
+\begin{equation}
+C_r = 10^{-3} \left ( 0.021 + \frac{10.4}{R^{1.23}+1.85} \right )
+\: . \label{eq:C95Ca} \end{equation}
+
+
+因此，估算拖曳系数需要估计高频能量水平 $\alpha$；原则上可直接由波浪模型估算。然而，谱的相应部分通常解析不足，容易含有噪声，并且受若干源项误差污染。因此，$\alpha$ 采用参数化估计 \citep{art:Jan89}：
+
+% eq:alpha_J89
+
+\begin{equation}
+\alpha = 0.57 \left ( \frac{u_\ast}{c_p} \right )^{3/2}
+\: . \label{eq:alpha_J89} \end{equation}
+
+\noindent
+由于后一方程依赖拖曳系数，式~（\ref{eq:C95R}）到（\ref{eq:alpha_J89}）在形式上需要迭代求解。这类迭代在模型初始化期间进行，但在实际模型运行期间并非必需，因为 $u_\ast$ 通常变化缓慢。注意，式~（\ref{eq:alpha_J89}）可视为 $C_r$ 参数化的内部关系，因此即使它偏离实际模型行为，也不失一般性。因此，在 \cite{tol:JPO96} 中，$C_r$ 直接表示为 $c_p$ 的函数。
+
+利用拖曳系数的定义和式~（\ref{eq:u_z}），粗糙度参数 $z_0$ 为
+
+% eq:z0
+
+\begin{equation}
+z_0 = z_r \; \exp \left ( - \kappa C_r^{-1/2} \right )
+\; , \label{eq:z0} \end{equation}
+
+\noindent
+高度 $\lambda$ 处的风速和拖曳系数则为
+
+% eq:ul
+% eq:Cl
+
+\begin{equation}
+u_{\lambda} = u_r \frac{ln(\lambda_a/z_0)}{ln(z_r/z_0)},
+\label{eq:ul} \end{equation} \begin{equation}
+C_{\lambda} = C_r \left ( \frac{u_a}{u_\lambda}
+\right ) ^2 ,\label{eq:Cl}
+\end{equation}
+
+\noindent
+最后，式~（\ref{eq:alpha_J89}）需要估计峰值频率 $f_p$。为了即使在复杂多峰谱中也能一致估算主动生成波的峰值频率，该频率由输入源项正值部分的等效峰值频率估算 \citep[见][]{tol:JPO96}：
+
+% eq:fp_ir
+
+\begin{equation}
+f_{p,i} =
+\frac { \int \int \: f^{-2} \: c_g^{-1} \:
+\max \: [ \: 0 \:,\: \cS_{wind}(k,\theta) \: ] \: d f \: d\theta }
+{ \int \int \: f^{-3} \: c_g^{-1} \:
+\max \: [ \: 0 \:,\: \cS_{wind}(k,\theta) \: ] \: d f \: d\theta }
+\: , \label{eq:fp_ir}
+\end{equation}
+
+\noindent
+再由此估算实际峰值频率（波浪号表示基于 $u_\ast$ 和 $g$ 的无量纲参数）：
+
+% eq:fp_fpi
+
+\begin{equation}
+\tilde{f}_p \: = \: 3.6 \: 10^{-4} \: + \: 0.92 \tilde{f}_{p,i}
+\: - \: 6.3 \: 10^{-10} \: \tilde{f}_{p,i}^{-3}
+\:\: . \label{eq:fp_fpi} \end{equation}
+
+\noindent
+上述方程中的所有常数均在模型内部定义。用户只需定义参考风高 $z_r$。
+
+在包含该源项的 \ws\ 全球实现测试中 \citep{tol:OMB02a}，发现其由逆风或弱风导致的涌浪耗散被严重高估。为修正这一缺陷，定义了一个经过滤波的输入源项：
+
+% eq:swellf         Input source term (modified)
+
+\begin{equation}
+\cS_{i,m} = \left \{ \begin{array}{ccccc}
+    \cS_i         & \mbox{for} & \beta \geq 0 & \mbox{or}  & f > 0.8 f_p \\
+  X_s \cS_i       & \mbox{for} & \beta < 0    & \mbox{and} & f < 0.6 f_p \\
+{\cal{X}}_s \cS_i & \mbox{for} & \beta < 0    & \mbox{and} & 0.6 f_p < f < 0.8 f_p
+\end{array} \right . \: , \label{eq:swellf} \end{equation}
+
+\noindent
+其中 $f$ 为频率，$f_p$ 是由输入源项计算得到的风海峰值频率，$\cS_i$ 为输入源项（\ref{eq:CB93_gen}），$0 < X_s < 1$ 是 $\cS_i$ 的削减因子，仅施加于 $\beta$ 为负的涌浪（由用户定义）。${\cal{X}}_s$ 表示 $X_s$ 随 $f_p$ 的线性削减，在原输入和削减输入之间提供平滑过渡。
+
+由式~（\ref{eq:alpha_J89}）得到的拖曳系数在飓风强度风速下会变得不现实地高，导致不现实的高波浪增长率。为缓解这一问题，参考高度处拖曳系数 $C_r$ 可用允许的最大拖曳系数 $C_{r,max}$ 封顶，可以采用简单硬上限：
+
+\begin{equation}
+C_r = \min ( C_r , C_{r,max}) \:\:\: , \label{eq:Cd_cap_1}
+\end{equation}
+
+\noindent
+也可以采用平滑过渡：
+
+\begin{equation}
+C_r = C_{r,max} \tanh ( C_r / C_{r,max} ) \:\:\: . \label{eq:Cd_cap_2}
+\end{equation}
+
+\noindent
+封顶拖曳系数的选择发生在代码编译阶段。封顶水平和封顶类型可由用户设置。默认设置为 $C_{r,max} = 2.5 \:10^{-3}$ 和式~（\ref{eq:Cd_cap_1}）。
+
+
+
+相应的耗散源项由两个分量组成。（占主导的）低频分量基于与湍流导致能量耗散的类比：
+
+%-------------------------------%
+% TC, low frequency dissipation %
+%-------------------------------%
+% eq:TCdl
+% eq:h
+% eq:phi
+
+\begin{equation}
+\cS_{ds,l}(k,\theta) = -2 \: u_{\ast} \: h \: k^2 \phi
+\: N(k,\theta) \: , \label{eq:TCdl}
+\end{equation} \begin{equation}
+h = 4\left(\int_{0}^{2\pi} \int_{f_h}^{\infty} \: F(f,\theta) \:
+d f \: d\theta \right)^{1/2} \: . \label{eq:h} \end{equation} \begin{equation}
+\phi = b_0 + b_1 \tilde{f}_{p,i}  + b_2 \tilde{f}_{p,i} ^{- b_3}
+\: . \label{eq:phi} \end{equation}
+
+\noindent
+其中 $h$ 是由波场高频能量含量确定的混合尺度，$\phi$ 是考虑波场发展阶段的经验函数。式~（\ref{eq:phi}）的线性部分描述增长波的耗散。加入非线性项的目的是通过为 $f_{p,i}$ 的最小值（$f_{p,i,\min}$）定义 $\phi$ 的最小值（$\phi_{\min}$），从而对充分发展条件提供一定控制。如果 $\phi_{\min}$ 低于线性曲线，则 $b_2$ 和 $b_3$ 给定为
+
+% eq:b_21
+% eq:b_31
+
+\begin{equation}
+b_2 = \tilde{f}_{p,i,\min}^{b_3} \: \left ( \phi_{\min} - b_0
+- b_1 \tilde{f}_{p,i,\min} \right ) \: , \label{eq:b_21}
+\end{equation} \begin{equation}
+b_3 = 8 \: . \label{eq:b_31}
+\end{equation}
+
+\noindent
+如果 $\phi_{\min}$ 高于线性曲线，则 $b_2$ 和 $b_3$ 给定为
+
+% eq:f_a           Auxiliary frequency
+% eq:b_22          Equation b_2 above
+% eq:b_32          Equation b_3 above
+
+\begin{equation}
+\tilde{f}_a = \frac{\phi_{\min} - b_0}{b_1} \:\:\: , \:\:\:
+\tilde{f}_b = \max \: \left \{ \: \tilde{f}_a - 0.0025 \: , \:
+\tilde{f}_{p,i,\min} \: \right \} \:\:\: , \label{eq:f_a}
+\end{equation} \begin{equation}
+b_2 = \tilde{f}_b^{b_3} \left [ \phi_{\min} - b_0 -
+b_1 \tilde{f}_b \right ] \: , \label{eq:b_22}
+\end{equation} \begin{equation}
+b_3 = \frac{b_1 \tilde{f}_b}{\phi_{\min} -b_0 -b_1 \tilde{f}_b}
+\: . \label{eq:b_32}
+\end{equation}
+
+\noindent
+上述 $b_3$ 估计使得当 $\tilde{f}_{p,i} = \tilde{f}_b$ 时 $\partial \phi / \partial \tilde{f}_{p,i} = 0$。当 $\tilde{f}_{p,i} < \tilde{f}_b$ 时，$\phi$ 保持为常数（$\phi = \phi_{\min}$）。
+
+
+经验高频耗散定义为
+
+%--------------------------------%
+% TC, high frequency dissipation %
+%--------------------------------%
+% eq:TCdh
+
+\begin{equation}
+\cS_{ds,h}(k,\theta) = - a_0 \left ( \frac{u_\ast}{g} \right ) ^2  f^3 \:
+\alpha_n^B \: N(k,\theta) \:\:\: , \label{eq:TCdh}
+\end{equation} \begin{displaymath}
+B = a_1 \left( \frac{ f u_\ast}{g} \right ) ^{-a_2}
+\:\:\: , \end{displaymath} \begin{equation}
+\alpha_n = \frac{\sigma^6}{c_g \: g^2 \alpha_r} \int_0^{2\pi} N(k,\theta) \: d\theta
+\:\:\: , \label{eq:alpha_n} \end{equation}
+
+\noindent
+其中 $\alpha_n$ 是用 $\alpha_r$ 归一化的 Phillips 无量纲高频能量水平，$a_0$ 到 $a_2$ 以及 $\alpha_r$ 是经验常数。该参数化意味着参数化尾部中 $m = 5$，这已在模型中预设。注意，在模型中，式~（\ref{eq:alpha_n}）是在假定深水色散关系的条件下求解的，此时 $\alpha_n$ 计算为
+
+\begin{equation}
+\alpha_n = \frac{2 \: k^3}{\alpha_r}  F(k)
+\:\:\: . \label{eq:alpha_n_mod} \end{equation}
+
+\noindent
+耗散源项的两个分量用一个简单的线性组合合并，该组合由频率 $f_1$ 和 $f_2$ 定义。
+
+%-----------------------%
+% TC, total dissipation %
+%-----------------------%
+% eq:TCdtot
+% eq:filt_A        Dissipation filter function
+
+\begin{equation}
+\cS_{ds}(k,\theta) = {\cal{A}} \cS_{ds,l} +
+\left ( 1 - {\cal{A}} \right ) \cS_{ds,h}
+\: , \label{eq:TCdtot} \end{equation} \begin{equation}
+{\cal A} = \left \{ \begin{array}{ccrclc}
+  1  & \;{\rm for}\; &          &\!\!\!f& \!\!\! < f_l & ,\\
+\frac{ f-f_2}{f_1-f_2}
+     & \;{\rm for}\; & f_1 \leq &\!\!\!f& \!\!\! < f_2 & ,\\
+  0  & \;{\rm for}\; & f_2 \leq &\!\!\!f&              & .
+\end{array} \right . \label{eq:filt_A} \end{equation}
+
+\noindent
+为了增强模型在接近参数化截断频率 $f_{hf}$ 的频率处的行为平滑性，在预报谱和参数化高频尾之间使用与式~（\ref{eq:tail_N_k}）类似的过渡区：
+
+% eq:smtail
+
+\begin{equation}
+N(k_i,\theta) = \left ( 1 - {\cal{B}} \right ) N(k_{i},\theta) +
+{\cal{B}} N(k_{i-1},\theta) \left ( \frac{f_i}{f_{i-1}}\right ) ^{-m-2}
+\: , \label{eq:smtail}
+\end{equation}
+
+\noindent
+其中 $i$ 是离散波数计数器，$\cal{B}$ 的定义方式类似于 $\cal{A}$，在 $f_2$ 和 $f_{hf}$ 之间从 0 变到 1。
+
+定义过渡的频率和长度尺度 $h$ 在模型中预设为
+
+% eq:TC_f
+
+\begin{equation} \left . \begin{array}{lll}
+  f_{hf} & = & 3.00 \: f_{p,i}  \\
+  f_1 & = & 1.75 \: f_{p,i}  \\
+  f_2 & = & 2.50 \: f_{p,i}  \\
+  f_h & = & 2.00 \: f_{p,i}
+\end{array} \:\:\: \right \rbrace \:\:\: . \label{eq:TC_f} \end{equation}
+
+\noindent
+此外，$f_{p,i,\min} = 0.009$ 和 $\alpha_r = 0.002$ 在模型中预设。所有其他可调参数必须由用户提供。建议值和默认值见表~\ref{tab:TC_par}。
+
+% tab:TC_par
+
+\begin{table} \begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|} \hline \hline
+调校目标：  & $a_0$ &      $a_1$       & $a_2$ &
+            $b_0$           & $b_1$  & $\phi_{\min} $\\ \hline
+KC 稳定   &  4.8  & $1.7 \: 10^{-4}$ &  2.0  &
+ $ \:\:\:\: 0.3 \: 10^{-3}$ &  0.47  &  0.003  \\
+KC 不稳定 &  4.5  & $2.3 \: 10^{-3}$ &  1.5  &
+ $     -5.8 \: 10^{-3}$     &  0.60  &  0.003  \\ \hline \hline
+\end{tabular} \end{center}
+\caption{Tolman 和 Chalikov 源项包中的建议常数。KC 表示 \cite{art:KC92,ibk:KC94}。第一行代表模型默认设置。}
+\label{tab:TC_par} \botline \end{table}
+
+这些源项在全球模型实现中的测试结果 \citep{tol:OMB02a} 表明：（i）按传统方式用稳定条件下 fetch 受限增长调校的模型会低估深海波浪增长（这一缺陷显然也为 WAM 模型所共有）；（ii）稳定度对波浪增长率的影响 \citep{art:KC92,ibk:KC94} 应显式纳入源项参数化。理想情况下，这两个问题应通过对源项的理论研究来处理。另一种做法是用有效风速 $u_e$ 替代风速 $u$。在 \cite{tol:OMB02a} 中使用如下有效风速：
+
+% eq:scor         Stability correction
+% eq:c1
+% eq:c2
+% eq:stab         Stability parameter
+
+\begin{equation}
+\frac{u_e}{u} = \left ( \frac{c_o}{1 + C_1 + C_2} \right )^{1/2}
+\: , \label{eq:scor} \end{equation} \begin{equation}
+C_1 = c_1 \tanh \left [ \max ( 0 , f_1 \{ \ST - \ST_o \} ) \right ]
+\: , \label{eq:c1} \end{equation} \begin{equation}
+C_2 = c_2 \tanh \left [ \max ( 0 , f_2 \{ \ST - \ST_o \} ) \right ]
+\: , \label{eq:c2} \end{equation} \begin{equation}
+\ST = \frac{h g}{u_h^2} \: \frac{T_a - T_s}{T_0}
+\: , \label{eq:stab} \end{equation}
+
+\noindent
+其中 $\ST$ 是体稳定度参数，$T_a$、$T_s$ 和 $T_0$ 分别为空气、海面和参考温度。此外，$f_1 \leq 0$，$c_1$ 和 $c_2$ 符号相反，且 $f_2 = f_1 c_1 / c_2$。按照 \cite{tol:OMB02a}，默认设置采用 $c_0 = 1.4$、$c_1 = -0.1$、$c_2 = 0.1$、$f_1 = -150$ 和 $\ST_o = -0.01$，并与稳定层结波浪增长数据调校（表~\ref{tab:TC_par} 中的“KC 稳定”参数值）结合使用。注意，该有效风速是针对 10~m 高度处的风推导的。用户可在模型编译期间关闭风速修正，也可在程序输入文件中重新定义默认参数设置。该稳定度修正通过 {\code STAB2} 开关激活。海气温差需要由用户提供，例如使用 {\file ww3\_prep}。

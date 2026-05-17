@@ -1,0 +1,89 @@
+\vssub
+\subsection{~波-冰相互作用的源项}
+\vsssub
+
+波-冰相互作用过程已经是许多研究的主题。一般而言，波-冰相互作用需要描述海冰性质，
+通常至少包括冰浓度（海洋表面被冰覆盖的比例）、平均冰厚和最大冰 floe 直径。实际上，
+海冰常被破碎成许多块体（floes），其尺寸范围可以很宽，而这些尺寸会强烈改变色散以及
+波-冰相互作用过程。
+
+在当前版本的 \ww\ 中，处理海冰的不同选项代表了仍在推进的研究。目前有五种耗散过程版本，
+分别由开关 {\code IC1}、{\code IC2}、{\code IC3}、{\code IC4} 和 {\code IC5}
+启用；它们可与两种不同的散射效应版本 {\code IS1} 和 {\code IS2} 组合。第二种散射
+程序是唯一使用最大 floe 直径的程序，因此也包含对海冰破裂、所得最大 floe 直径以及
+部分滞回耗散的估计。
+
+这些开关选择中的某些特性在应用时需要谨慎。例如，除冰浓度和冰厚外，强迫场是依赖上下文的：
+它们在不同源项中具有不同含义。
+
+目前还不能把为 frazil ice 或 pancake ice 设计的耗散参数化（{\code IC3} 或
+{\code IC4}）与为冰盖设计的参数化（如 {\code IC2}）组合。此外，所有参数化尚未完全
+整合：例如，在一些考虑海冰的修正色散关系中，floe 尺寸尚未被纳入。我们预计在 \ws\
+未来版本中会有更流畅的方式来组合各种过程，可能会使用最大 floe 直径来调用不同程序。
+
+在多数情况下，\ws\ 现在允许海冰相关输入具有空间和时间变率；但在实践中，这类信息通常
+只对冰浓度（来自卫星或模型）和冰厚（多来自模型）可用。表示海冰性质的其他参数的变率，
+用户通常很少能够获得。
+
+观测研究海冰对波浪的影响很有挑战性；在冰缘及其附近对此类影响进行建模尤其困难，
+其中非定常、非均匀输入冰场的精度可能成为精度的主要限制因素 \citep{rep:RPLA18}。
+许多重要建模研究使用了 \ws\ 以外的模型，例如 \cite{art:DB13}。到目前为止，
+\ws\ 中可用并在以下各节描述的各种选项，只在少数实际条件研究中得到测试，包括
+\cite{art:LKS15}、\cite{art:Aea16}、\cite{art:WHR16}、\cite{art:RTS16}、
+\cite{rep:RPLA18}、\cite{art:CRT17} 和 \cite{Liu2020}。
+
+% Note: IC2 dispersion relation equation was moved to IC2 section
+
+\noindent
+用于表示海冰对波浪影响的实验性程序已经通过开关 {\code IC1}、{\code IC2}、
+{\code IC3} 等实现。\ws\ 中最早实现的两个程序（由 \cite{rep:RO13} 实现）是
+{\code IC1} 和 {\code IC2} 的初始版本；后者基于 \cite{art:LMC88} 和
+\cite{art:LHV91} 的工作。这些效应可用复波数表示：
+
+\begin{equation}\label{eq:waveno}
+     {k} = {k_r} + i{k_i},
+\end{equation}
+
+\noindent
+其中实部 ${k_r}$ 表示海冰对物理波长和传播速度的影响，会产生类似于水深地形导致的
+变浅和折射效应；复波数虚部 ${k_i}$ 是指数衰减系数
+${k_i}({x},{y},{t},\sigma $)（分别依赖位置、时间和频率），会造成波浪衰减。
+${k_i}$ 通过 ${S_{ice}}/{E}=-2{c_g}{k_i}$ 引入，其中 ${S_{ice}}$ 为源项
+（另见 \cite{bk:WAM94}, pg. 170）。对于提供 ${k_r}$ 的方法，例如 {\code IC2}、
+{\code IC3} 和 {\code IC5}，海冰效应需要求解新的色散关系。
+
+在 \ws\ 第 6 版中，海冰对 ${k_i}$ 的影响用于所有源函数：
+{\code IC1}, ..., {\code IC5}。海冰对 ${k_r}$ 的影响已经为 {\code IC2} 和
+{\code IC3} 实现，但只有 {\code IC3} 会把该影响导出给代码其他部分使用，这仍然是
+实验性功能。
+
+% Note : Is the above still true? Has it been done for IC2 now also?
+
+冰源函数按冰浓度进行缩放。
+
+对于海冰，最多允许五个输入参数作为非定常和非均匀场。这些参数可通称为
+${C_{ice,1}}$、${C_{ice,2}}$、...、${C_{ice,5}}$。海冰参数的含义会随所选择的
+${S_{ice}}$ 程序而变化。例如，在 {\code IC1} 的情况下，只指定一个参数
+${C_{ice,1}}$。在某些情况下，如 {\code IC3} 和 {\code IC4}，也可选择更简单的
+方式：输入与固定均匀情形相同的变量，并通过 namelist 参数定义。
+
+关于如何使用新的海冰源函数，读者可参考回归测试 {\file ww3\_tic1.1-3} 和
+{\file ww3\_tic2.1} 中的示例。
+
+\textrm{\textit{\underline{在 {\file ww3\_shel} 中使用：}}}
+允许非定常和非均匀输入海冰参数。当使用开关 {\code IC1}、{\code IC2}、{\code IC3}、
+{\code IC5}、{\code BT8} 或 {\code BT9} 启用任一冰和泥沙源函数时，
+{\file ww3\_shel} 会预期 8 个场的输入说明（5 个冰场，随后 3 个泥沙场）。
+这些说明位于 ``water levels'' 信息之前。新场也可选择使用 {\file ww3\_shel.inp}
+末尾附近的若干行指定为均匀场。
+
+\textrm{\textit{\underline{在 {\file ww3\_multi} 中使用（\ws\ 第 6 版新增）：}}}
+使用 namelist 方法向 {\file ww3\_multi} 提供说明时，现在可以在 {\file ww3\_multi}
+中把泥沙和海冰系数指定为非定常和非均匀场。第 6 版以前，这只可在 {\file ww3\_shel}
+中实现。不过，在撰写本文时，作者尚未测试通过 {\file ww3\_multi.nml} 读取这些说明
+的新方法。
+
+\textrm{\textit{\underline{源项的区分：}}}
+源项 {\code IC1},...,{\code IC5} 预报波能耗散。海冰引起的波浪反射和散射
+（例如 \cite{art:Wad75}）并不是耗散，而是保守过程。它们在 {\code IS1} 和
+{\code IS2} 中单独处理。

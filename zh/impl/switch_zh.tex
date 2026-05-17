@@ -1,0 +1,288 @@
+\vssub
+\subsection{~选择模式选项} \label{sec:switches}
+\vssub
+
+{\file bin} 目录中的文件 {\file switch} 包含一组字符串，用于标识要选择的模式选项。可用选项很多。其中若干组选项要求必须且只能选择一个。这些强制开关在 \para\ref{sub:man_switch} 中说明。其他开关是可选的，在 \para\ref{sub:opt_switch} 中说明。默认模式设置在 \para\ref{sub:opt_default} 中说明。开关在 {\file switch} 中出现的顺序是任意的。这些开关如何包含到源代码文件中，见 \para\ref{sec:w3adc}。
+
+\vsssub
+\subsubsection{~强制开关} \label{sub:man_switch}
+\vsssub
+
+以下每组开关都必须且只能选择一个。硬件模式（第一组）和消息传递协议（第二组）如下。注意，这两组共享一个开关。这意味着 {\sc mpi} 开关只能与 {\sc dist} 开关组合使用。
+\begin{slist}
+\sit{shrd}{共享内存模式。}
+\sit{dist}{分布式内存模式。}
+\end{slist}
+
+\begin{slist}
+\sit{shrd}{共享内存模式，无消息传递。}
+\sit{mpi} {消息传递接口（MPI）。}
+\end{slist}
+
+\noindent
+传播格式和 GSE 缓解方法的选择。它们表示两组开关，两组之间有一些共享开关。注意，第二组开关从属于第一组开关中的程序模块选择，因此没有用户定义选项。
+\begin{slist}
+\sit{pr0} {不使用传播格式 / GSE 缓解。}
+\sit{pr1} {一阶传播格式，无 GSE 缓解。}
+\sit{pr2} {带 \cite{art:BH87} 色散修正的高阶格式。}
+\sit{pr3} {带 \cite{tol:OMOD02b} 平均技术的高阶格式。}
+%\sit{pr4} {带 \cite{tol:OMOD02b}
+%           散度技术的 \uq\ 传播格式。}
+\end{slist}
+
+\begin{slist}
+\sit{pr0} {不使用传播格式。}
+\sit{pr1} {一阶传播格式。}
+\sit{uno} {二阶（UNO）传播格式。}
+\sit{uq } {三阶（UQ）传播格式。}
+\end{slist}
+
+\noindent
+通量计算的选择：
+\begin{slist}
+\sit{flx0} {不使用例程；通量计算包含在源项中。}
+\sit{flx1} {根据式~(\ref{eq:Wu}) 计算摩擦速度。}
+\sit{flx2} {来自 Tolman and Chalikov 输入的摩擦速度。}
+\sit{flx3} {同上，但带式~(\ref{eq:Cd_cap_1}) 或 (\ref{eq:Cd_cap_2}) 的上限。}
+\sit{flx4} {根据式~(\ref{eq:ST607}) 计算摩擦速度。}
+\sit{flx5} {来自大气应力的摩擦速度（应力应作为输入）。}
+\end{slist}
+
+\noindent
+线性输入的选择：
+\begin{slist}
+\sit{ln0} {无线性输入。}
+\sit{seed}{式~(\ref{eq:seed}) 的谱播种。}
+\sit{ln1} {带滤波器的 Cavaleri and Malanotte-Rizzoli。}
+\end{slist}
+
+\noindent
+输入与耗散的选择。{\F stab{}\it n} 开关是可选的，并且是对应 {\F st{\it n}} 开关的附加项：
+\begin{slist}
+\sit{st0} {不使用输入与耗散。}
+\sit{st1} {\wam\-3 源项包。}
+\sit{st2} {\cite{tol:JPO96} 源项包。另见可选开关 {\F stab2}。}
+\sit{stab0}{无稳定度修正。与任何源项（{\F st}）包兼容。包含该开关没有效果。}
+\sit{stab2}{启用稳定度修正 (\ref{eq:scor})--(\ref{eq:stab})。仅与 {\F st2} 兼容。}
+\sit{st3} {\wam\-4 及其变体源项包。}
+\sit{stab3}{启用来自 \cite{rep:AB02} 的稳定度修正。仅与 {\F st3} 和 {\F st4} 兼容。}
+\sit{st4} {\cite{art:Aea10} 源项包。}
+%\sit{st5} {UNSW 源项包。}
+\sit{st6} {BYDRZ 源项包。}
+\end{slist}
+
+\noindent
+非线性相互作用的选择：
+\begin{slist}
+\sit{nl0} {不使用非线性相互作用。}
+\sit{nl1} {离散相互作用近似（\dia）或 Gaussian Quadrature Method（GQM）。}
+\sit{nl2} {精确相互作用近似（\xnl）。}
+\sit{nl3} {广义多重 \dia{}（\gmd{}）。}
+\sit{nl4} {双尺度近似（TSA）。}
+\end{slist}
+
+\noindent
+底摩擦的选择：
+\begin{slist}
+\sit{bt0} {不使用底摩擦。}
+\sit{bt1} {\js\ 底摩擦公式。}
+%\sit{bt2} {??? 底摩擦公式。}
+%\sit{bt3} {??? 底摩擦公式。}
+\sit{bt4} {\showex\ 底摩擦公式。}
+\sit{bt8} {Dalrymple and Liu 公式（流体泥海底）。}
+\sit{bt9} {Ng 公式（流体泥海底）。}
+\end{slist}
+
+\noindent
+海冰阻尼项的选择：
+\begin{slist}
+\sit{ic0} {无海冰阻尼。}
+\sit{ic1} {简单公式。}
+\sit{ic2} {Liu et al. 公式。}
+\sit{ic3} {Wang and Shen 公式。}
+\sit{ic4} {随频率变化的海冰阻尼。}
+\end{slist}
+
+\noindent
+海冰散射项的选择：
+\begin{slist}
+\sit{is0} {无海冰散射。}
+\sit{is1} {海冰扩散散射（简单）。}
+\sit{is2} {依赖浮冰尺寸的散射和耗散。}
+\end{slist}
+
+\noindent
+反射项的选择：
+\begin{slist}
+\sit{ref0} {无反射。}
+\sit{ref1} {启用海岸线和冰山反射。}
+\end{slist}
+
+\noindent
+水深诱导破碎的选择：
+\begin{slist}
+\sit{db0} {不使用水深诱导破碎。}
+\sit{db1} {Battjes-Janssen。}
+\end{slist}
+
+\noindent
+三波相互作用的选择：
+\begin{slist}
+\sit{tr0} {不使用三波相互作用。}
+\sit{tr1} {集总三波相互作用（LTA）方法。}
+\end{slist}
+
+\noindent
+底部散射的选择：
+\begin{slist}
+\sit{bs0} {不使用底部散射。}
+\sit{bs1} {Magne and Ardhuin。}
+\end{slist}
+
+\noindent
+风/动量/空气密度插值方法（时间）的选择：
+\begin{slist}
+\sit{wnt0}{无插值。}
+\sit{wnt1}{线性插值。}
+\sit{wnt2}{近似二次插值。}
+\end{slist}
+
+\noindent
+风/动量插值方法（空间）的选择：
+\begin{slist}
+\sit{wnx0}{矢量插值。}
+\sit{wnx1}{近似线性速度插值。}
+\sit{wnx2}{近似二次速度插值。}
+\end{slist}
+
+\noindent
+流插值方法（时间）的选择：
+\begin{slist}
+\sit{crt0}{无插值。}
+\sit{crt1}{线性插值。}
+\sit{crt2}{近似二次插值。}
+\end{slist}
+
+\noindent
+流插值方法（空间）的选择：
+\begin{slist}
+\sit{crx0}{矢量插值。}
+\sit{crx1}{近似线性速度插值。}
+\sit{crx2}{近似二次速度插值。}
+\end{slist}
+
+\noindent
+用户提供 GRIB 包的开关。
+\begin{slist}
+\sit{nogrb}{不包含包。}
+\sit{ncep2}{用于 IBM SP 的 \ncep\ GRIB2 包。}
+\end{slist}
+
+% -------------------------------------------------------------
+\vsssub
+\subsubsection{~可选开关} \label{sub:opt_switch}
+\vsssub
+
+以下所有开关在被选择时都会激活模式行为，但不要求特定组合。以下开关控制 \ws{} 程序的可选输出。
+
+\begin{slist}
+\sit{o0}  {网格预处理器中 namelist 的输出。}
+\sit{o1}  {网格预处理器中边界点的输出。}
+\sit{o2}  {网格预处理器中网格点状态图的输出。}
+\sita{o2} {网格预处理器中生成陆海掩膜文件 {\file mask.ww3}。}
+\sitb{o2} {网格预处理器中障碍物图的输出。}
+\sitc{o2} {以 {\file ww3\_grid} 读取的格式打印状态图。}
+\sit{o3}  {场预处理器中场循环的附加输出。}
+\sit{o4}  {初始条件程序中归一化一维能量谱的打印图。}
+\sit{o5}  {同上，二维能量谱。}
+\sit{o6}  {同上，波高的空间分布（未适配分布式内存）。}
+\sit{o7}  {通用壳中均匀场输入数据的回显。}
+\sita{o7} {输出点的诊断输出。}
+\sitb{o7} {同上，在 {\file ww3\_multi} 中。}
+\sit{o8}  {在波浪模式中筛除极小波高的场输出（对某些传播测试有用）。}
+\sit{o9}  {在波浪模式中将负能量指定为负波高。用于新传播格式的测试阶段。}
+\sit{o10} {在标准输出中标识多网格模式扩展的主要元素。}
+\sit{o11} {{\file log.mww3} 中管理算法的附加日志输出。}
+\sit{o12} {标识重叠网格中被移除的边界点（中心）。}
+\sit{o13} {标识重叠网格中被移除的边界点（边缘）。}
+\sit{o14} {为 {\file ww3\_outp} 中输出类型 {\code ITYPE = 0} 生成带浮标数据的日志文件 {\file buoy\_log.ww3}。}
+\sit{o15} {在 {\file ww3\_prep} 中生成带输入数据文件时间戳的日志文件 {\file times.XXX}。}
+\sit{o16} {在 {\file ww3\_gspl} 中生成网格分区的 GrADS 输出。}
+\end{slist}
+
+\noindent
+以下开关使用 \omp{} 指令启用模式并行化，也称为 `threading'。在模式 5.01 版之前，线程化与使用 {\sc mpi} 开关的并行化不能同时使用。从 5.01 版开始，可以使用纯 MPI、纯 OMP 和混合 MPI-OMP 方法。5.01 版及更高版本使用的开关与旧模式版本中使用的开关不兼容。
+\begin{slist}
+\sit{ompg}{通用循环并行化指令，同时用于纯 OpenMP 并行化和混合 MPI-OpenMP 并行化。}
+\sit{omph}{同上，但仅用于混合 MPI-OpenMP 并行化的指令。}
+\sit{pdlib}{三角形非结构网格上显式和隐式求解器的区域分解（该选项需要 {\code ParMetis}）。}
+\sit{b4b}{强制启用 OpenMP 的代码实现逐位可复现。某些 OpenMP 操作（尤其是求和等归约）可能由于浮点舍入误差，在不同运行之间产生略有不同的结果。该开关启用中间步骤（例如将数值缩放为整数值），以确保不同运行之间的结果逐位可复现。适用于运行需要这种可复现性的回归测试。目前只影响使用 {\F smc} 开关编译的代码。}
+\end{slist}
+注意，这些开关只能以特定组合使用，模式安装脚本（特别是 {\file make\_makefile.sh}）会强制执行这一点。纯 MPI 方法需要 {\F dist} 和 {\F mpi} 开关。纯 OpenMP 方法需要 {\F shrd} 和 {\F ompg} 开关，混合方法需要 {\F dist}、{\F mpi}、{\F ompg} 和 {\F omph} 开关。
+
+\vspace{\baselineskip}
+\noindent
+以下开关与连续移动网格选项有关。第一个开关激活该选项，另外两个是可选附加项。
+\begin{slist}
+\sit{mgp }{激活式~(\ref{eq:bal_move}) 中的传播修正。}
+\sit{mgw }{在移动网格方法中应用风修正。}
+\sit{mgg }{激活式~(\ref{eq:move_GSE_avg2}) 中的 GSE 缓解修正。}
+\end{slist}
+
+\noindent
+此外，还提供以下杂项开关：
+\begin{slist}
+\sit{cou} {激活耦合所需变量的计算。}
+\sit{dss0}{关闭扩散色散修正中的频率色散。}
+\sit{fld1}{依赖海况的 $\tau$，\citet{art:Rei14}（\para\ref{sec:FLD1}）。}
+\sit{fld2}{依赖海况的 $\tau$，\citet{art:Don12}（\para\ref{sec:FLD2}）。}
+\sit{ig1} {二阶谱和自由次重力波（\para\ref{sec:IG1}）。}
+\sit{mlim}{使用式~(\ref{eq:MLIM}) 的 Miche 型浅水限制器。}
+\sit{mpibdi}{多网格模式初始化的实验性并行化。}
+\sit{mpit}{\mpi{} 初始化的测试输出。}
+\sit{mprf}{在 {\file ww3\_multi} 中对单个模式和嵌套进行剖析。}
+\sit{nco} {面向 NCO（NCEP Central Operations）业务实现的代码修改。主要改变单元号和文件名。不建议一般使用。}
+\sit{nls }{激活非线性平滑器（\para\ref{sec:NLS}）。}
+\sit{nnt} {生成文件 test\_data\_{\it{nnn}}.ww3，其中包含用于 NNIA 训练和测试的谱与非线性相互作用。}
+\sit{oasis }{初始化 OASIS 耦合器（App.~\ref{sec:couplingB}）。}
+\sit{oasacm}{OASIS 大气模式耦合场（App.~\ref{sec:couplingB}）。}
+\sit{oasocm}{OASIS 海洋模式耦合场（App.~\ref{sec:couplingB}）。}
+\sit{oasicm}{OASIS 海冰模式耦合场（App.~\ref{sec:couplingB}）。}
+\sit{refrx} {启用基于相速空间梯度的折射（\para\ref{sec:ICE3}）。}
+\sit{reft}{海岸线反射的测试输出（由 {\F ref1} 激活）。}
+\sit{rtd} {旋转网格选项。}
+\sit{rwnd}{按流速修正风速。}
+\sit{s}   {通过激活对子程序 {\F strace} 的调用，在主要 \ws{} 子程序中启用子程序跟踪。}
+\sit{scrip   }{启用 SCRIP 重映射例程（App. \ref{sec:scripC}）。}
+\sit{scripnc }{启用将重映射权重存储在 NetCDF 文件中（App. \ref{sec:scripC}）。}
+\sit{sec1}{启用小于 1~s 的全局时间步长，但不允许以小于 1~s 的时间步输出。}
+\sit{smc} {激活 SMC 网格。}
+\sit{t}   {在整个程序中启用测试输出。}
+\sitn{t}  {同上。}
+\sit{tdyn}{扩散色散修正中涌浪年龄的动态增量（仅测试案例）。}
+\sit{tide }{启用潮汐分析：用于输入文件预处理、ww3\_shel 中的运行时潮汐预报，或使用 ww3\_prtide 进行潮汐预报。}
+\sit{tidet}{潮汐分析的测试输出。}
+\sit{trknc} {激活波浪系统跟踪后处理程序中的 NetCDF API。}
+\sit{uost}{启用未解析障碍物源项。}
+\sit{wrst}{在重启动中保存风，并在 wmesmf 的第一个时间步中使用。}
+\sit{xw0 }{\uq\ 格式中仅涌浪扩散。}
+\sit{xw1 }{同上，仅波浪增长扩散。}
+\end{slist}
+
+\vsssub
+\subsubsection{~默认模式设置} \label{sub:opt_default}
+\vsssub
+
+直到模式 3.14 版，NCEP 业务模式设置都被视为默认模式设置。然而，随着 \ws{} 后续版本的发展，该模式已经演化为一个建模框架，而不是单一模式。因此，各中心以不同方式运行 \ws{}，也就不再能明确识别一个“默认”的模式版本。尽管如此，为了能够在出版物中简洁地精确标识所使用的模式设置，目前在 {\file bin} 目录中提供了各中心的“默认”配置。这些配置以示例 switch 文件和 README 文件的形式提供，例如 {\file switch\_NCEP\_st2} 和 {\file README.NCEP}。注意，这些文件用于简化对模式版本的引用，但并不意味着认可特定的模式配置；在此语境下还应注意，业务中心的模式版本本质上处于持续开发状态。
+
+
+
+% 由于 \ws{} 中数值和物理选项非常繁多，并且各机构实现 \ws{} 的方式各不相同且不断演化，我们不再为多数数值和物理方法提供一个模式的 `default' 设置。仍被视为默认的唯一设置选项是输入场处理。
+
+% \begin{slist}
+% \sit{wnt1} {风插值（线性）。}
+% \sit{wnx1} {风插值（线性）。}
+% \sit{rwnd} {将风定义为相对于流。}
+% \sit{crt1} {流插值（线性）。}
+% \sit{crx1} {流插值（线性）。}
+% \end{slist}

@@ -1,0 +1,140 @@
+\vsssub
+\subsubsection{~$S_{ice}$：海冰经验/参数化阻尼} \label{sec:ICE4}
+\vsssub
+
+\opthead{IC4}{\ws/NRL}{C. Collins and E. Rogers}
+
+\noindent
+海冰导致波浪阻尼的第四个选项（{\code IC4}）最早由 \cite{rep:CR17} 引入。
+它提供若干简单经验/参数化形式之一，用于实现海冰造成的波能耗散。{\code IC4} 的动机
+是提供一个简单、灵活且高效的源项，以一种高度参数化的方式再现波-冰相互作用的一些
+基本物理。具体方法由 namelist 参数 {\code IC4METHOD} 的整数值设定（目前为 1 到 10）。
+前六个方法为：1) 对 \cite{art:WAD88} 现场数据的指数拟合；2) \cite{art:MBK14}
+中的多项式拟合；3) \cite{art:HT15} 中给出的、对 \cite{art:KM08} 计算结果的二次拟合；
+4) \cite{art:Ko14} 的式 1；5) 最多 4 个阶梯的简单阶跃函数（可为非定常和非均匀）；
+6) 最多 10 个阶梯的简单阶跃函数（必须定常且均匀）。方法 7、8 和 9 使用依赖频率和
+冰厚的多变量幂律拟合。除 {\code IC4} 的第四种方法外，所有方法都具有依赖频率的衰减。
+第四种方法中，衰减随波高变化，但在频率空间中均匀。
+
+下文用 {\code IC4M1} 表示 {\code IC4} 方法 1，依此类推。{\code IC4} 出现在
+{\file switch} 中，而 namelist {\code IC4METHOD=1}（例如）出现在文件
+{\file ww3\_grid.inp} 中。与 {\code IC1} 中 ${C_{ice,1}}$ 为用户确定的衰减不同，
+这里 ${C_{ice,n}}$ 的含义依赖上下文。对于 {\code IC4M1}、{\code IC4M2} 和
+{\code IC4M4}，${C_{ice,n}}$ 是方程常数。对于 {\code IC4M3}、{\code IC4M7}、
+{\code IC4M8} 和 {\code IC4M9}，${C_{ice,1}}$ 为冰厚。对于 {\code IC4M5}，
+${C_{ice,n}}$ 控制阶跃函数。对于 {\code IC4M6}，namelist 变量控制阶跃函数。
+注意，对于会使用 ${C_{ice,n}}$ 的方法，用户可用类似输入水位的方法，将其作为
+非定常和非均匀场提供。
+
+{\code IC4M1}：选择一个指数方程拟合 \cite{art:WAD88} 表 2 中的数据，结果会优先
+衰减高频波。这参数化了众所周知的海冰低通滤波效应。方程形式如下：
+\begin{equation}\label{eq:ice1}
+  {\alpha} = \exp\left[\frac{-{2\pi}C_{ice, 1}}{{\sigma}} - C_{ice, 2}\right]
+\end{equation}
+
+\noindent 这里，$\alpha$ 是能量的指数衰减率，为振幅衰减率的两倍：
+$\alpha = 2k_i$。由数据确定的数值为 ${C_{ice,1...2}}=[0.18, 7.3]$，但用户可以修改。
+该方法在 \cite{rep:CR17} 中有说明和应用。
+
+{\code IC4M2}：该方法使用用户指定的多项式表示耗散。它很有力，因为可表示许多形状，
+例如拟合基于观测的耗散率。该方法在 \cite{rep:CR17} 中有说明和应用。方程为
+\begin{equation}\label{eq:ice2}
+  {\alpha} = C_{ice,1} + C_{ice,2}\left[{\frac{\sigma}{2\pi}}\right] + C_{ice,3}\left[{\frac{\sigma}{2\pi}}\right]^2 + C_{ice,4}\left[{\frac{\sigma}{2\pi}}\right]^3 + C_{ice,5}\left[{\frac{\sigma}{2\pi}}\right]^4
+\end{equation}
+
+\noindent
+若用户希望遵循 \cite{art:MBK14}，建议系数为
+${C_{ice,1...5}}=[0, 0, 2.12\times 10^{-3}, 0, 4.59\times 10^{-2}]$。
+其他建议多项式见 \cite{rep:RMK18}。
+
+采用合适系数时，该多项式方法可再现所谓的 ``roll-over effect''，即衰减在频率空间中
+非单调。不过，一些近期研究并未显示这一效应，例如 \cite{art:RTS16} 和 \cite{art:LK17}；
+它也可能只是早期观测研究中的虚假伪影。
+
+虽然 ${C_{ice,1...5}}$ 可指定为随时间和空间变化，但实践中很少使用这一特性。多数用户
+会偏好使用常数值；为方便起见，这些值可通过 namelist 参数设置，其中 $C_{ice,i}$
+在 {\code SIC4} namelist 中指定为 {\code IC4CN(i)}，而不是通过 {\file ww3\_prep}
+等作为输入场给出。
+
+{\code IC4M3}：\cite{art:HT15} 将一个二次方程拟合到 \cite{art:KM08} 计算的衰减系数，
+该衰减系数是频率、$T$ 和冰厚 $h$ 的函数。较厚的冰和较高频率（较短周期）会使衰减增大。
+二次方程的系数数量多到不适合由用户指定，因此方程被硬编码，可调参数 ${C_{ice,1}}$
+为冰厚 $h$。该方法在 \cite{rep:CR17} 中有说明和应用。作为参考，方程如下：
+\begin{equation}\label{eq:ice3}
+  {\ln{\alpha(T,h)}} = -0.3203 + 2.058h - 0.9375T - 0.4269h^2 + 0.1566hT + 0.0006T^2
+\end{equation}
+
+\noindent
+关于 {\code IC4M3} 有四点警告。第一，该方程本身是对 \cite{art:KM08} 中用于计算
+衰减系数的原始 $h$ 范围（0.5 到 3 m）的外推，见 \cite{art:HT15}。第二，在
+\cite{art:KM08} 中，预测的波浪衰减基于散射（保守过程），而在 {\code IC4M3} 中，
+波浪衰减被当作耗散（非保守）处理。第三，不建议把 {\code IC4M3} 与散射程序
+{\code IS1} 或 {\code IS2} 组合使用，因为这会把散射重复计入。第四，实现中假定每米
+遇到一个 floe，这不同于 \cite{art:HT15} 中允许该长度尺度变化的处理。更多细节请参阅
+{\file w3sic4md.F90} 中的内联文档。
+
+{\code IC4M4}：\cite{art:Ko14} 发现衰减是有效波高的函数。衰减随 ${H_s}$ 线性增大，
+直到 ${H_s} = 3$ m，此后衰减封顶，即
+\begin{equation}
+\left \{
+\begin{array}{llrcl}
+{\frac{\partial H_s}{\partial dx}} = {C_{ice,1}}\times {H_s}   & & \text{for} \> {H_s} \leq 3 \text{ m}  \\
+{\frac{\partial H_s}{\partial dx}} = {C_{ice,2}}               & & \text{for} \> {H_s} > 3 \text{ m}     \\
+\end{array} \right .
+\end{equation}
+其中 {$k_i=\frac{\partial H_s}{\partial dx}/H_s$}。
+
+\cite{art:Ko14} 给出的数值为 ${C_{ice,1...2}}=[5.35\times 10^{-6}, 16.05\times 10^{-6}]$。
+示例见回归测试 {\file ww3\_tic1.1/input\_IC4\_M4}。该方法在 \cite{rep:CR17}
+中有说明和应用。
+
+{\code IC4M5}：这是一个最多 4 个阶梯的简单阶跃函数。它由可选的非定常和非均匀参数
+${C_{ice,1...7}}$ 控制。参数 ${C_{ice,1...4}}$ 控制阶梯水平，单位为耗散率
+${k_i}$。参数 ${C_{ice,5...7}}$ 控制阶梯边界（单位 Hz）。示例见回归测试
+{\file ww3\_tic1.1/input\_IC4\_M5}。该方法见 \cite{rep:CR17}。
+
+{\code IC4M6}：这是一个最多 10 个阶梯的简单阶跃函数。它由定常且均匀的 namelist
+参数 {\code IC4KI} 和 {\code IC4FC} 控制。数组 {\code IC4KI} 控制阶梯水平，
+其单位为弧度每米的耗散率 ${k_i}$。数组 {\code IC4FC} 控制阶梯边界（单位 Hz）。
+示例见回归测试 {\file ww3\_tic1.1/input\_IC4\_M6}。
+
+{\code IC4M7}：这是 \cite{art:Dob15} 给出的耗散公式，针对 pancake ice 与 frazil ice
+混合物开发，使用了南极 Weddell 海收集的数据。公式依赖波频率和冰厚：
+\begin{equation}\label{eq:ice7}
+  {\alpha=2k_i=0.2h^1f^{2.13}} \:\:\: .
+\end{equation}
+该方法见 \cite{rep:RPLA18}。
+
+{\code IC4M8}：与 {\code IC4M7} 类似，该方法具有如下通用形式：
+\begin{equation}\label{eq:ice8}
+  {k_i=C_{hf}h^mf^n} \:\:\: .
+\end{equation}
+该公式取自 \cite{Meylan2018}，其中称为 ``Model with Order 3 Power Law''。
+\cite{Liu2020} 应用了该公式，并称其为 ``M2'' 模型。该模型规定 $m=1$、$n=3$，
+$C_{hf}$ 为用户指定的率定系数。\cite{Liu2020} 为两个现场案例提供了率定，
+\cite{rep:RYW2021} 则为第三个现场案例 \cite{art:RMK2021} 提供了率定。第三个率定
+被设为 {\code IC4M8} 的默认值，$C_{hf}=0.059$，但可通过 namelist 参数
+{\code IC4CN}（常数且均匀设置）修改，也可使用空间和/或时间变化参数 ${C_{ice,2}}$。
+关于这些率定的更多细节见 {\file w3sic4md.F90} 中的内联文档。该方法在功能上与
+{\code IC5} 中的 ``{\code M2}'' 模型相同（即 {\code IC5} 且 {\code IC5VEMOD=3}），
+这里只是作为 {\code IC4M8} 冗余纳入，因为它与 {\code IC4M7} 和 {\code IC4M9}
+同属式 (\ref{eq:ice8}) 形式的 ``family''。
+
+设置 namelist 参数的示例见 {\file /regtests/ww3\_tic1.1/input\_IC4\_M8}。
+
+{\code IC4M9}：该公式取自 \cite{rep:RYW2021} 第 2.2.3 节给出的 ``monomial power fit''。
+与 {\code IC4M7} 和 {\code IC4M8} 一样，它是式 (\ref{eq:ice8}) 通用形式的一个特例。
+其特殊性在于约束 $m=n/2-1$。\cite{rep:RYW2021} 通过调用 \cite{art:YRW2019} 的缩放
+关系推导了这一约束；该缩放基于以冰厚为相关长度尺度的 Reynolds 数。\cite{art:YRW2022}
+的方程 2 中也给出了该关系。默认 namelist 设置为 $C_{hf}=2.9$ 和 $n=4.5$，来自
+\cite{rep:RYW2021} 和 \cite{art:YRW2022} 针对 \cite{art:RMK2021} 的率定。更多细节
+（包括 \cite{art:Yu2022} 等替代率定）见 {\file w3sic4md.F90} 中的内联文档。
+常数值可用 namelist 参数设置，其中 $C_{hf}$ 和 $n$ 分别为 {\code IC4CN(1)}
+和 {\code IC4CN(2)}。同一组量的空间和/或时间变化可分别用 ${C_{ice,2}}$ 和
+${C_{ice,3}}$ 指定。
+
+{\code IC4M8} 和 {\code IC4M9} 中 namelist 默认的 $C_{hf}$ 值，与
+\cite{man:SWAN4145A} 中实现的相同公式一致。
+
+{\code IC4M10} 是一种由海冰 floe 散射造成衰减的方法，依赖冰厚和 floe 尺寸，
+基于 \cite{art:MHB21}。

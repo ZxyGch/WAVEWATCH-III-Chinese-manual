@@ -1,0 +1,19 @@
+\vsssub
+\subsubsection{潮汐预报程序} \label{sub:ww3prtide}
+\vsssub
+
+\proddefH{ww3\_prtide}{w3tide}{ww3\_prtide.ftn}
+\proddeff{输入}{ww3\_prtide.inp}{传统配置文件。}{10} (App.~\ref{sec:config071})
+\proddefa{mod\_def.ww3}{模式定义文件。}{20}
+\proddefa{current.ww3\_tide or level.ww3\_tide}{包含潮汐分潮的文件。}{user}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{current.ww3 or level.ww3}{水位或流强迫。}{33}
+
+\vspace{\baselineskip} 
+\vspace{\baselineskip} 
+\noindent 
+用户提供的文件 current.ww3\_tide 或 level.ww3\_tide 是二进制文件，可通过使用 'AT' 选项运行 ww3\_prnc 获得，然后将所得文件 current.ww3 或 level.ww3 重命名为 current.ww3\_tide 或 level.ww3\_tide。用于潮汐预报的潮汐分潮可以是这些文件中已有分潮的一个子集，也可以是全部分潮。
+
+由于干湿变化或网格不匹配，在某些 \ws{} 节点上，潮汐分潮可能错误或缺失。可通过对特定分量设置最大振幅来检测错误分潮。当振幅超过这些最大值时，将从最近节点外推潮汐分潮。该功能仅在三角形网格上测试过。
+
+\pb

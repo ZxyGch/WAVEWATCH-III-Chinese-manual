@@ -1,0 +1,157 @@
+\vsssub
+\subsubsection{~$S_{nl}$：完整 Boltzmann 积分（WRT）} \label{sec:NL2}
+\vsssub
+
+\opthead{NL2}{Exact-NL model}{G. Ph. van Vledder}
+
+\noindent
+\ws\ 中计算非线性相互作用的第二种方法是所谓 Webb-Resio-Tracy 方法
+（\xnl）。该方法基于 \cite{art:Has62,art:Has63a,art:Has63b} 关于
+六维 Boltzmann 积分形式的原始工作，以及 \cite{art:Web78}、
+\cite{rep:TR82} 和 \cite{art:RP91} 的进一步考虑。
+
+Boltzmann 积分描述的是：由于四个波数组成的成对共振相互作用，某一特定
+波数的作用量密度发生变化的速率。若要发生相互作用，这些波数必须满足以下
+共振条件：
+
+%--------------------------%
+% Resonance conditions WRT %
+%--------------------------%
+% eq:resonance_2
+
+\begin{equation} \left .
+\begin{array}{ccc}
+  \bk_1 + \bk_2 & = & \bk_3 + \bk_4          \\
+  \sigma_1 + \sigma_2  & = & \sigma_3 + \sigma_4
+\end{array} \:\:\: \right \rbrace \:\:\: , \label{eq:resonance_2}
+\end{equation}
+
+\noindent
+这是共振条件（\ref{eq:resonance}）的更一般形式。由于所有包含 $\bk_1$
+的四波组相互作用，波数 $\bk_1$ 处的作用量密度 $N_1$ 的变化率为
+
+\begin{eqnarray}
+\frac{{\p N_1 }}{{\p t}} & = & \int\!\!\int\!\!\int G\left( \bk_1
+,\bk_2 ,\bk_3 ,\bk_4 \right ) \: \delta \left( \bk_1  + \bk_2  - \bk_3
+- \bk_4 \right)
+\: \delta \left( {\sigma _1  + \sigma _2  - \sigma _3  - \sigma _4 }
+\right) \nonumber \\  & &
+\hspace{7mm}\times \:\:\: \left[ {N_1 N_3 \left( {N_4  - N_2 } \right)
++ N_2 N_4 \left(
+{N_3  - N_1 } \right)} \right] \: d\bk_2 \: d\bk_3 \: d\bk_4 \:\:\: ,
+\label{eq:HKE}
+\end{eqnarray}
+
+\noindent
+其中作用量密度 $N$ 以波数向量 $\bk$ 定义，即 $N = N(\bk)$。项 $G$ 是
+复杂的耦合系数，其表达式由 \cite{art:HH80} 给出。在 \xnl\ 方法中，通过
+若干变换消去 delta 函数。\xnl\ 方法的一个关键要素是针对每个
+$(\bk_1 ,\bk_3)$ 组合考察积分空间 \citep[见][]{art:RP91}：
+
+\begin{equation}
+{{\partial N_1 } \over {\partial t}} = 2\int T\left( {\bk_1 ,\bk_3 }
+\right) \: d\bk_3  \:\:\: ,
+\end{equation}
+
+\noindent
+其中函数 $T$ 为
+
+\begin{eqnarray}
+T \left( \bk_1 ,\bk_3 \right) & = & \int\!\!\int
+G\left( \bk_1 ,\bk_2, \bk_3 ,\bk_4 \right) \: \delta \left( \bk_1  +
+\bk_2  - \bk_3  - \bk_4 \right) \nonumber \\
+& \times & \delta \left( {\sigma _1  + \sigma _2  - \sigma _3  -
+\sigma _4 }
+\right) \: \theta \left ( \bk_1 , \bk_3 , \bk_4 \right )
+\nonumber \\
+& \times & \left [ N_1 N_3 \left ( N_4 - N_2 \right ) + N_2 N_4 \left
+(
+N_3  - N_1 \right ) \right ] \: d\bk_2 \: d\bk_4 \:\:\: ,
+\label{eq:WRT_T}
+\end{eqnarray}
+
+\noindent
+其中
+
+\begin{equation}
+\theta \left( {\bk_1 ,\bk_3 ,\bk_4 } \right) = \left\{ {\begin{array}{*{20}c}
+   1 & {\rm{when}} & {\left| {\bk_1  - \bk_3 } \right| \leq \left| {\bk_1  - \bk_4 } \right|}  \\
+   0 & {\rm{when}} & {\left| {\bk_1  - \bk_3 } \right| > \left| {\bk_1  - \bk_4 } \right|}  \\
+ \end{array} } \right.
+\end{equation}
+
+式（\ref{eq:WRT_T}）中的 delta 函数确定了波数空间中的一条区域，积分应沿
+该区域进行。函数 $\theta$ 确定积分中未定义的一段；未定义的原因是作出了
+$\bk_1$ 比 $\bk_2$ 更接近 $\bk_3$ 的假设。Webb 方法的核心，是沿所谓
+locus 使用局地坐标系；这里的 locus 指在给定 $\bk_1$ 和 $\bk_3$ 组合时，
+由共振条件给出的 $\bk$ 空间路径。为此，$(k_{x},k_{y})$ 坐标系被替换为
+$(s,n)$ 坐标系，其中 $s$（$n$）为沿 locus 的切向（法向）方向。经过若干
+变换，传递积分可写成沿闭合 locus 的闭合线积分：
+
+\begin{eqnarray}
+T \left( \bk_1 ,\bk_3 \right) & = & \oint G \:
+\left | \frac{\p W(s,n)}{\p n}\right | ^{-1}
+\: \theta ( \bk_1 , \bk_3 , \bk_4 ) \nonumber \\
+& \times & \left [ N_1 N_3 \left ( N_4 - N_2 \right ) + N_2 N_4 \left
+(
+N_3  - N_1 \right ) \right ] \: d s  \:\:\: , \label{eq:WRT_T2}
+\end{eqnarray}
+
+\noindent
+其中 $G$ 为耦合系数，$\left| {\partial W/\partial n}\right|$ 是表示
+共振条件的函数的梯度项 \citep[见][]{pro:vVl00}。在数值上，Boltzmann
+积分被计算为许多线积分 $T$ 的有限和，覆盖 $\bk_1$ 和 $\bk_3$ 的所有
+离散组合。线积分（\ref{eq:WRT_T2}）通常通过将 locus 划分为 30 段来求解，
+其离散形式为：
+
+\begin{equation}
+T\left( {\bk_1 ,\bk_3 } \right) \approx \sum_{i=1}^{n_s } G(s_i)
+W(s_i) P(s_i) \: \Delta s_i \:\:\: ,
+\end{equation}
+
+\noindent
+其中 $P(s_i)$ 是 locus 上给定点的乘积项，$n_s$ 是分段数，$s_i$ 是沿
+locus 的离散坐标。最后，给定波数 $\bk_1$ 的变化率为
+
+\begin{equation}
+\frac{\p N(\bk_1)}{\p t} \approx \sum_{i_{k3}  = 1}^{n_k }
+{\sum_{i_{\theta 3}  = 1}^{n_\theta  } k_3 T(\bk_1,\bk_3) \: \Delta
+k_{i_{k3}} \: \Delta \theta_{i_{\theta 3} } }, \label{eq:WRT_numT}
+\end{equation}
+
+\noindent
+其中 $n_k$ 和 $n_\theta$ 分别为计算网格中的离散波数个数和方向个数。
+注意，虽然谱以向量波数 $\bk$ 定义，但在波浪模型中，为保证计算的方向各向
+同性，计算网格更方便地用绝对波数和波向（$k,\theta$）定义。考虑所有波数
+$\bk_1$ 后，即得到由非线性四波波--波相互作用导致的完整源项。关于给定
+$\bk_1$ 和 $\bk_3$ 波数组合下 locus 的高效计算细节，见
+\cite{pro:vVl00,rep:vVl02a,rep:vVl02b}。
+
+需要指出，这类精确相互作用计算代价极高，通常需要比 \dia\ 多
+$10^3$ 到 $10^4$ 倍的计算量。因此，目前这类计算只能用于空间网格有限的
+高度理想化测试算例。
+
+根据 \xnl\ 方法的非线性相互作用，已在 \ws\ 中通过 \cite{rep:vVl02b}
+开发的可移植子程序实现。在该实现中，\xnl\ 方法的计算网格与 \ws\ 的
+离散谱网格相同。此外，\xnl\ 例程继承了与 \dia\ 中相同的参数化谱尾幂次。
+理论上，可以使用高于 \ws\ 计算网格的分辨率来计算非线性相互作用，但这不会
+改善结果，因此未予实现。
+
+由于高频处的非线性四波波--波相互作用十分重要，建议将波浪模型最大频率
+设为模型运行中预期出现谱峰频率的大约五倍。注意这一点很重要，因为谱网格
+决定了式~(\ref{eq:WRT_numT}) 中的积分范围。推荐频率个数约为 40，
+频率递增因子为 1.07。用于计算非线性相互作用的推荐方向分辨率约为
+$10^\circ$。对于特定目的也可使用其他分辨率，并可能需要对这些分辨率进行
+测试。
+
+大多数用于求解 Boltzmann 积分的算法都有一个重要特征：积分空间可以预先
+计算。\ws\ 中使用的 \xnl\ 方法子程序版本也是如此。在波浪模型初始化阶段，
+会计算由所有 locus 的离散路径组成的积分空间，并连同相互作用系数和梯度项
+一起存入一个二进制数据文件。每个水深都会生成这样一个数据文件，并存放在
+当前目录中。这些数据文件名由关键字 “quad” 后接关键字 “{\it{xxxx}}”
+组成，其中 {\it xxxx} 为以米为单位的水深，深水则用 9999 表示。二进制
+数据文件的扩展名为 “bqf”（Binary Quadruplet File, BQF）。如果 BQF 文件
+已存在，程序会检查该 BQF 文件是否使用正确的谱网格生成。若不是，则用正确
+的 BQF 文件覆盖已有文件。在具有不同水深的波浪模型运行中，会通过查找已
+生成有效 BQF 文件的最近水深来使用最优 BQF。此外，结果还会利用目标水深
+与 BQF 文件对应水深的深度缩放因子（\ref{eq:snl_shal}）之比重新缩放。

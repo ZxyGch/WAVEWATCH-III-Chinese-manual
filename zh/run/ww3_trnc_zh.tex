@@ -1,0 +1,34 @@
+\vsssub
+\subsubsection{轨迹输出 NetCDF 后处理器} \label{sec:ww3trnc}
+\vsssub
+
+\proddefH{ww3\_trnc}{w3trnc}{ww3\_trnc.ftn}
+\proddeff{输入}{ww3\_trnc.nml}{Namelist 配置文件。}{10} (App.~\ref{sec:config202})
+\proddefa{ww3\_trnc.inp}{传统配置文件。}{10} (App.~\ref{sec:config201})
+\proddefa{track\_o.ww3}{原始轨迹输出数据。}{11}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{*.nc}{NetCDF 文件。}{}
+
+\vspace{\baselineskip}
+\noindent
+该后处理器将原始轨迹输出数据转换为 NetCDF 文件。输出 NetCDF 文件包含以下变量：
+
+\begin{list}{$\bullet$}{\itemsep 0mm \parsep 0mm}
+\item 自 1990-01-01 起算的天数形式的时间，即 UTC 时间下的儒略日。
+\item 每个频率箱的频率（弧度）。
+\item 每个频率箱下边带的频率（弧度）。
+\item 每个频率箱上边带的频率（弧度）。
+\item 每个频率箱的频率宽度（弧度）。
+\item 每个方向箱的方向（海洋学约定）。
+\item 沿时间维度给出的纬度和经度（度）。
+\end{list}
+
+\noindent
+对于随时间和位置变化的每个输出点，将写出以下记录：
+\begin{list}{$\bullet$}{\itemsep 0mm \parsep 0mm}
+\item 轨迹名称（32 个字符）。
+\item 完整谱（m2 s rad-1）。
+\item 水深（m），海流和风的 $u$、$v$ 分量（m s-1），摩擦速度（m s-1），气海温差（摄氏度）。
+\end{list}
+
+\pb

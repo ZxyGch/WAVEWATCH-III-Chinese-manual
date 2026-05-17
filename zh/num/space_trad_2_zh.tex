@@ -1,0 +1,28 @@
+\addcontentsline{toc}{subsubsection}{\strut \hspace{24mm} 二阶格式
+  (UNO)}
+
+\vspace{\baselineskip} 
+\vspace{\baselineskip} 
+\noindent {\bf 二阶格式 (UNO)}
+
+\opthead{UNO}{MetOffice}{J.-G. Li}
+
+\noindent
+上游非振荡二阶（UNO）平流格式 \citep{art:Li08} 是 MINMOD 格式 \citep{art:Roe86} 的扩展。在 UNO 格式中，单元 \emph{i}-1 与单元 \emph{i} 之间单元面中通量点处的插值波作用量值为
+\begin{equation}
+N_{i-}^{*}=N_{c}+sign\left(N_{d}-N_{c}\right)\frac{\left(1-C\right)}{2}\min\left(|N_{u}-N_{c}|,|N_{c}-N_{d}|\right) \:\:\: ,
+\label{eq:UNO2regular}
+\end{equation}
+
+\noindent
+其中 \emph{i}- 为单元面索引；$C=\left|\dot{\phi_{b}}\right|\Delta t/\Delta\phi$ 为绝对 CFL 数；下标 \emph{u}、\emph{c} 和 \emph{d} 分别表示相对于给定 \emph{i}- 单元面速度 $\dot{\phi}_{b}$ 的\emph{上游、中心}和\emph{下游}单元。若 $\dot{\phi}_{b}>0$，则对单元 \emph{i}-1 与单元 \emph{i} 之间的单元面，有 \emph{u} = \emph{i}-2、\emph{c}=\emph{i}-1、\emph{d}=\emph{i}。若 $\dot{\phi}_{b}\leq0$，则 \emph{u}=\emph{i}+1、\emph{c}=\emph{i}、\emph{d}=\emph{i}-1。UNO 格式的细节见 \cite{art:Li08}，其中还给出了标准数值测试，证明只要 CFL 数小于 1.0，Cartesian 多单元网格上的 UNO 格式就是非振荡、守恒、保持形状的，并且比其经典对应格式更快。
+
+通量和单元值更新采用与一阶上游格式相同的形式，即
+
+\begin{equation}
+\mathcal{F}_{i-}=\dot{\phi_{b}N_{i-}^{*}};\;\;\; N_{i}^{n+1}=N_{i}^{n}+\frac{\Delta t}{\Delta\phi}\left(\mathcal{F}_{i-}-\mathcal{F}_{i+}\right) \:\:\: ,
+\end{equation}
+ 
+\noindent
+其中 $\mathcal{F}_{i+}$ 是单元 \emph{i} 与单元 \emph{i}+1 之间单元面的通量。它可用类似于 (\ref{eq:UNO2regular}) 的中通量值估计，只需把 \emph{i} 替换为 \emph{i}+1。为把 UNO 格式扩展到多维，采用可减小时间分裂误差的平流-守恒混合算子 \citep{art:LLM96}。
+

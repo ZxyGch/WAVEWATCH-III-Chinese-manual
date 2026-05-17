@@ -1,0 +1,131 @@
+\vsssub
+\subsubsection{~$S_{nl}$：广义多重 \dia\ （\gmd）} \label{sec:NL3}
+\vsssub
+
+\opthead{NL3}{\ws}{H. L. Tolman}
+
+\noindent
+\gmd\ 是作为 \dia\ 的扩展而开发的。其发展过程记录在一系列技术说明
+\citep{tol:MMAB03a, tol:MMAB05a, tol:MMAB08b,tol:MMAB10d}、报告
+\citep{tol:Oahu04a, tol:Hal09a, tol:Kona11b} 和论文
+\citep{tol:OMOD04, tol:OMOD13d} 中。作为 \gmd\ 开发的一部分，还建立了
+一种整体遗传优化技术 \citep{tol:OMOD13e}。\cite{tol:MMAB10e} 首先提供了
+在 \ws\ 中执行该优化的软件包。该软件包的最新版本为 \genever\
+\citep{\generef}。
+
+\gmd\ 从三个方面扩展了 \dia。第一，扩展了代表性四波组的定义。第二，方程
+针对任意水深建立，其中包括极浅水中强相互作用的描述
+\citep[例如][]{art:Web78}。第三，使用多个代表性四波组。
+
+\gmd\ 通过如下方式扩展共振条件（\ref{eq:resonance}），允许代表性四波组
+采用任意构型：
+
+\begin{equation} \left .
+\begin{array}{ccc}
+  \sigma_1    & = & a_1 \: \sigma_r \\
+  \sigma_2    & = & a_2 \: \sigma_r \\
+  \sigma_3    & = & a_3 \: \sigma_r \\
+  \sigma_4    & = & a_4 \: \sigma_r \\
+  \theta_{12} & = & \theta_1 \pm \theta_{12}   \
+\end{array} \:\:\: \right \rbrace \:\:\: , \label{eq:gmd_res}
+\end{equation}
+
+\begin{table}
+\caption{\gmd\ 中代表性四波组的一参数、二参数或三参数定义。$\bk_d$ 或
+         （$\sigma_d, \theta_d$）表示用于计算离散相互作用贡献的离散谱网格点。
+         所有四波组均通过取 $\bk_1 + \bk_2 // \bk_d$ 与离散方向对齐。}
+  \label{tab:gmd_quad_def}
+\vspace{\baselineskip}
+\begin{center}
+\begin{tabular}{ccccccc} \hline
+ parameters  & $a_1$ & $a_2$ & $a_3$  & $a_4$ & $\theta_{12}$ &
+ $\sigma_r$  \\ \hline
+$(\lambda)$
+    &    1    &    1    & $1+\lambda$  & $1-\lambda$ &    0  & $\sigma_d$ \\
+$(\lambda, \mu)$
+    & $1+\mu$ & $1-\mu$ & $1+\lambda$ & $1-\lambda$  &
+                                   implied\textsuperscript{*}& $\sigma_d$ \\
+$(\lambda, \mu, \theta_{12})$
+    & $1+\mu$ & $1-\mu$ & $1+\lambda$ & $1-\lambda$  & free  &
+                                                 $\frac{\sigma_d}{1+\mu}$ \\
+\hline
+\end{tabular}
+\end{center}
+\hspace{55mm} \textsuperscript{*}~假定 $\bk_1 + \bk_2 = \bk_3 + \bk_4 =
+2\bk_d$ 
+\vspace{\baselineskip}
+\botline
+\end{table}
+
+\noindent 
+其中 $a_1 + a_2 = a_3 + a_4$，以满足一般共振条件
+（\ref{eq:resonance_2}）；$\sigma_r$ 为参考频率；$\theta_{12}$ 为波数
+$\bk_1$ 与 $\bk_2$ 之间的夹角。后一参数既可以隐含在四波组定义中，也可以
+作为显式可调参数。由此可构造一参数（$\lambda$）、二参数（$\lambda,\mu$）
+或三参数（$\lambda, \mu, \theta_{12}$）四波组定义，如
+表~\ref{tab:gmd_quad_def} 所示。注意，与 \dia\ 不同，所有四波组均在实际
+水深和频率下进行计算。
+
+在 \gmd\ 中，离散相互作用按任意水深计算。颇有些出人意料的是，
+先对 $F(f, \theta)$ 谱计算相互作用，再用 Jacobian 变换转换为 \ws\ 的原生谱
+$N(k, \theta)$，被证明比直接对后者计算相互作用贡献更易优化。此外，还引入
+了一个双分量缩放函数：其中“深水”缩放函数用于表示传统中深水到深水中的弱
+相互作用，“浅水”缩放函数用于表示极浅水中的强相互作用。经过这些修改，
+\dia\ 的离散相互作用贡献（\ref{eq:snl_dia}）变为
+\begin{eqnarray}
+\left ( \begin{array}{c}
+  \delta S_{nl,1} \\ \delta S_{nl,2} \\ \delta S_{nl,3} \\ \delta S_{nl,4} 
+\end{array} \right )  & = &  
+\left ( \begin{array}{r} -1 \\  -1 \\ 1 \\ 1 \end{array} \right )
+  \left ( \frac{1}{n_{q,d}} C_{\rm{deep}} B_{\rm{deep}} + 
+          \frac{1}{n_{q,s}} C_{\rm{shal}} B_{\rm{shal}} \right ) \times \nonumber \\
+ &  & \hspace{20mm} \left [ \:\:\:\:
+                    \frac{c_{g,1}F_1}{k_1 \sigma_1} 
+                    \frac{c_{g,2}F_2}{k_2 \sigma_2} \left ( 
+                    \frac{c_{g,3}F_3}{k_3 \sigma_3} +
+                    \frac{c_{g,4}F_4}{k_4 \sigma_4} \right )
+                                                         \right . \nonumber \\
+ &  &  \hspace{20mm} \left . - \:\:
+                    \frac{c_{g,3}F_3}{k_3 \sigma_3} 
+                    \frac{c_{g,4}F_4}{k_4 \sigma_4} \left ( 
+                    \frac{c_{g,1}F_1}{k_1 \sigma_1} + 
+                    \frac{c_{g,2}F_2}{k_2 \sigma_2} \right ) \:\:\:\:
+                                                    \right ] \:\:\:
+, \label{eq:gmd_dsnl} 
+\end{eqnarray}
+
+\noindent
+其中 $B_{\rm{deep}}$ 和 $B_{\rm{shal}}$ 分别为深水和浅水缩放函数：
+
+\begin{equation}
+B_{\rm{deep}} = \frac{k^{4+m} \sigma^{13-2m} }{(2\pi)^{11} \:
+                 g^{4-m} \: c_g^2 } \:\:\: , \label{eq:gmd_B_deep}
+\end{equation}
+
+\begin{equation}
+B_{\rm{shal}} = \frac{g^2 \: k^{11}}{(2\pi)^{11} \: c_g} (kd)^n
+\:\:\: , \label{eq:gmd_B_shal}
+\end{equation}
+
+\noindent
+其中 $m$ 和 $n$ 为可调参数；式~(\ref{eq:gmd_dsnl}) 中的
+$C_{\rm{deep}}$ 和 $C_{\rm{shal}}$ 是对应的深水和浅水可调比例常数；
+$n_{q,d}$ 和 $n_{q,s}$ 分别为采用深水缩放和浅水缩放的代表性四波组个数，
+体现了 \gmd\ 可使用多个代表性四波组的特征。
+
+在 namelist {\F snl3} 和 {\F anl3} 中，用户定义四波组数量，并为每个
+四波组定义 $\lambda$、$\mu$、$\theta_{12}$、$C_{\rm{deep}}$ 和
+$C_{\rm{shal}}$。$m$ 和 $n$ 的取值只定义一次，并用于所有四波组。最后，
+还需定义相对水深阈值：低于该值时不使用深水缩放，高于该值时不使用浅水
+缩放。\cite{tol:MMAB10d} 中若干 \gmd\ 构型示例已包含在
+\para\ref{sub:ww3grid} 的示例输入文件 {\file ww3\_grid.inp} 中。默认设置
+为复现传统 \dia。
+
+注意，\gmd\ 明显比 \dia\ 公式更复杂，并且需要对每个谱频率评估四波组布局
+（相比之下，\dia\ 只使用单一布局）。为提高计算效率，四波组布局会针对一组
+无量纲水深预先计算并存入内存。即便采用这些以及其他优化，在使用一参数
+四波组布局时，单个代表性四波组的 \gmd\ 计算代价仍大约是 \dia\ 的两倍。
+若使用二参数或三参数四波组布局，\gmd\ 具有四个而不是两个四波组实现，因此
+按每个四波组计，其代价为传统 \dia\ 的四倍。使用多个代表性四波组时，计算
+成本按线性方式增加。关于包含 \gmd\ 的模型计算成本的更深入评估，见
+\cite{tol:MMAB10d} 和 \cite{tol:OMOD13d}。

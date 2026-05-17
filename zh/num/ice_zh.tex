@@ -1,0 +1,44 @@
+\vssub
+\subsection{~简单冰阻挡 ({\code IC0})} \label{sub:num_ice}
+\opthead{IC0}{\ws}{H. L. Tolman} %\conthead{\ws}{H. L. Tolman}
+
+\noindent
+在 \ws{} 中，冰覆盖海域被视为“陆地”，假定波能为零，且冰缘处的边界条件与岸线处的边界条件相同。若冰浓度大于用户定义浓度，相应网格点将从计算中移除。若冰浓度降到其临界值以下，相应网格点会被“重新激活”。随后，谱会用基于局地风向的 PM 谱初始化，其峰值频率对应于网格中第二高的离散频率。这里使用低能量谱，以保证即使在浅水近岸点，谱也是现实的。
+
+上述不连续冰处理是 \ws{} 的默认模式设置。在 \para\ref{sub:num_obst} 讨论的未解析障碍物建模框架下，还可以使用 \cite{tol:OMOD03a} 给出的连续方法。在该方法中，用户需给出障碍开始出现的临界冰浓度
+($\epsilon_{c,0}$) 和障碍完全形成的临界冰浓度 ($\epsilon_{c,n}$)（默认值为 $\epsilon_{c,0} = \epsilon_{c,n} =
+0.5$，即冰的不连续处理）。由这些临界浓度可计算相应的衰减长度尺度：
+
+\begin{equation}
+l_0 = \epsilon_{c,0} \min ( \Delta x , \Delta y )
+, \label{eq:l0}
+\end{equation}
+\begin{equation}
+l_n = \epsilon_{c,n} \min ( \Delta x , \Delta y )
+, \label{eq:ln}
+\end{equation}
+
+\noindent
+再由此计算 $x$ 和 $y$ 方向上的单元透射率（分别为 $\alpha_x$ 和 $\alpha_y$）：
+
+\begin{equation}
+\alpha_x = \left \{ \begin{array}{ccl}
+ 1 & \mbox{for} & \epsilon \Delta x < l_0 \\
+ 0 & \mbox{for} & \epsilon \Delta x > l_n \\
+\frac{l_n - \epsilon \Delta x}{l_n - l_0} & \multicolumn{2}{c}{\mbox{otherwise}} 
+\end{array} \right .
+\:\:\: , \:\:\:
+\alpha_y = \left \{ \begin{array}{ccl}
+ 1 & \mbox{for} & \epsilon \Delta y < l_0 \\
+ 0 & \mbox{for} & \epsilon \Delta y > l_n \\
+\frac{l_n - \epsilon \Delta y}{l_n - l_0} & \multicolumn{2}{c}{\mbox{otherwise}} 
+\end{array} \right .
+\:\:\: . \label{eq:ice_0} 
+\end{equation}
+
+\noindent
+该模型的细节可参见 \cite{tol:OMOD03a}。
+
+模式内冰图的更新发生在旧冰图和新冰图有效时间之间大约居中的离散模式时刻。若两个冰场的时间戳相同，则不会更新冰图。
+
+以上描述对应于开关 {\code IC0}。注意，可以使用传播中的冰透射（{\code IC0}），也可以使用作为源项的冰（{\code IC1}、{\code IC2}、{\code IC3}），但不能同时使用这两类方法。

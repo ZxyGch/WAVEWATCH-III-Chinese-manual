@@ -1,0 +1,19 @@
+\vsssub
+\subsubsection{网格预处理器} \label{sub:ww3grid}
+\vsssub
+
+\proddefH{ww3\_grid}{w3grid}{ww3\_grid.ftn}
+\proddeff{输入}{ww3\_grid.nml}{Namelist 配置文件。}{10} (App.~\ref{sec:config012})
+\proddefa{ww3\_grid.inp}{传统配置文件。}{10} (App.~\ref{sec:config011})
+\proddefa{'grid file' \opt}{包含海底水深的文件。}{user}
+\proddefa{'obstr. file' \opt}{包含子网格障碍物的文件。}{user}
+\proddefa{'mask file' \opt}{包含网格掩膜的文件。}{user}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{mod\_def.ww3}{\ws{} 格式的模式定义文件。}{20}
+\proddefa{mask.ww3 \opt}{陆海掩膜文件（开关 {\F o2}a）。}{20}
+\proddeff{暂存}{ww3\_grid.scratch}{格式化暂存文件。}{90}
+
+\vspace{\baselineskip} \noindent
+注意，海底和障碍物数据可位于同一文件中。
+
+\pb

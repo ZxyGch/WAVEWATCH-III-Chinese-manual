@@ -1,0 +1,14 @@
+\vsssub
+\subsubsection{~$S_{ice}$：海冰阻尼（简单方法）} \label{sec:ICE1}
+\vsssub
+
+\opthead{IC1}{\ws/NRL}{E. Rogers and S. Zieger}
+
+最先实现的方法（{\code IC1}）是由用户指定 ${k_i(x,t)}$；它在频率空间中均匀，
+即 ${C_{ice,1}}={k_i}$。参数 ${C_{ice,2}}$,...,${C_{ice,5}}$ 不使用。
+一个示例设置为 ${C_{ice,1}}=2\times 10^{-5}$。关于 {\code IC2} 和 {\code IC3}
+的专门说明见后续各节。
+
+{\code IC1} 的完整说明见 \cite{rep:RO13}，\cite{rep:RPLA18} 给出了简要总结。
+这一简单方法曾用于 \cite{art:LKS15}，并被 \cite{art:RTS16}、\cite{rep:RPLA18}
+和 \cite{rep:RMK18} 用作模型-数据反演程序的建模组成部分。

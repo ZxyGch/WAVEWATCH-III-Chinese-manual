@@ -1,0 +1,32 @@
+\vsssub
+\subsubsection{轨迹输出后处理器} \label{sec:ww3trck}
+\vsssub
+
+\proddefH{ww3\_trck}{w3trck}{ww3\_trck.ftn}
+\proddeff{输入}{ww3\_trck.inp}{传统配置文件。}{10} (App.~\ref{sec:config191})
+\proddefa{track\_o.ww3}{原始轨迹输出数据。}{11}
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{track.ww3}{格式化数据文件。}{51}
+
+\vspace{\baselineskip}
+\noindent
+该后处理器将原始轨迹输出数据转换为整数压缩的格式化文件。该文件包含以下头记录：
+
+\begin{list}{$\bullet$}{\itemsep 0mm \parsep 0mm}
+\item 文件标识符（长度为 34 的字符串）。
+\item 频率数和方向数、第一个方向以及方向增量（弧度，海洋学约定）。
+\item 每个频率箱的弧频率。
+\item 对应的方向箱宽乘以频率箱宽，用于得到每个离散箱的能量。
+\end{list}
+
+\noindent
+对于随时间和位置变化的每个输出点，将写出以下记录：
+\begin{list}{$\bullet$}{\itemsep 0mm \parsep 0mm}
+\item {\tt yyyymmdd hhmmss} 格式的日期和时间、以度为单位的经度和纬度，以及状态标识符
+      `{\F ice}'、`{\F lnd}' 或 `{\F sea}'。以下两条记录仅对海点写出。
+\item 以米为单位的水深，以米每秒为单位的海流和风的 $u$、$v$ 分量，
+      以米每秒为单位的摩擦速度，以摄氏度为单位的气海温差，以及谱的缩放因子。
+\item 以整数打包格式给出的完整谱（可用自由格式读取）。
+\end{list}
+
+\pb

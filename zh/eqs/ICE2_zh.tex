@@ -1,0 +1,70 @@
+\vsssub
+\subsubsection{~$S_{ice}$：海冰阻尼（Liu et al.）} \label{sec:ICE2}
+\vsssub
+
+\opthead{IC2}{\ws/NRL}{E. Rogers, S. Zieger, F. Ardhuin}
+
+\noindent
+这种表示波-冰相互作用导致波能耗散的方法，基于 \cite{art:LMC88}、\cite{art:LHV91}
+和 \cite{art:Aea15}。主要输入海冰参数是冰厚（单位 m），它可在空间和时间上变化，
+并作为强迫场 ${C_{ice,1}}$。
+
+这是一个海冰覆盖导致衰减的模型，假定耗散由冰下边界层中的摩擦造成，并把海冰表示为
+连续薄弹性板。\cite{art:LMC88} 的原始形式可通过把 {\code IC2} namelist {\F SIC2}
+参数 {\code IC2DISPER = .TRUE.} 启用。该形式假定边界层始终为层流，但使用可在空间上
+变化的涡黏性 ${\nu}$，它是强迫场 ${C_{ice,2}}$。
+
+{\code IC2} 和 {\code IS2} 共享一个可选项，即使用 \cite{art:LMC88} 针对未破碎冰层
+给出的色散关系：
+\begin{equation}
+\sigma^2 =  \left(gk_{ice} + B k_{ice}^5\right)  / \left(1/\tanh ( k_{ice}H) +\frac{\rho_{ice}  h k_{ice}} {\rho_{w} }\right),
+\end{equation}
+\begin{equation}
+c_g =  (g+(5 + 4 k_{ice} M)Bk_{ice}^4)/(2\sigma(1+k_{ice}M)^2).
+\end{equation}
+
+\noindent
+$B$ 和 $M$ 分别量化波浪导致的海冰弯曲效应和海冰惯性效应。由同一关系推导得到的冰下
+群速在模块 {\code W3SIS2MD} 中使用，并在 {\code W3DISPMD} 中计算。细节见
+\citet{art:LMC88}。
+
+对于 {\code IC2}，色散关系定义为
+
+\begin{equation}\label{eq:ice1}
+  {\sigma}^2 = ({gk_r} + {Bk_r^5})/(\coth({k_r}{h_w}) + {k_r}{M}),
+\end{equation}
+\begin{equation}\label{eq:ice2}
+  {c_g} = (g + (5 + 4{k_r}{M}){B}{k_r^4})/(2{\sigma}(1+{k_r}{M})^2),
+\end{equation}
+\begin{equation}\label{eq:ice3}
+  {\alpha} = (\sqrt{{\nu\sigma}}{k_r)}/({c_g}\sqrt{2}(1+{k_r}{M})).
+\end{equation}
+
+\noindent
+在本文记号中，$h_w$ 为水深，$h_i$ 为冰厚。变量 $B$ 和 $M$ 分别量化海冰弯曲和
+海冰惯性的影响。二者都依赖 $h_i$ \citep[见][]{art:LMC88, art:LHV91}。
+
+只有当 {\F MISC} namelist 中 ICEDISP=TRUE 时才会求解该方程。否则，
+$k_{ice}=k$，与开阔水面相同。注意，$k_{ice}$ 的影响不会传回主程序。
+
+\cite{art:SAG16} 通过加入一个更好的替代方案来表示涡黏耗散，从而改进了 {\code IC2}。
+他们区分层流和湍流状态；把 {\code IC2DISPER = .FALSE.} 即可启用这一形式。在这种
+情况下，耗散从层流形式（使用分子黏性并乘以经验调整因子 {\code IC2VISC}）过渡到
+湍流形式（由因子 {\code IC2TURB} 放大），该过渡发生在 Reynolds 数高于用户定义阈值
+{\code IC2REYNOLDS} 时。为考虑随机波场性质，该过渡会在范围 {\code IC2SMOOTH} 内
+平滑处理。在湍流状态中，摩擦因子根据用户指定的冰下粗糙长度 {\code IC2ROUGH} 估计，
+该长度预期为 $10^{-4}$~m 量级。
+当 floe 直径远小于海洋波长时，还增加了对耗散率进行启发式削减的可能性
+\citep[细节见][]{Aea18}。它基于如下假设：在这些条件下，冰 floe 至少部分跟随
+水平运动，因此应减小用于估计耗散率的冰-水相对速度。该削减由 \cite{Aea18} 中称为
+$r_D$ 的因子控制，其取值可通过 namelist 参数 {\code IC2DMAX} 设置。当波长长于
+$D_{\max}/r_D$（$D_{\max}$ 为最大 floe 尺寸）时，耗散率会被削减；当最大 floe 直径
+达到波长量级或更大时，则不削减。
+
+参数 {\code IC2TURBS} 是南半球湍流耗散的经验增强项，引入它是为了测试偏差来源。
+该参数将在未来版本中弃用。现在看来，把 IC2 与 IS2 中的非弹性耗散组合，可对两个半球
+的主导波给出良好结果 \citep{Aea18}。
+
+{\code IC2} 原始形式的完整说明见 \cite{rep:RO13}。它在 \cite{art:LKS15} 中得到应用。
+\cite{rep:RPLA18} 给出了当前代码的简要总结。{\code IC2} 耗散机制改进的说明见
+\cite{art:SAG16} 附录 B，该文也使用了这一改进。

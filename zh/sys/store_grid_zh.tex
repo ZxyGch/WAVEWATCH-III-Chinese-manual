@@ -1,0 +1,155 @@
+\vsssub
+\subsubsection{~网格} \label{sec:grids}
+\vsssub
+
+% fig_grids_1
+
+\input{zh/sys/fig_grd1_zh}
+
+为便于编程并节省开销，空间网格和谱网格分开考虑。这种做法受
+第~\ref{chapt:num} 章所述分裂技术启发。对于空间传播，使用一个简单的
+“矩形”空间网格，如图~\ref{fig:grids_1} 所示。该网格可以是笛卡尔
+``$(x,y)$'' 网格、球面网格（经纬度上为规则步长）、曲线网格，或基于三角形
+的网格。在球面网格中，程序中始终用计数器 {\F ix} 表示经度，用计数器
+{\F iy} 表示纬度，并采用相应网格维度 {\F (nx,ny)}。所有空间场数组都在
+代码中动态分配；相应工作数组通常为自动数组，以允许线程安全代码。全局
+应用中网格闭合由模式内部处理，不需要用户干预。为简化导数计算，特别是
+流的导数计算，外侧网格点（{\F ix=1,nx}，除非网格为全局网格）以及
+（{\F iy=1,ny}）会被视为陆点、非活动点或活动边界点。因此，除基于三角形
+的网格外，最小网格尺寸为 {\F nx=3, ny=3}。在后一种情况下，所有节点作为
+维度为 {\F nx} 的长向量列出，同时令 {\F ny=1}，从而保持相同代码结构。
+输入数组通常假定具有如下形式
+
+\vspace{\baselineskip} \centerline{\F array(nx,ny) ,} \vspace{\baselineskip}
+
+\noindent
+并逐行读取（另见第~\ref{chapt:run} 章）。不过，在程序内部，它们通常以
+旋转后的索引存储：
+
+\vspace{\baselineskip} \centerline{\F array(ny,nx) .} \vspace{\baselineskip}
+
+\noindent
+这样更容易提供全局闭合；全局闭合通常需要扩展 $x$ 轴。此外，这类二维数组
+通常按一维数组处理，以增加向量长度。数组 {\F array}、其等价一维形式
+{\F varray} 以及 {\F ixy} 定义为
+
+\vspace{\baselineskip}
+\centerline{\F array(my,mx) , varray(my*mx) ,}
+\centerline{\F ixy = iy + (ix-1)*my .}
+\vspace{\baselineskip}
+
+\noindent
+注意，网格的这种表示只在模式{\it 内部}使用。
+
+% fig:grids_2
+
+\input{zh/sys/fig_grd2_zh}
+
+给定空间网格点 {\F (ix,iy)} 处的谱网格以类似方式定义，使用方向计数器
+{\F ith} 和波数计数器 {\F ik}（图~\ref{fig:grids_2}）。谱网格大小通过
+动态分配设置。与空间网格一样，谱 {\F a} 的内部描述定义为
+
+\vspace{\baselineskip}
+\centerline{\F a(nth,nk) ,}
+\vspace{\baselineskip}
+
+\noindent
+程序中通篇使用等价的一维数组。在模式内部，方向始终为笛卡尔方向，
+$\theta = 0^\circ$ 对应从西向东传播（正 $x$ 或 {\F ix} 方向），
+$\theta = 90^\circ$ 对应从南向北传播（正 $y$ 或 {\F iy} 方向）。输出方向
+使用其他约定，如第~\ref{chapt:run} 章所述。
+
+波谱存储占据模式所需内存的大部分，因为所采用的分裂技术保证模式任一部分
+只在整个波场的一个小子集上运行。为尽量减少所需内存，只存储实际海点处的
+谱。这里的海点定义为可能需要谱的点。这包括活动边界点和被冰覆盖的海点。
+出于归档目的，使用计数器 {\F isea} 定义一维海点网格。随后谱存储为
+
+\vspace{\baselineskip}
+\centerline{\F a(ith,ik,isea) .}
+\vspace{\baselineskip}
+
+\noindent
+图~\ref{fig:grids_3} 给出了该存储网格相对于图~\ref{fig:grids_1} 中完整
+网格布局的示例。显然，存储网格和完整空间网格之间的关系需要一些簿记。
+为此定义了两个“映射”{\F mapfs} 和 {\F mapsf}。
+
+\vspace{\baselineskip}
+\centerline{\F mapsf(isea,1) = ix ,}
+\centerline{\F mapsf(isea,2) = iy ,}
+\centerline{\F mapsf(isea,3) = ixy ,}
+\centerline{\F mapfs(iy,ix) = vmapfs(ixy) = isea ,}
+\vspace{\baselineskip}
+
+% fig:grids_3
+
+\input{zh/sys/fig_grd3_zh}
+
+\noindent
+其中，对于陆点，{\F mapfs(iy,ix) = 0}。最后，维护状态映射
+{\F mapsta(iy,ix)} 和 {\F mapst2(iy,ix)}，用于识别海点、陆点、活动边界点
+和冰点。{\F mapsta} 表示网格的主状态映射：
+
+\vspace{\baselineskip} \noindent
+\strut \hspace{25mm} {\F mapsta(iy,ix) = 0} \hspace{10mm} 表示排除点，\\
+\strut \hspace{25mm} {\F mapsta(iy,ix) = 1} \hspace{10mm} 表示海点，\\
+\strut \hspace{25mm} {\F mapsta(iy,ix) = 2} \hspace{10mm} 表示活动边界点。
+
+\vspace{\baselineskip}
+
+由于存在海冰而未纳入波浪模式计算的海点和活动边界点，会以相应的负状态
+指示符（-1 或 -2）标记。{\F mapst2} 包含二级信息。对于排除点
+{\F mapsta(iy,ix) = 0}，该映射区分陆点 {\F mapst2(iy,ix) = 0} 和其他排除点
+{\F mapst2(iy,ix) = 1}。对于被禁用的海点 {\F mapsta(iy,ix) < 0}，
+{\F mapst2} 中的连续位标识停用原因（位值 1 表示停用）。
+
+\begin{center} \begin{tabular}{cl}
+ bit & 标识 \\ \hline
+  1  & 海冰覆盖     \\
+  2  & 点已干出  \\
+  3  & 移动网格中的陆地或嵌套中推断出的陆地 \\
+  4  & 在双向嵌套中被掩膜
+\end{tabular} \end{center}
+
+这里还考虑了另外两点。首先，两个状态映射可以折叠为单个映射以便存储。
+为保证这种存储与前一模式版本向后兼容，两个映射合并为单个映射 {\F maptmp}：
+
+\vspace{\baselineskip}
+\centerline{\F maptmp = mapsta + 8 * mapst2}
+\vspace{\baselineskip}
+
+\noindent
+这是因为只有 {\F mapsta} 的前几位包含数据。NetCDF 文件中保存的正是该
+映射 MAPTMP。原始映射可恢复为
+
+\vspace{\baselineskip}
+\centerline{\F mapsta = mod ( maptmp + 2 , 8 ) - 2}
+\centerline{\F mapst2 = maptmp - mapsta}
+\vspace{\baselineskip}
+
+\noindent
+其次，图形输出程序使用单个映射，以简化网格点状态的绘制。在图形文件中，
+该映射定义为
+
+\begin{center} \begin{tabular}{cl}
+{map} & 表示 \\ \hline
+  2 & 活动边界点 \\
+  1 & 活动海点      \\
+  0 & 陆点（包括在 {\F MAPST2} 中识别出的陆点） \\
+ -1 & 被冰覆盖但为湿点的点 \\
+ -2 & 未被冰覆盖的干点 \\
+ -3 & 被冰覆盖的干点 \\
+ -4 & 在双向嵌套方案中被掩膜的点 \\
+ -5 & 其他禁用点
+\end{tabular} \end{center}
+
+\noindent
+类似地，在网格准备程序 {\file ww3\_grid} 中，也可使用单个映射来简化处理。
+该映射按如下方式区分各点：
+
+\begin{center} \begin{tabular}{cl}
+{map} & 表示 \\ \hline
+  3 & 排除点 \\
+  2 & 活动边界点 \\
+  1 & 活动海点      \\
+  0 & 陆点 
+\end{tabular} \end{center}

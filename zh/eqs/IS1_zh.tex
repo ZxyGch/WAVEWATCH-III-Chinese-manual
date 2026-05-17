@@ -1,0 +1,19 @@
+\vsssub
+\subsubsection{~$S_{is}$：海冰扩散散射（简单方法）} \label{sec:IS1}
+\vsssub
+
+\opthead{IS1}{\ws/NRL}{S. Zieger}
+
+\noindent
+海冰对波浪的非保守效应已通过开关 {\code IC1} 到 {\code IC3} 实现（见
+\para\ref{sec:ICE1}--\ref{sec:ICE3}）。海冰的保守效应已在开关 {\code IS1}
+中实现，表示一种简单的散射形式。假定 floe 尺寸小于网格尺寸，并且入射波能的一部分
+$\alpha_{ice}$ 会各向同性地散射。该比例由海冰浓度 ICE 通过一个简单线性传递函数确定：
+\begin{equation}\label{eq:IS101}
+     \alpha_{ice} = \max\left \{0 , C_1\ \mathrm{ICE} + C_2 \right \} \:\:\: .
+\end{equation}
+
+\noindent
+系数 $C_1$ 和 $C_2$ 可通过 namelist {\F SIS1} 中的 namelist 参数 {\code ISC1}
+和 {\code ISC2} 定制。在每个离散频率和方向上，波能按 $\alpha_{ice}$ 的量减少，
+并重新分配到同一离散频率的所有方向上，以守恒能量。

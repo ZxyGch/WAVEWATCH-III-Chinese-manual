@@ -1,0 +1,74 @@
+\vssub
+\subsection{~波峰和波高的时空极值} \label{sub:space_time_ext}
+\conthead{\ws (ISMAR, NCEP)}{Barbariol, F., Benetazzo, A., Alves, J.H.G.M.}
+
+WAVEWATCH III 中的时空（ST）极端波基于 Euler Characteristics（EC）方法建模。该方法认为，对于给定的多维（二维空间 + 时间）、统计均匀且平稳的高斯随机波场，最大海面高程的超越概率可用 EC 的平均值近似表示 \citep{Fed12eu}。这里使用的 ST 极端高程模型由 \cite{Fed12sp} 针对高斯海浪建立，并由 \cite{Fed13} 扩展到二阶非线性空间波场，由 \cite{Beet15} 扩展到时空波场。所提出的 ST 极值线性模型已通过数值模拟评估 \citep{Baet15,Baet16}，而二阶非线性波的扩展则用立体成像验证 \citep{Fed13,Beet15}。根据这些模型，二阶非线性 ST 最大波峰高度 $\eta_{2ST_m}$ 的超越概率可近似为（阈值 $z_2$ 相对于海面高程标准差 $\sigma$ 较大时）：
+\begin{equation}
+P(\eta_{2ST_m} > z_2) \approx \left[N_{3D} \left( \frac{z_1}{\sigma} \right)^{2} + N_{2D} \left( \frac{z_1}{\sigma} \right) + N_{1D} \right] \exp{ \left( -\frac{z_1^2}{2 \sigma^2} \right)},
+\label{eq_STE1}
+\end{equation}
+其中非线性阈值 $z_2$ 通过使用陡度参数 $\mu$ 的 Tayfun 二次方程与其线性近似 $z_1$ 相关联；该关系严格适用于深水，并考虑了带宽效应。参数 $N_{3D}$、$N_{2D}$ 和 $N_{1D}$ 分别表示 ST 区域内三维、二维和一维波的平均个数，并由方向波谱 $S(k, \theta)$ 的矩 $m_{ijl}$ 确定，其定义如下：
+\begin{equation}
+m_{ijl}=\int k_{x}^{i}k_{y}^{j}\omega^{l}S(k,\theta)dkd\theta.
+\label{eq_STE2}
+\end{equation}
+
+式~(\ref{eq_STE1}) 中的平均波数还取决于时空域的大小，即沿平均波传播方向的空间尺度 $X$、与平均波传播方向正交的空间尺度 $Y$ 以及持续时间 $D$。随机变量 $\eta_{2ST_m}$ 的期望值 $\bar{\eta}_{2ST_m}$（输出参数 \textbf{STMAXE}，单位为米）为
+\begin{multline}
+\bar{\eta}_{2ST_m}=\mathbb{E}\left\{\eta_{2ST_m} \right\} = \\ 
+	\sigma \left[(h_1+\frac{\mu}{2}h_1^{2})+
+\gamma \left( h_1-\frac{2N_{3D}h_1+N_{2D}}{N_{3D} h_1^{2}+N_{2D} h_1+N_{1D}}\right)^{-1} (1+\mu h_1) \right],
+\label{eq_STE3}
+\end{multline}
+其中 $\gamma \approx 0.5772$ 是 Euler-Mascheroni 常数，$h_1$ 是相对于标准差 $\sigma$ 无量纲化后的最可能（众数）极值，即关于 $h$ 的隐式方程中最大的解：
+\begin{equation}
+\left[N_{3D} h^{2} + N_{2D} h + N_{1D} \right] \exp{ \left( -\frac{h^2}{2} \right)}=1.
+\label{eq_STE4}
+\end{equation}
+
+波峰高度 $\eta_{2ST_m}$ 的标准差 $\sigma_{2_m}$（输出参数 \textbf{STMAXD}，单位为米）为：
+\begin{equation}
+\sigma_{2_m}=std(\eta_{2ST_m})=\sigma \frac{\pi}{\sqrt{6}} \left( h_1-\frac{2N_{3D}h_1+N_{2D}}{N_{3D} h_1^{2}+N_{2D} h_1+N_{1D}}\right)^{-1} (1+\mu h_1) .
+\label{eq_STE5}
+\end{equation}
+
+ST 极端波峰到波谷波高的期望值用 Quasi-Determinism（QD）模型得到，该模型预测 ST 波群在其发展顶点附近的平均形状。根据 QD 模型，对于线性极端波峰高度为 $\bar{\eta}_{1ST_m}$ 的波，其波峰到波谷高度 $\bar{H}_{1_{cm}}$（输出参数 \textbf{HCMAXE}，单位为米）的期望值表示为
+\begin{equation}
+\bar{H}_{1_{cm}}=\mathbb{E}\left\{H_{1_{cm}} \right\} = \bar{\eta}_{1ST_m}(1-\psi_1^* / \sigma^2),
+\label{eq_STE6}
+\end{equation}
+其中 $\psi_1^* < 0$ 是由谱计算得到的时间自协方差函数的第一个极小值：
+\begin{equation}
+\psi_1(\tau) = \int S(\omega) \cos{(\omega \tau)} d \omega,
+\label{eq_STE7}
+\end{equation}
+而 $\bar{\eta}_{1ST_m}  \psi_1^*/\sigma^2 < 0$ 是位于预期线性极端波峰高度 $\bar{\eta}_{1ST_m}$ 之前或之后的波谷的预期位移；该线性极端波峰高度通过在式~(\ref{eq_STE3}) 中令波陡 $\mu=0$ 计算得到。对于给定的线性波群，高度 $\bar{H}_{1_{cm}}$ 通常小于最大预期波高 $\bar{H}_{1_m}$（输出参数 \textbf{HMAXE}，单位为米），后者计算为
+\begin{equation}
+\bar{H}_{1_m}=\mathbb{E}\left\{H_{1_m} \right\} = \bar{\eta}_{1ST_m}\sqrt{2(1-\psi_1^* / \sigma^2)}.
+\label{eq_STE8}
+\end{equation}
+
+二阶非线性对波高的影响通常较小，特别是在窄带海况中；为降低计算成本，本实现中忽略该影响。$\bar{H}_{1_{cm}}$（输出参数 \textbf{HCMAXD}，单位为米）和 $\bar{H}_{1_m}$（输出参数 \textbf{HMAXD}，单位为米）的估计不确定性由 $\eta_{1ST_m}$ 的标准差确定（$\sigma_{1_m}$，通过在式~(\ref{eq_STE5}) 中令波陡 $\mu=0$ 计算），如下所示：
+\begin{eqnarray}
+std({H}_{1_m})&=&\sigma_{1_m}\sqrt{2(1-\psi_1^* / \sigma^2)}, \nonumber \\
+std({H}_{1_{cm}})&=&\sigma_{1_m}(1-\psi_1^* / \sigma^2).
+\label{eq_STE9}
+\end{eqnarray}
+
+要在 WAVEWATCH III 中启用波峰和波高时空极值计算，用户必须在 {\file ww3\_grid.inp} 的 {\F MISC} namelist 中为参数 {\code STDX}、{\code STDY} 和 {\code STDT} 指定不同于 -1 的值（-1 为默认值，在不需要这些参数时可避免计算开销）。{\code STDX} 和 {\code STDY} 是计算极值的空间尺度。{\code STDT} 是计算极值的时间长度。若 {\code STDX} 和 {\code STDY} 保持默认值（-1），但 {\code STDT} 的 namelist 值不同于默认值（例如大于 0），则会针对某一点给出时间上的极值。反之，若 {\code STDT} 保持默认值（-1），而 {\code STDX} 和 {\code STDY} 大于零，则计算空间上的瞬时极值。当三个参数均大于零时，则计算时空概率和值。
+
+波峰和波高时空极值输出遵循标准 WAVEWATCH III 参数框架，必须在 {\file ww3\_shel.inp} 或 {\file ww3\_multi.inp} 中以 namelist 或标志指定；此时它们会在模式运行期间包含在标准网格二进制输出文件中。因此，为获得最终的人类可读形式，也必须在网格输出后处理程序中指定它们。WAVEWATCH III 可用的时空极值输出参数见表~\ref{tab:ste_parm}。
+
+\begin{table}[h]
+\begin{center} \begin{tabular}{|l|c|c|} \hline \hline
+内部标签 & 用户接口标签 & 描述 \\ \hline
+STMAXE  &   MXE   & 最大海面高程 (STE) \\
+STMAXD  &   MXES  & 最大波峰的标准差 (STE) \\
+HMAXE   &   MXH   & 最大波高 (STE) \\
+HCMAXE  &   MXHC  & 从波峰估计的最大波高 (STE) \\
+HMAXD   &   SDMH  & MXH 的标准差 (STE) \\
+HCMAXD  &   SDMHC & MXHC 的标准差 (STE) \\ \hline
+\end{tabular}
+\end{center}
+\caption{波峰和波高时空极值计算中的用户定义参数。}
+\label{tab:ste_parm} \botline \end{table}

@@ -1,0 +1,16 @@
+\vsssub
+\subsubsection{~$S_{mud}$：黏性浮泥耗散（Ng）} \label{sec:BT9}
+\vsssub
+
+\opthead{BT9}{NRL/SWAN}{M. Orzech and E. Rogers}
+
+\noindent
+要使用 Ng 程序启用黏性浮泥效应，用户需在开关参数文件中指定 {\code BT9}。
+Ng 方法按如下方式计算 $k_i$：
+\begin{equation}\label{eq:dmud3}
+  k_i \approx {D_{mud}} \equiv \frac{\delta_m({B_r'}+{B_i'}){k_1}^2}{sinh2{k_1}{d}+2{k_1}{d}},
+\end{equation}
+这里，${\delta_m}$ 是泥沙的 Stokes 边界层厚度，${d}$ 是水深，${k_1}$ 是在泥水界面
+附近作 Taylor 展开时，受浮泥修正的波数 $k_{mud}$ 实部的首阶项；${D_{mud}}$ 则是
+$k_i$ 完整展开中的首阶项。$B'$ 是影响速度垂向剖面的复系数。更多细节见
+\para\ref{sec:BT8} 和 \cite{art:Ng00}。

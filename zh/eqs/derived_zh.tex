@@ -1,0 +1,32 @@
+\vssub
+\subsection{~派生参数} \label{sub:outpars}
+\vssub
+
+\subsubsection{方向坡度和近天底后向散射}
+在线性波假设下，海面坡度服从 Gaussian 分布，并由均方坡度张量 mss$_x$、mss$_y$、mss$_{xy}$ 完全描述。在 \ws\ 中，计算得到的 mss 参数包括顺波方向的 $\mathrm{mss}_u$，其方向由 $\mathrm{mss}_d$ 给出；以及垂直方向上的横波 $\mathrm{mss}_c$。
+
+因此，在把 $\mathrm{mss}_d$ 转为弧度后，波浪模式解析的（长）波的均方坡度张量为
+\begin{eqnarray}
+   \mathrm{mss}_{x,\mathrm{long}} &=& \mathrm{mss}_u \cos^2(\mathrm{mss}_d)+\mathrm{mss}_c \sin^2(\mathrm{mss}_d) \\
+   \mathrm{mss}_{y,\mathrm{long}} &=& \mathrm{mss}_u \sin^2(\mathrm{mss}_d)+\mathrm{mss}_c \cos^2(\mathrm{mss}_d) \\
+   \mathrm{mss}_{xy,\mathrm{long}}&=&0.5 (\mathrm{mss}_u - \mathrm{mss}_c) \sin(2 \mathrm{mss}_d)
+\end{eqnarray}
+若要与近天底光学或雷达数据（高度计、GPM 或 CFOSAT/SWIM 数据）的后向散射功率（$\sigma^0$）等观测进行比较，应在这些量上加入短波（高于模式最高频率）的贡献。
+   
+\subsubsection{Stokes 漂流剖面}
+海表 Stokes 漂流谱有两个分量，其计算为 \\
+{\code usf(IK)= SUM( E(IK,ITH)*ECOS(ITH)*DTH(ITH) )*DK(IK)*2*WN(IK,ISEA) *  FACT(KD)/DF(IK)}
+
+{\code vsf(IK)= SUM( E(IK,ITH)*ESIN(ITH)*DTH(ITH) )*DK(IK)*2*WN(IK,ISEA) *  FACT(KD)/DF(IK)}
+
+其中 WN 为波数，FACT(KD) 为无量纲水深的函数。
+
+由该谱可得到任意深度 $z$ 处的 Stokes 漂流，$z$ 由参考面 $z=0$ 起向上为正：
+
+Us(z)= SUM{IK=I1,I2} ( usf(IK) * FACT2(z,KD)*DF(IK))
+Vs(z)= SUM{IK=I1,I2} ( vsf(IK) * FACT2(z,KD)*DF(IK))
+
+这需要知道局地水深 D、平均海面 LEV 以及波数 WN(IK)。因此 KD=D*WN(IK) 是频率/波数索引 IK 的局地函数。
+
+系数 FACT2(z,KD) 在 KD $>$ 6 时等于 EXP(2*WN(IK)*(z-LEV))，否则为\\
+FACT2(z,KD)=COSH(2*WN(IK)*(z+H))/COSH(2*WN(IK)*D).

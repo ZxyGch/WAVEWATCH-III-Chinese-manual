@@ -1,0 +1,82 @@
+\vsssub
+\subsubsection{~$S_{ice}$：海冰阻尼（有效介质模型）} \label{sec:ICE5}
+\vsssub
+
+\opthead{IC5}{U. of Otago MATLAB code}{Q. Liu, E. Rogers, A. Babanin}
+
+\noindent
+表示海冰诱导波浪衰减的第五个选项（{\code IC5}）由 \citet{Liu2020} 引入。它提供
+三种不同模型来估计衰减率 $k_i$，包括两个黏弹性（VE）梁模型 \citep{art:MMS15}
+和一个黏性模型 \citep{Meylan2018}。
+
+两个 VE 模型，即扩展 Fox and Squire 模型 \citep[下文称 EFS 模型；另见][]{art:FS1994}
+以及 Robinson and Palmer 模型 \citep[][下文称 RP 模型]{Robinson1990}，都把无限长
+漂浮冰层描述为均匀 VE 介质，其特征由两个\emph{经验}流变参数表示，即冰层弹性剪切模量
+$G$ 和冰层黏性 $\eta$。在这一框架下，色散关系修正为 \citep{art:MMS15}：
+\begin{equation}
+Q g \kappa \tanh(\kappa d)-\sigma^2 = 0,
+\label{eq:vedisp}
+\end{equation}
+其中 $d$ 为水深，$\kappa = k_r + i k_i$ 为冰耦合波的复波数。实部
+$k_r = 2\pi / \lambda$ 表征海冰对波长的影响，$k_i$ 为波振幅衰减率。
+式 (\ref{eq:vedisp}) 中 EFS 和 RP 模型的 $Q$ 项为
+
+\begin{align}
+Q_{EFS} &= \frac{G_{\eta} h_i^3}{6 \rho_w g} (1+\nu) \kappa^4 - \frac{\rho_i h_i \sigma^2}{\rho_w g} + 1,\label{eq:fsdisp}\\
+%
+Q_{RP}  &= \frac{G h_i^3}{6 \rho_w g} (1+\nu) \kappa^4 - \frac{\rho_i h_i \sigma^2}{\rho_w g} + 1 - i \frac{\sigma \eta}{\rho_w g}.\label{eq:rpdisp}
+\end{align}
+这里 $\rho_w$（$\rho_i$）为水（海冰）密度，$h_i$ 为冰盖厚度，
+$G_{\eta}=G- i \sigma \rho_i \eta$ 为复剪切模量，$\nu \simeq 0.3$ 为海冰 Poisson 比。
+EFS 模型中的黏性参数 $\eta$ 具有运动黏性的量纲（单位：m$^2$ s$^{-1}$），而 RP 模型
+中的 $\eta$ 表示单位面积、单位速度上的常数黏性阻尼力
+\citep[单位：kg m$^{-2}$ s$^{-1}$；][]{Meylan2018}。由于二者高度相似，
+式 (\ref{eq:fsdisp}) 和 (\ref{eq:rpdisp}) 可用同一个 Newton-Raphson 迭代求解器计算
+\citep[见][]{Liu2020} 的附录。
+
+通过详细理论分析，\citet{Meylan2018} 指出，在假定 $k_r$ 与开阔水面波数 $k_0$
+偏离不大、且衰减率 $k_i$ 较弱时，上述两个 VE 模型预报
+\begin{align}
+k_i^{EFS} &\propto \eta h_i^3 \sigma^{11},\label{eq:fspw}\\ k_i^{RP} &\propto \frac{\eta}{\rho_w g^2} \sigma^3,\label{eq:rppw}
+\end{align}
+而先前现场测量 \citep[e.g.,][]{Meylan2018, RMK21} 支持幂律 $k_i \propto \sigma^n$，
+其中 $n$ 在 2 到 4 之间。式~(\ref{eq:fspw}) 和 (\ref{eq:rppw}) 表明，在某些状态下
+（即 $k_r \approx k_0$ 且 $k_i$ 较低），EFS 模型的 $k_i$ 对波频率过于敏感，而 RP
+模型的 $k_i$ 不显示对冰厚的依赖。
+
+{\code IC5} 模块包含的第三个模型基于 \citet[][其第 6.2 节；下文称 M2 模型]{Meylan2018}
+提出的 ``Model with Order 3 Power Law''。该模型假设波能损失与水平冰速平方乘以冰厚
+成正比。衰减率为
+\begin{equation}
+k_i^{M2} = \frac{\eta h_i}{\rho_w g^2} \sigma^3,
+\label{eq:m2pw}
+\end{equation}
+其中 $k_i$ 随 $h_i$ 线性缩放，这类似于 \citet{art:Dob15} 在 pancake ice 下收集的
+现场测量；$\eta$ 的单位为 kg m$^{-3}$ s$^{-1}$。
+
+与 {\code IC3} 相同，{\code IC5} 需要四个海冰输入参数：$C_{ice, 1}$ 为冰厚 $h_i$
+（m），$C_{ice, 2}$ 为\emph{有效}黏性 $\eta$（单位随所选模型而变化，见上文），
+$C_{ice, 3}$ 为冰密度 $\rho_i$（kg m$^{-3}$），$C_{ice, 4}$ 为\emph{有效}剪切模量
+$G$（Pa）\footnote{该参数与 M2 模型无关；选择 M2 模型时可简单使用 $G=1$ Pa。}。
+\citet{Liu2020} 给出了 {\code IC5} 模块在两个案例研究中的应用。关于如何使用该海冰
+模块的示例，请读者参阅该论文和回归测试 {\code ww3\_tic1.1}。
+
+Namelist {\F SIC5} 包含下列参数：
+\begin{clist}
+\cit{IC5MINIG} {允许的最小剪切模量 $G$；默认= 1 Pa（即不允许零 $G$）。}
+%
+\cit{IC5MINWT} {允许的最小波周期 $T$；默认=0 s（即默认不使用该选项）。}
+%
+\cit{IC5MAXKRATIO} {允许的最大 $k_{ow}/k_r$，其中 $k_{ow}$ 为开阔水面波数；默认=1E9（即默认不使用该选项）。}
+%
+\cit{IC5MAXKI} {允许的最大 $k_i$；默认=100 m$^{-1}$（即默认不使用该选项）。}
+%
+\cit{IC5MINHW} {允许的最小水深 $d$；默认=0 m（即默认不使用该选项）。}
+%
+\cit{IC5MAXITER} {允许的最大迭代次数；默认=100。}
+%
+\cit{IC5VEMOD} {要选择的海冰模型：1 - {\code EFS}，2 - {\code RP}，3 - {\code M2}；默认=3（即\textbf{选择 {\code M2} 模型}）。}
+\end{clist}
+前 6 个参数被引入以提高 EFS 模型数值求解器的稳定性
+\citep[在少数情况下，特别是水深 $d$ 较浅且 $G$ 较低时，求解器可能在短波周期下失败；见][]{Liu2020}。
+不过，自 7.12 版起，M2 模型成为默认选项，因此默认不使用这些限制器。

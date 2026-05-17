@@ -1,0 +1,18 @@
+\vsssub
+\subsubsection{多网格壳程序} \label{sec:ww3multi}
+\vsssub
+
+\proddefH{ww3\_multi}{w3mlti}{ww3\_multi.ftn}
+\proddeff{输入}{ww3\_multi.nml}{Namelist 配置文件。}{8} (App.~\ref{sec:config102})
+\proddefa{ww3\_multi.inp}{传统配置文件。}{8} (App.~\ref{sec:config101})
+\proddeff{输出}{standard out}{程序的格式化输出。}{6}
+\proddefa{log.mww3}{波浪模式驱动器的输出日志。}{9}
+\proddefa{test.mww3\opt}{波浪模式的测试输出。}{auto}
+
+\vspace{\baselineskip}
+\noindent
+该波浪模式程序需要并产生大量输入和输出文件，这些文件与 \para\ref{sec:ww3shel} 中 {\file ww3\_shel} 的文件一致；其中，文件扩展名 {\file .ww3} 会替换为特定网格的标识符。注意，所有文件均按名称打开，单元号分配是动态且自动的。
+
+为使所有现有功能可用，现已有一个使用 namelist 的新版输入文件。这是未来将支持的版本，因为它可更灵活地添加新功能。{\bf 请注意，4.8.2 之前版本的 GCC 编译器不支持 namelist 形式。}
+
+\pb

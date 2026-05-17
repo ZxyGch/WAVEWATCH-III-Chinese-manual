@@ -1,0 +1,61 @@
+\vsssub
+\subsubsection{~依赖海况的 $\tau$：Reichl et al. 2014} \label{sec:FLD1}
+\vsssub
+
+\opthead{FLD1}{\ws}{B. Reichl}
+
+\paragraph{Reichl et al., 2014 的风应力}
+
+在 \citet{art:Rei14} 中，总应力随高度保持常数，但按高度分解为两个分量：
+\begin{equation}
+\vec{\tau}=\vec{\tau}_t(z)+\vec{\tau}_f(z),
+\end{equation}
+其中 $\tau_t$ 为湍流应力，在非常接近海面的地方等于黏性应力。波形状应力可表示为：
+\begin{equation}
+\vec{\tau}_f(z)=\rho_w\int^{k=\delta/z}_{k_{min}} \int^\pi_{-\pi}\beta_g(k,\theta) \sigma F(k,\theta) d\theta {\vec{k}} dk,
+\end{equation}
+也就是说，高度 $z$ 处的波形状应力等于对海面处波形状应力在低于 $k=\delta/z$ 的波数范围内积分，其中 $\delta/k$ 是波数为 $k$ 的波对应的内层高度 \citep{art:Har04}。该表达式由如下假设推导而来：波致应力从海面到内层高度范围内显著，而在更高处可忽略。由于在海面处
+\begin{equation}
+\vec{\tau}=\vec{\tau}_\nu+\vec{\tau}_f(z=0)=\vec{\tau}_\nu+\rho_w\int^{k_{max}}_{k_{min}} \int^\pi_{-\pi}\beta_g(k,\theta) \sigma F(k,\theta) d\theta {\vec{k}} dk,
+\end{equation}
+高度 $z$ 处的湍流应力可表示为：
+\begin{equation}
+\vec{\tau}_t(z)=\vec{\tau}_\nu+\rho_w\int^{k_{max}}_{k=\delta/z} \int^\pi_{-\pi}\beta_g(k,\theta) \sigma F(k,\theta) d\theta {\vec{k}} dk.
+\end{equation}
+
+在该模型中，假定内层高度 $z=\delta/k$ 处的湍流应力决定波数为 $k$ 的波的增长率：
+\begin{equation}
+\beta_g(k,\theta)=c_\beta \sigma\frac{\left|\tau_t(z=\delta/k)\right|}{\rho_wc^2}\cos^2(\theta-\theta_\tau),
+\end{equation}
+其中 $\theta_\tau$ 是内层高度处湍流应力的方向。使用内层高度处的湍流应力代替总风应力，是因为较长波会削弱较短波受到的有效风强迫（波浪遮蔽）。
+
+增长率系数 $c_\beta$ 随波相速与局地湍流摩擦速度（内层高度处的摩擦速度）之比而变化，$u_\star^l=\sqrt{\tau_t(z=\delta/k)/\rho_a)}$。
+\begin{equation}
+c_{\beta}=\left\{
+\begin{array}{cll} 
+25  &: \cos(\theta-\theta_w)>0 \hspace{2mm}&:c/u_{\star}^l<10\\
+10+15\cos[\pi(c/u_\star-10)/15]   &:&:10\le c/u_{\star}^l<25 \\
+-5  &:&:25\le c/u_{\star}^l\\
+-25  &: \cos(\theta-\theta_w)<0 &\\
+\end{array}
+\right.
+\end{equation}
+
+风廓线在波边界层中利用能量守恒约束显式计算。从黏性子层顶部到最短波的内层高度，风切变表示为：
+\begin{equation}
+\frac{d {\vec{u}}}{\partial z}=\frac{\rho_a}{\kappa z}\left|\frac{ \vec{\tau}_\nu}{\rho_a}\right|^{3/2}\frac{\vec{\tau}_\nu}{\vec{\tau}_\nu\cdot\vec{\tau}_{tot}}\hspace{3mm}{\rm for}\hspace{3mm}z_\nu<z<\delta/k_l.
+\end{equation}
+在最短波的内层高度与最长波的内层高度之间，风切变表示为：
+\begin{equation}
+\frac{d {\vec{u}}}{\partial z}=\left[ \frac{\delta}{z^2}\tilde{F}_w\left(k=\frac{\delta}{z}\right)+\frac{\rho_a}{\kappa z}\left| \frac{\vec{\tau}_t(z)}{\rho_a}\right|^{3/2} \right]\times\frac{\vec{\tau}_t(z)}{\vec{\tau}_t(z)\cdot\vec{\tau}_{tot}}\hspace{3mm}{\rm for}\hspace{3mm}\delta/k_l\le z,
+\end{equation}
+其中 $\tilde{F}_w(k=\delta/z)$ 是表面波吸收的能量：
+\begin{equation}
+\tilde{F}_w(k=\delta/z)=\rho_w\int^{\pi}_{-\pi}\beta_g(k,\theta)gF(k,\theta)k d\theta.
+\end{equation}
+最后，在最长波的内层高度以上，波浪影响可忽略，风切变沿风应力方向排列：
+\begin{equation}
+\frac{d{\vec{u}}}{dz}=\frac{u_\star}{\kappa z}\frac{\vec{\tau}_{tot}}{|\vec{\tau}_{tot}|}.
+\end{equation}
+
+注意，使用 FLD1 开关时，黏性应力、摩擦速度、表面粗糙长度和 Charnock 参数的内部变量和输出值会被重新计算并覆盖。

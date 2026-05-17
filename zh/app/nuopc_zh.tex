@@ -1,0 +1,87 @@
+\pagestyle{myheadings} \setcounter{page}{1} \setcounter{footnote}{0}
+
+\section{~与 NUOPC 耦合} \label{app:nuopc}
+\newcounters
+
+\vssub
+\subsection{~引言} \label{sec:nuopcintro}
+\vssub
+
+从 v6.02 起，\ws\ 具有一个分量 cap {\code wmesmf}，它通过 National
+Unified Operational Prediction Capability（NUOPC）
+\footnote{https://earthsystemcog.org/projects/nuopc/} Layer 与多网格例程
+建立接口；NUOPC 规定使用 Earth System Modeling Framework（ESMF）
+\footnote{https://www.earthsystemcog.org/projects/esmf/} 与大气、海洋、冰和
+风暴潮模式等其他地球系统耦合。该 cap 旨在保持灵活，并已在 NOAA 和美国
+海军的多个不同耦合模式中使用。本节说明如何构建、安装、配置和运行 NUOPC
+cap。它假定读者具备 \ws\ 的基本知识。
+
+\vssub
+\subsection{~构建和安装 NUOPC Cap} \label{sec:nuopcbuild}
+\vssub
+
+若要生成一个库，使其中包含可纳入 NUOPC 耦合模式的 \ws\ 代码和 cap，请使用
+{\code model\/esmf\/Makefile}。例如，在 NOAA Environmental Modeling System
+（NEMS）中，命令为：
+\command{make ww3\_nems}
+该 makefile 随后会调用 {\code w3\_make}。作为这一过程的一部分，还会创建
+一个 nuopc.mk makefile 片段，用来告诉 NUOPC/ESMF \ws\ 库的位置。
+
+注意有一个新的开关 {\code WRST}，它会把 10 m 风加入重启动文件，并在波浪
+模式初始时间步使用该风场。这可用于耦合大气模式在初始化时没有 10 m 风速的
+情况。
+
+\vssub
+\subsection{~NUOPC Cap 中的导入/导出场} \label{sec:nuopcfields}
+\vssub
+
+可用的导入和导出场列在下面。有关如何为某个导入场激活耦合的信息，请参见
+第~\ref{sec:nuopcconfig} 节。
+
+\noindent 导入场：
+\begin{itemize}
+\item sea\_surface\_height\_above\_sea\_level
+\item surface\_eastward\_sea\_water\_velocity
+\item surface\_northward\_sea\_water\_velocity
+\item eastward\_wind\_at\_10m\_height
+\item northward\_wind\_at\_10m\_height
+\item sea\_ice\_concentration
+\end{itemize}
+
+\noindent 导出：
+\begin{itemize}
+\item wave\_induced\_charnock\_parameter
+\item wave\_z0\_roughness\_length
+\item eastward\_stokes\_drift\_current
+\item northward\_stokes\_drift\_current
+\item eastward\_wave\_bottom\_current
+\item northward\_wave\_bottom\_current
+\item wave\_bottom\_current\_period
+\item eastward\_wave\_radiation\_stress
+\item eastward\_northward\_wave\_radiation\_stress
+\item northward\_wave\_radiation\_stress
+\end{itemize}
+
+
+\vssub
+\subsection{~NUOPC Cap 输入文件配置} \label{sec:nuopcconfig}
+\vssub
+
+所需的 \ws\ 输入文件是 ww3\_multi.inp 或 ww3\_multi.nml 文件。若要指定某个
+特定输入场通过耦合而非文件获取，需要在该输入场的输入网格说明前放置
+`CPL:'。
+
+注意，NUOPC cap 当前的限制是只能有一个输入网格（无论它是模式网格之一还是
+输入网格）和一个导出网格（如果有多个计算网格，则为第一个计算网格）。网格
+可以是非结构网格或结构网格。
+
+注意，虽然运行的起止时间由 NUOPC 驱动程序决定，输出的起始时间、结束时间
+和频率仍由 ww3\_multi 输入文件决定。
+
+\vssub
+\subsection{~运行 NUOPC Cap} \label{sec:nuopcrun}
+\vssub
+
+该 cap 设计为用于耦合系统，这超出了本文档的范围。{\code
+regtest/run\_esmf\_test\_suite} 脚本提供了一个运行独立 \ws\ cap 回归测试
+的脚本。

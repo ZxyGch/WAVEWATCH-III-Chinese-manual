@@ -1,0 +1,29 @@
+\vssub
+\subsection{~空间传播} \label{sub:xy_prop}
+\vssub
+\subsubsection{~一般概念}
+\vsssub
+
+\ws\ 中的空间传播由式 (\ref{eq:bal_f_grid}) 的前几项描述。对于球坐标 [式 (\ref{eq:bal_sphere})]，相应的空间传播步骤为
+
+%----------------------------%
+% Step : Spatial propagation %
+%----------------------------%
+% eq:step_xy_prop
+
+\begin{equation}
+\frac{\p \cN}{\p t} + \frac{\p}{\p \phi} \, \dot{\phi} \cN +
+\frac{\p}{\p \lambda} \, \dot{\lambda} \cN = 0
+\: , \label{eq:step_xy_prop} 
+\end{equation}
+
+\noindent 
+其中被传播的量 $\cN$ 定义为 $\cN \equiv N \, c_g^{-1} \, \cos\phi$。对于 Cartesian 网格，可得到类似方程，其中 $\cN \equiv N \, c_g^{-1}$。本节仅给出更复杂的球面网格方程。转换到 Cartesian 网格通常是一种简化，而且是直接的。
+
+式~(\ref{eq:step_xy_prop}) 在形式上与常规深水传播方程相同，但同时包含有限水深和流的影响。在陆海边界处，假定向陆地传播的波作用量被吸收且不反射，离岸传播的波在岸线处假定无能量。对于规定边界条件的所谓“活动边界点”，也采用类似方法。传播到这些点的作用量被吸收，而边界点处的作用量用于估计进入模式的分量的作用量通量。
+
+空间网格可使用两种不同坐标系统：一种是“平面” Cartesian 坐标系，通常用于小尺度和理想化测试应用；另一种是球面（纬度-经度）系统，用于大多数真实应用。在模式 3.14 版中，坐标系统通过 {\code XYG} 或 {\code LLG} 开关在编译时选择。在较新的模式版本中，网格类型已成为在 {\file ww3\_grid} 中定义并存储于 {\file mod\_def.ww3} 文件中的变量。
+
+球面网格可选择简单闭合，使其在经度方向周期化，例如能量可从网格最大经度向东传播到网格最小经度。该闭合之所以称为“简单”，是因为跨过这条“接缝”时纬度索引不变。也允许“非简单”闭合类型，它与三极网格有关。三极网格是一种不规则网格，因此该闭合将在 (\ref{sub:num_space_curv}) 中进一步讨论。
+ 
+直到模式 3.14 版，\ws\ 只考虑规则离散网格，其中两个主网格轴 ($x,y$) 使用常数增量 $\Delta x$ 和 $\Delta y$ 离散。在模式 \WWver\ 中，加入了包括曲线网格和非结构网格在内的附加选项。以下小节将先讨论这些网格方法，然后再处理额外的传播问题，包括 Garden Sprinkler Effect（\ref{sub:num_GSE}）、连续移动网格（\ref{sub:num_move}）、未解析岛屿（\ref{sub:num_obst}）和旋转网格（\ref{sub:num_space_rotagrid}）。

@@ -1,0 +1,122 @@
+\vsssub
+\subsubsection[~$S_{nl}$：双尺度近似（TSA）]{~$S_{nl}$：双尺度近似（TSA）和完整 Boltzmann 积分（FBI） \label{sec:NL4}}
+\vsssub
+
+\opthead{NL4，INDTSA=1 时为 TSA，INDTSA=0 时为 FBI}{完整 Boltzmann 积分}{B. Toulany, W. Perrie, D. Resio \& M. Casey}
+
+
+\noindent
+Boltzmann 积分描述由于四个波数之间的共振相互作用，某一特定波数处作用量密度的变化率。这些波数必须满足共振关系：
+\begin{equation}
+{\bf k}_1 +{\bf k}_2 = {\bf k}_3+{\bf k}_4. 
+\end{equation}
+
+\ws\ 中实现的用于计算非线性相互作用的双尺度近似（Two-Scale Approximation, TSA）基于 \cite{art:Resio2008}（下文记为 RP08）、\cite{art:Perrie2009}、\cite{art:Resio2011} 和 \cite{art:Perrie2013}。从 Boltzmann 积分角度描述 TSA 与 WRT 方法的描述相近。这里重点讨论 TSA 的推导以及它与 WRT 方法的差异。
+
+从 RP08 的式（2）出发，从波数 ${\bf k}_3$ 向波数 ${\bf k}_1$ 的传递率积分记为 $T({\bf k}_1,{\bf k}_3 )$，满足：
+\begin{equation}
+\frac{\partial n({\bf k}_1)}{\partial t} = \int \int T ({\bf k}_1,{\bf k}_3 ) d {\bf k}_3 \label{eq:nl4_2}
+\end{equation}    
+它可（如 RP08 所示）重写为：
+\begin{eqnarray}
+T({\bf k}_1,{\bf k}_3 ) &=& 2 \oint [n_1 n_3 (n_4-n_2) +n_2n_4(n_3-n_1)] C({\bf k}_1,{\bf k}_2,{\bf k}_3,{\bf k}_4)\nonumber \\
+&& \vartheta (|{\bf k}_1-{\bf k}_4|-|{\bf k}_1-{\bf k}_3|) \left|\frac{\partial W}{\partial \eta}\right|^{-1} ds \nonumber\\
+& \equiv & 2 \oint N^3 C \vartheta \left|\frac{\partial W}{\partial \eta}\right|^{-1} ds \label{eq:nl4_3}
+\end{eqnarray}
+这是沿轮廓 $s$ 的线积分，其中函数 $W$ 定义为
+\begin{equation}
+W = \omega_1+\omega_2-\omega_3-\omega_4
+\end{equation}
+其中 $\vartheta$ 为 Heaviside 函数，且 ${\bf k}_2={\bf k}_2(s,{\bf k}_1,{\bf k}_3)$。这里，$n_i$ 是 ${\bf k}_i$ 处的作用量密度；函数 $W = \omega_1+\omega_2-\omega_3-\omega_4$ 要求相互作用在 $s$ 上守恒能量。$s$ 是满足 $W=0$ 的点的轨迹，$\eta$ 是该轨迹的局部正交方向。注意，式（\ref{eq:nl4_3}）与第 \ref{sec:NL2} 节 WRT 的式（\ref{eq:WRT_T2}）相似，其中耦合系数 $C$ 等于 WRT 耦合系数 $G$ 的一半。
+
+\paragraph{TSA 和 FBI}
+
+对于 FBI 以及 WRT，我们以数值方式把式（\ref{eq:nl4_3}）的离散形式计算为许多线积分的有限和：对 ${\bf k}_1$ 和 ${\bf k}_3$ 的所有离散组合，在轨迹 $s$ 周围计算 $T({\bf k}_1,{\bf k}_3 )$。线积分通过把轨迹划分为有限个线段来确定，每段长度为 $ds$。一次完整的“精确”计算代价很高，需要 DIA 运行时间的 $10^3-10^4$ 倍。
+
+TSA 的方法是把方向谱分解为一个\textit{参数化}（\textit{大尺度}）谱和一个（\textit{局地尺度}）非参数化\textit{残差}分量。残差分量使分解能够保留与原始谱相同的自由度数，这是 3G 模型中非线性传递源项所要求的前提。如引用文献所述，这种分解把非线性波--波相互作用表示为\textit{大尺度}相互作用、\textit{局地尺度}相互作用以及\textit{交叉项}：即谱的大尺度分量与局地尺度分量之间的相互作用。该方法允许预先计算大尺度相互作用以及局地尺度相互作用的某些部分。TSA 的精度取决于用于表示大尺度分量的参数化方案的精度。
+
+我们首先把给定的作用量密度谱 $n_i$ 分解为\textit{参数化}大尺度项 $\hat{n}_i$ 和\textit{残差}局地尺度（或“\textit{扰动尺度}”）项 $n'_i$。假设大尺度项 $\hat{n}_i$ 具有 JONSWAP 型形式，只依赖少数参数，
+\begin{equation}
+		n'_i=n_i-\hat{n}_i
+\end{equation}			
+TSA 的精度取决于 $\hat{n}_i$：如果用于 $\hat{n}_i$ 的自由度数接近给定波谱 $n_i$ 的自由度数，则局地尺度 $n'_i$ 会变得很小，因此 TSA 会非常精确。然而，为 $\hat{n}_i$ 建立大型多维预计算矩阵集合非常耗时。因此，最优的 TSA 形式必须尽量减少 $\hat{n}_i$ 所需的参数数量。不过，即使对于复杂的多峰谱 $n_i$，仍可使用一小组参数使 $\hat{n}_i$ 捕捉谱的\textit{大部分}特征，从而使残差 $n'_i$ 较小（RP08；\cite{art:Perrie2009}）。
+ 
+RP08 描述了对 $n_i$ 的划分方式，使得式（\ref{eq:nl4_3}）中的传递积分 $T$ 由\textit{大尺度}项 $\hat{n}_i$（记为 $B$）、\textit{局地尺度}项 $n'_i$（记为 $L$），以及 $\hat{n}_i$ 和 $n'_i$ 的\textit{跨尺度项}（记为 $X$）之和组成。因此非线性传递项可表示为
+\begin{equation}
+S_{nl}(f,\theta) = B+L+X \label{eq:nl4_6}
+\end{equation}
+其中 $B$ 依赖 JONSWAP 型参数 $x_i$，并可预先计算，
+\begin{equation}
+S_{nl}(f,\theta)_{broadscale} = B(f,\theta,x_1,\ldots,x_n). \label{eq:nl4_7}
+\end{equation}
+TSA 需要为 $L+X$ 寻找准确且高效的近似。如果式（\ref{eq:nl4_6}）中的所有项都按 FBI 的方式计算，相比式（\ref{eq:nl4_6}）中的 $B$，计算量可能增加 $8\times$。这种方法虽可用于考察双峰波谱的一般问题，例如混合海况和涌浪中通过从两个谱区之和的相互作用中减去单一谱区的相互作用来分析问题，但它不如使用\textit{拆分}密度函数那样直观，因为在后者中交叉相互作用项可以用代数方式考察。
+
+
+无论如何，为了简化式（\ref{eq:nl4_6}），涉及 $n'_2$ 和 $n'_4$ 的项被忽略。这里假设这些局地尺度项只是围绕大尺度项 $\hat{n}_2$ 和 $\hat{n}_4$ 的偏差，而后者应能捕捉谱的大部分；与此同时，$n'_2$ 和 $n'_4$ 的正/负差值及乘积往往相互抵消。TSA 与测试谱的 FBI（或 WRT）结果的一致能力被用来支持这一处理。此外，大尺度项 $\hat{n}_2$ 和 $\hat{n}_4$ 沿轨迹 $s$ 往往具有更长的长度，因此应对净传递积分贡献更大。因此，RP08 表明
+\begin{equation}
+S_{nl}(k_1) = B+L+X=B + \int\int \oint N^3_* C\left| \frac{\partial W}{\partial n} \right|^{-1} ds k_3 d\theta_3dk_3, \label{eq:nl4_8}
+\end{equation}                   
+其中 $N^3_*$ 是在忽略涉及 $n'_2$ 和 $n'_4$ 的项之后，所有交叉项中剩余的部分，
+\begin{equation}
+N^3_*=\hat{n}_2 \hat{n}_4 (n'_3-n'_1)+n'_1 n'_3(\hat{n}_4-\hat{n}_2)+\hat{n}_1n'_3(\hat{n}_4-\hat{n}_2)+n'_1\hat{n}_3(\hat{n}_4-\hat{n}_2),.
+\end{equation}
+他们还使用已知的缩放关系，并配合具体参数化，例如基于 $f^{-4}$ 或 $f^{-5}$ 的谱。为实现这一形式，我们通常分别拟合每一个峰。
+
+
+需要注意的是，为了加快计算，会生成一组预计算的多维数组并保存到文件中。例如，网格几何数组和梯度数组是谱参数、轨迹上的线段数和水深的函数，文件名形如 `\textbf{grd\_dfrq\_nrng\_nang\_npts\_ndep.dat}'，例如 `grd\-\_1.1025\-\_35\-\_36\-\_30\-\_37\-.dat' 等。
+
+TSA 主子程序 W3SNL4（位于 w3snl4md.ftn）流程图如下：
+{\footnotesize 
+\begin{verbatim}
+           /
+          |
+          |*** 它由以下过程调用：
+          |    -----------------
+          |    (1) w3srcemd.ftn 中的 W3SRCE；用于在单点计算并积分源项
+          |    (2) gx_outp.ftn 中的 GXEXPO；用于执行点输出
+          |    (3) ww3_outp.ftn 中的 W3EXPO；用于执行点输出
+          |    (4) ww3_ounp.ftn 中的 W3EXNC；用于执行点输出
+          |*** 它也可由以下过程调用：
+          |    (5) w3iogrmd.ftn 中的 W3IOGR；用于执行 "mod_def.ww3" 的 I/O
+          |
+W3SNL4 -->| 
+          |
+          |*** 它调用：
+          |    ---------
+          |               /
+          |              |
+          |              |*** 它由以下过程调用：
+          |              |    -----------------
+          |              |    w3snl4md.ftn 中的 W3SNL4；TSA 主子程序
+          |              |*** 它也可由子程序 W3IOGR 调用
+          |              |    w3iogrmd.ftn 中的 W3IOGR；mod_def.ww3 的 I/O
+          |              |
+          |              |*** 它调用：
+          |              |    ---------
+          |              |--> wkfnc（函数）
+          |              |--> cgfnc（函数）
+          |(1)           |
+          |--> INSNL4 -->|                 /
+          |              |                |--> shloxr（使用函数 wkfnc）
+          |              |--> gridsetr -->|--> shlocr
+          |              |                |--> cplshr
+          |              |                 \
+          |(2)            \
+          |--> optsa2
+          |
+          |                 /
+          |(3)             |    如果 (ialt=2)
+          |--> snlr_tsa -->|--> interp2
+          |                |
+          |                 \
+          |
+          |
+          |                 /
+          |(4)             |    如果 (ialt=2)
+          |--> snlr_fbi -->|--> interp2
+          |                |
+          |                 \
+          |
+           \ 
+\end{verbatim}
+ }

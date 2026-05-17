@@ -1,0 +1,104 @@
+\vsssub
+\subsubsection{~多网格模块} \label{sec:multi_mod}
+\vsssub
+
+多网格波浪模式壳程序 {\file ww3\_multi} 在上一节所述基本波浪模式外提供
+一层壳。该壳负责管理多个波浪模式网格的并列运行，以及网格之间的所有通信。
+为此开发了多个附加模块。其核心是初始化、多网格模式和结束处理例程。
+
+\vspace{\baselineskip} \noindent
+多网格模式初始化 \hfill {\file wminitmd.ftn}
+
+\begin{flisti}
+\fit{wminit}{多网格模式初始化。}
+\end{flisti}
+
+\noindent
+多网格模式运行 \hfill {\file wmwavemd.ftn}
+
+\begin{flisti}
+\fit{wmwave}{多网格模式执行。}
+\fit{wmprnt}{打印到日志文件。}
+\fit{wmbcst}{非阻塞 MPI 广播。}
+\fit{wmwout}{同上。}
+\end{flisti}
+
+\noindent
+多网格模式结束处理 \hfill {\file wmfinlmd.ftn}
+
+\begin{flisti}
+\fit{wmfinl}{多网格模式结束处理。}
+\end{flisti}
+
+\noindent
+这些例程设计为耦合模式的一部分。实际波浪模式例程的结构可参考
+\cite{tol:MMAB07b}。由此形成的波浪模式驱动器 {\file ww3\_multi} 因而变得
+极为简单：它初始化 MPI 环境，然后依次调用上述三个模块。
+
+主要的多网格波浪模式例程需要扩展 \ws\ 使用的数据结构。此外，主要活动被
+汇集到多个模块中的子程序内。
+
+\vspace{\baselineskip} \noindent
+数据存储 \hfill {\file wmmdatmd.ftn}
+
+\begin{flisti}
+\fit{wmndat}{设置需要考虑的网格数量。}
+\fit{wmdimd, wmdimm}{}
+\fit{      }{设置维度并分配存储空间。}
+\fit{wmsetm}{设置指向所选网格的指针。}
+\end{flisti}
+
+\noindent
+确定网格关系 \hfill {\file wmgridmd.ftn}
+
+\begin{flisti}
+\fit{wmglow}{与较低等级网格的关系。}
+\fit{wmghgh}{与较高等级网格的关系。}
+\fit{wmgeql}{同等级网格之间的关系。}
+\fit{wmrspc}{确定网格之间是否需要谱转换。}
+\end{flisti}
+
+\noindent
+更新模式输入 \hfill {\file wmupdtmd.ftn}
+
+\begin{flisti}
+\fit{wmupdt}{通用输入更新例程。}
+\fit{wmupd1}{使用 \para\ref{sec:aux_mod} 中 {\file w3fldsmd.ftn} 从原生文件
+             更新输入。} 
+\fit{wmupd2}{从预定义输入网格更新输入。}
+\fit{wmupdv}{更新矢量场。}
+\fit{wmupds}{更新标量场。}
+\end{flisti}
+
+\noindent
+执行内部通信 \hfill {\file wminiomd.ftn}
+
+\begin{flisti}
+\fit{wmiobs}{暂存内部边界数据。}
+\fit{wmiobg}{汇集内部边界数据。}
+\fit{wmiobf}{结束 {\F wmiobs}（仅 MPI）。}
+\fit{wmiohs}{暂存内部高等级到低等级数据。}
+\fit{wmiohg}{汇集内部高等级到低等级数据。}
+\fit{wmiohf}{结束 {\F wmiohs}（仅 MPI）。}
+\fit{wmioes}{暂存同等级网格之间的内部数据。}
+\fit{wmioeg}{汇集同等级网格之间的内部数据。}
+\fit{wmioef}{结束 {\F wmioes}（仅 MPI）。}
+\end{flisti}
+
+\noindent
+将点输出统一到单个文件 \hfill {\file wmiopomd.ftn}
+
+\begin{flisti}
+\fit{wmiopp}{初始化例程。}  
+\fit{wmiopo}{数据汇集和写入例程（使用 {\file w3iopomd.ftn} 中的
+             {\F w3iopo}）。}
+\end{flisti}
+
+\noindent
+为完整构建多网格波浪模式，还需要一个附加服务模块。服务模块的实际内容
+见源代码文件中的文档。
+
+\begin{flist}
+\fit{wmunitmd.ftn}{动态单元号分配}
+\fit{wmscrpmd.ftn}{SCRIP 工具。}
+\end{flist}

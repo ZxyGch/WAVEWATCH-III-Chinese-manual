@@ -1,0 +1,174 @@
+\vssub
+\subsection{~WAVEWATCH III\textsuperscript{\textregistered} 开发组（WW3DG）\label{sec:WW3DG}}
+\vssub
+
+\ww\ 的发展依赖一支开发团队的长期投入；他们使其成为有效的社区工具。
+随着可用物理和数值参数化方案不断扩展，本模式的贡献者名单也持续增长。
+开发组由两部分组成：一是参与总体代码开发、调试和优化的核心开发者；
+二是已经或仍在为物理包和数值方法作出贡献的更大范围贡献者群体。
+以下按字母顺序列出该开发组过去和现在的贡献者：
+
+\begin{list}{\ldots}{ }
+
+\item [Abdolali, Ali] (UCAR at NOAA/NCEP/EMC, USA) \\
+  非结构网格、并行效率、波浪--风暴潮耦合，以及 \ws\ 通用代码开发支持和代码管理。
+
+\item [Accensi, Mickael] (LOPS, France) \\
+  输入和输出中的 NetCDF（ww3\_prnc、ww3\_bounc、ww3\_ounf、ww3\_ounp、ww3\_trnc）、
+  namelist 输入文件、OASIS 耦合、安装和编译环境，以及通用代码开发支持。
+
+\item [Alves, Jose-Henrique] (SRG at NOAA/NCEP/EMC, USA) \\
+  浅水物理包、时空波高极值方法开发，以及 \ws\ 通用代码开发支持和代码管理。
+
+\item [Ardhuin, Fabrice] (LOPS, France, previously at SHOM) \\
+  多种参数化包（ST3、ST4、BS1、BT4、IG1、REF1、IS2 等）、与非结构网格格式的接口、
+  潮汐分析，以及部分 I/O 工作（通量估算、NetCDF 适配）。
+
+\item [Babanin, Alexander] (University of Melbourne, Australia)\\
+  ST6 项目负责人；源函数（风输入、白帽耗散、涌浪耗散、负输入、物理约束）；
+  海冰源函数 IC5；广义动力学方程 NL5。
+
+\item [Barbariol, Francesco] (ISMAR-CNR, Italy) \\
+  时空波高极值方法开发。
+
+\item [Benetazzo, Alvise] (ISMAR-CNR, Italy) \\
+  时空波高极值方法开发。
+
+\item [Bidlot, Jean] (ECMWF, UK) \\
+  物理包 ST3 更新。
+
+\item [Booij, Nico] (Delft University of Technology, The Netherlands, retired) \\
+  源代码预处理器（{\code w3adc}）原始设计、基本文档方法和其他编程习惯；
+  空间变化波数网格。
+
+\item [Boutin, Guillaume] (LOPS, France) \\
+  对 IS2 和 IC2 的贡献。
+
+\item [Bunney, Chris] (Met Office, UK) \\
+  SMC 网格的额外谱分区方案和 netCDF 输出。
+
+\item [Campbell, Tim] (Naval Research Laboratory, USA)\\
+  搜索和重网格化工具、不规则网格、回归测试 shell 脚本、ESMF 接口模块，
+  以及总体代码开发支持。
+
+\item [Chalikov, Dmitry V.] (Formerly UCAR at NOAA/NCEP/EMC) \\
+  \cite{tol:JPO96} 输入和耗散参数化及源代码的共同作者。
+
+\item [Chawla, Arun](NOAA/NCEP/EMC, USA) \\
+  NCEP 代码开发支持、GRIB 打包、自动网格生成软件 \citep{tol:MMAB07a, tol:OMOD08a}。
+
+\item [Cheng, Sukun] (while at Clarkson University, USA) \\
+  原始代码作者；该代码后来被移植到 WW3（模式版本 5）中，作为改进的海冰对波浪影响
+  ``IC3'' 参数化。
+
+\item [Collins, Clarence] (while an NRL/ASEE post-doc, USA) \\
+  IC4（海冰源函数）的创建。
+
+\item [Filipot, Jean-Fran{\c c}ois] (France Energy Marine, formerly at SHOM then LOPS, France).\\
+  ST4 中白帽和破碎过程的统一。
+
+\item [Flampouris, Stylianos S.] (IMSG at NOAA/NCEP/EMC, USA) \\
+  波浪数据同化，以及 DA 系统和模式之间的通信（ww3\_uprstr）。
+
+\item [Foreman, Mike]  (IOS, Canada) \\
+  通用潮汐分析包。
+
+\item [Gramstad, Odin] (DNV GL, Norway)\\
+  广义动力学方程 NL5。
+
+\item [Ginis, Isaac] (University of Rhode Island, USA) \\
+  海况相关风应力计算源代码开发（FLD1、FLD2）。
+
+\item [Hara, Tetsu] (University of Rhode Island, USA) \\
+  海况相关风应力计算源代码开发（FLD1、FLD2）。
+
+\item [Hesser, Tyler J.] (US Army Engineer Research and Development Center Coastal and Hydraulics Laboratory) \\
+  非结构网格、浅水物理。
+
+\item [Janssen, Peter] (ECMWF, United Kingdom) \\
+  WAM-Cycle 4 包（ST3）的原始版本，以及二阶波谱的正则变换。
+
+\item [Leckler, Fabien] (LOPS, France) \\
+  来自源项的破碎参数，以及对 ST4 的贡献。
+
+\item [Li, Jian-Guo] (UK MetOffice, United Kingdom) \\
+  SMC 网格、二阶 UNO 格式和旋转网格。
+
+\item [Lind, Kevin]  (DoD PETTT, USA)\\
+  改进部分多重网格函数的性能。
+
+\item [Liu, Qingxiang] (Ocean University of China; University of Melbourne, Australia)\\
+  海冰源函数 IC5；源项包 ST6 更新；广义动力学方程 NL5。
+
+\item [Meixner, Jessica] (NOAA/NCEP/EMC, USA) \\
+  耦合建模开发、通用代码开发支持和 \ws\ 代码管理。
+
+\item [Mentaschi, Lorenzo]  (European Commission, Joint Research Centre, JRC,
+  formerly at the University of Genova, Italy)\\
+  未解析障碍物源项（UOST）开发。
+
+\item [Orzech, Mark]  (Naval Research Laboratory, USA)\\
+  泥影响源项（BT8、BT9）。
+
+\item [Padilla--Hern\'andez, Roberto]  (IMSG at NOAA/NCEP/EMC, USA)\\
+  NCEP 代码开发支持、编辑。
+
+\item [Perrie, William] (Bedford Institute of Oceanography, Canada)\\
+  非线性相互作用的双尺度近似（NL4）。
+
+\item [Rawat, Arshad] (MIO, Mauritius and LOPS, France) \\
+  对二阶谱和自由次重力波源（IG1）的贡献。
+
+\item [Reichl, Brandon] (NOAA/GFDL and Princeton University; Formerly at University of Rhode Island, USA) \\
+  海况相关风应力计算源代码开发与编码（FLD1、FLD2）。
+
+\item [Rogers, W. Erick]  (Naval Research Laboratory, USA)\\
+  不规则网格，海冰影响（如 IC1、IC2、IC3、IC4、IC5）和泥影响（BT8、BT9），
+  ST6 包（源材料和建议）、守恒重映射软件适配/接口、三极网格、回归测试。
+
+\item [Roland, Aron] (T. U. Darmstadt, Germany) \\
+  非结构（三角形）网格上的平流和网格生成工具、并行效率、隐式求解器实现。
+
+\item [Sevigny, Caroline] (UQAR, Canada) \\
+  对包含海冰破裂的冰散射过程的贡献。
+
+\item [Shen, Hayley] (Clarkson Univ.) \\
+  指导 Zhao 和 Cheng 关于海冰对波浪影响 ``IC3'' 参数化的贡献。
+
+\item [Saulter, Andy] (Met Office, UK)\\
+  Met Office 的代码开发测试和支持。
+
+\item [Sikiric, Mathieu Dutour] (IRB, Croatia) \\
+  使用非结构（三角形）网格的多重网格计算、并行效率、隐式求解器实现。
+
+\item [Szyszka, Mark] (RPS Group, Australia) \\
+  在代码开发过程中识别多个缺陷，并为 OpenMP 问题提供修复。
+
+\item [Smith, Jane M.] (US Army Engineer Research and Development Center Coastal and Hydraulics Laboratory) \\
+  非结构网格、浅水物理。
+
+\item [Tolman, Hendrik L.] (DOC/NOAA/NWS/OSTI, USA). \\
+  通用代码架构，原始 \wt-I、II 和 III 模式，以及持续的模式开发。
+
+\item [Toulany, Bash] (Bedford Institute of Oceanography, Canada)\\
+  非线性相互作用的双尺度近似（NL4）。
+
+\item [Tracy, Barbara] (US Army Corps of Engineers, ERDC-CHL, USA, retired) \\
+  谱分区。
+
+\item [Van Vledder, Gerbrant Ph.] (Delft University of Technology, NL) \\
+  Webb-Resio-Tracy 精确非线性相互作用例程，以及部分原始服务例程。
+
+\item [Van Der Westhuysen, Andr\'e](IMSG at NOAA/NCEP/EMC, USA) \\
+  NCEP 代码开发支持、波浪系统追踪、三波相互作用添加。
+
+\item [Young, Ian] (University of Melbourne, Australia)
+  ST6 源函数（风输入、白帽耗散）。
+
+\item [Zhao, Xin] (while at Clarkson University, USA) \\
+  原始代码作者；该代码被移植到 WW3（模式版本 4）中，作为海冰对波浪影响的
+  ``IC3'' 参数化。
+
+\item [Zieger, Stefan] (Bureau of Meteorology, Australia) \\
+  ST6 源项包、代码和测试。
+\end{list}

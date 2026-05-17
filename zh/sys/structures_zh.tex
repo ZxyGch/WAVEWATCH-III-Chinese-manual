@@ -1,0 +1,18 @@
+\vsssub
+\subsubsection{~数据结构}
+\vsssub
+
+如 \para\ref{sec:mgrids} 所述，波浪模式的核心由一组数据结构构成，它们支持
+多个网格的数据连续存储。各个存储结构包含在以下模块中：
+
+\begin{flist}
+\fit{w3gdatmd.ftn}{空间和谱网格信息，以及所有物理和数值模式参数。}
+\fit{w3wdatmd.ftn}{实际波浪数据，包括谱以及热启动模式所需的 $u_*$ 等场。}
+\fit{w3adatmd.ftn}{辅助场和参数。}
+\fit{w3odatmd.ftn}{输出数据。}
+\fit{w3idatmd.ftn}{输入数据。}
+\fit{wmmdatmd.ftn}{多网格模式专用数据。}
+\end{flist}
+
+\noindent
+这些数据结构已在上述文件中完整记录，手册中不再重复收录其文档。

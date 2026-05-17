@@ -1,0 +1,34 @@
+\vsssub
+\subsubsection{~依赖海况的 $\tau$：Donelan et al. 2012} \label{sec:FLD2}
+\vsssub
+
+\opthead{FLD2}{UMWM}{B. Reichl}
+
+\paragraph{Donelan et al., 2012 的风应力}
+在 \citet{art:Don12} 中，式 (\ref{formdrag}) 中的增长率参数表示为：
+\begin{equation}
+\beta_g(k,\theta)=A_1 \sigma \frac{\left[u_{\lambda/2} \cos(\theta-\theta_w)-c\right]\left| u_{\lambda/2}cos(\theta-\theta_w)-c \right|}{c^2}\frac{\rho_a}{\rho_w},
+\end{equation}
+\begin{equation}
+A_{1}=\left\{
+\begin{array}{lll} 
+0.11, & :  u_{\lambda/2}\cos\theta>c,  &\mbox{for wind forced sea}\\
+0.01 & :   0<u_{\lambda/2}\cos\theta<c, &\mbox{for swell faster than the wind}\\
+0.1 & :  \cos\theta<0,  &\mbox{for swell opposing the wind}
+\end{array}
+\right.
+\end{equation}
+其中 $A_1$ 为经验确定的比例系数（使模拟波谱与现场观测一致），$u_{\lambda/2}$ 为半波长高度处的风速（最高取到 20 m），$\theta_w$ 为风向，$c$ 为波相速。风速使用粗糙表面的壁面律计算：
+\begin{equation}
+u(z)=\frac{u_\star}{\kappa}\ln\left(\frac{z}{z_0}\right),
+\end{equation}
+其中 $\kappa$ 为 von K\'arm\'an 系数（默认 0.4）。黏性应力由光滑表面的壁面律计算。黏性阻力系数 $Cd_\nu$ 会调整以考虑遮蔽作用：
+\begin{equation}
+Cd'_\nu=\frac{Cd_\nu}{3}\left(1+\frac{2 Cd_\nu}{Cd_\nu+Cd_f}\right),
+\end{equation}
+其中 $Cd_f$ 为波形状阻力系数。于是黏性应力可解为：
+\begin{equation}
+\vec{\tau}_\nu=\rho_a Cd'_\nu \left|{\bf u_{z}}\right|{\bf {u}}_{z}.
+\end{equation}
+
+注意，使用 FLD2 开关时，黏性应力、摩擦速度、表面粗糙长度和 Charnock 参数的内部变量和输出值会被重新计算并覆盖。

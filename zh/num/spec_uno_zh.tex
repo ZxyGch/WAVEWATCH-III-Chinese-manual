@@ -1,0 +1,20 @@
+\vssub
+\subsubsection{~二阶格式 (UNO)}
+\opthead{UNO}{Met Office}{J.-G. Li}
+
+\noindent
+对于方向 $\theta$ 空间，UNO 格式与规则网格上的格式相同，前提是假定方向箱间距规则。然而，对于 \emph{k} 空间，UNO 格式使用其不规则版本；该版本用局地梯度而不是差分，估计谱箱 \emph{i}-1 与 \emph{i} 之间单元面中通量点处的波作用量值，即
+\begin{equation}
+  N_{i-}^{*}=N_{c}+sign\left(N_{d}-N_{c}\right)\frac{\left(\Delta
+      k_{c}-|\dot{k}_{i-}|\Delta
+      t\right)}{2}\min\left(|\frac{N_{u}-N_{c}}{k_{u}-k_{c}}|,|\frac{N_{c}-N_{d}}{k_{c}-k_{d}}|\right)
+  \:\:\:,
+\label{eq:UNO2irregular}
+\end{equation}
+
+\noindent
+其中 \emph{i}- 为波数 \emph{k} 箱索引；下标 \emph{u}、\emph{c} 和 \emph{d} 分别表示相对于给定 \emph{i}- 面速度 $\dot{k}_{i-}$ 的\emph{上游、中心}和\emph{下游}单元；$k_{c}$ 为中心箱波数，$\Delta k_{c}$ 为中心箱宽度。不规则网格 UNO 格式的细节见 \cite{art:Li08}。
+
+$\theta$ 空间的边界条件是自然周期条件。对于 \emph{k} 空间，由于 UNO 格式为二阶精度，在波谱区域两端各增加两个零谱箱。
+
+

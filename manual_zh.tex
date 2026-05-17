@@ -1,0 +1,93 @@
+\documentclass [12pt,twoside,letterpaper]{article}
+%\usepackage{geometry}
+\usepackage{microtype}
+\usepackage{natbib}
+\usepackage{epsfig}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{svn}
+\usepackage{lscape}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{threeparttable}
+\usepackage{rotating}
+\usepackage{lscape}
+\usepackage{tocloft}
+\usepackage{xcolor}
+\usepackage{bigints}
+\usepackage[UTF8,heading=false,fontset=fandol]{ctex}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\SVN $Revision$
+\SVN $Date$
+
+\input{defs}
+
+\renewcommand{\contentsname}{目录}
+\renewcommand{\refname}{参考文献}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\bpage}{\vfill \pagebreak \strut
+
+\vspace{2.5in} \centerline{本页有意留白。}}
+\renewcommand{\bpagea}{\strut
+
+\vspace{2.5in} \centerline{本页有意留白。}}
+
+\sloppy
+
+\begin{document}
+
+\include{zh/start_zh}
+\include{zh/intro_zh}
+\include{zh/eqs_zh}
+\include{zh/num_zh}
+\include{zh/run_zh}
+\include{zh/impl_zh}
+\include{zh/sys_zh}
+
+\phantomsection
+\addtocontents{toc}{\vspace
+{\baselineskip}}
+\addcontentsline{toc}{section}{参考文献}
+\setcounter{footnote}{0}
+
+%\bibliographystyle{jas}
+\bibliographystyle{agufull08}
+\bibliography{manual}
+
+\pb
+\pagestyle{empty}
+
+\pb \strut
+
+\appendix
+\renewcommand{\thepage}{\thesection.\arabic{page}}
+
+\addtocontents{toc}{\vspace{\baselineskip}}
+\addtocontents{toc}{\vspace{\baselineskip}}
+\addtocontents{toc}{ }
+\addtocontents{toc}{\noindent {\bf 附录}}
+\addtocontents{toc}{ }
+
+\vspace{2.5in} \centerline{\large \bf 附录}
+
+\pb
+\bpage
+
+\include{zh/app/tstep_zh}
+\include{zh/app/nest_zh}
+\include{zh/app/mpi_zh}
+\include{zh/app/scrip_zh}
+\include{zh/app/oasis_zh}
+\include{zh/app/nuopc_zh}
+%\include{app/config}
+%\include{app/to_do}
+
+\end{document}

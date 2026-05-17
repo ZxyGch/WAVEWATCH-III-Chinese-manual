@@ -1,0 +1,667 @@
+\subsubsection{~波浪模式模块} \label{sec:wave_mod}
+\vsssub
+
+波浪模式的核心是波浪模式初始化模块和波浪模式模块。
+
+\vspace{\baselineskip} \noindent
+主波浪模式初始化模块 \hfill {\file w3initmd.ftn}
+
+\begin{flisti}
+\fit{w3init}{初始化例程 {\F w3init}，为计算准备波浪模式（内部）。}
+\fit{w3mpii}{\mpi\ 初始化（内部）。}
+\fit{w3mpio}{用于 I/O 的 \mpi\ 初始化（内部）。}
+\fit{w3mpip}{用于 I/O 的 \mpi\ 初始化（内部，仅点输出）。}
+\end{flisti}
+
+\noindent
+主波浪模式模块 \hfill {\file w3wavemd.ftn}
+
+\begin{flisti}
+\fit{w3wave}{实际的波浪模式 {\F w3wave}。}
+\fit{w3gath}{数据转置，用于把空间传播所需数据汇集到单个数组中（内部）。}
+\fit{w3scat}{对应的分散操作（内部）。}
+\fit{w3nmin}{计算每个处理器的最小海点数（内部）。}
+\end{flisti}
+
+\noindent
+主波浪模式例程以及所有其他子程序都需要已有数据结构。数据结构包含在
+以下模块中。
+
+\vspace{\baselineskip} \noindent
+定义模式网格和参数设置 \hfill {\file w3gdatmd.ftn}
+
+\begin{flisti}
+\fit{w3nmod}{设置需要考虑的网格数量。}
+\fit{w3dimx}{设置空间网格维度并分配存储空间。}
+\fit{w3dims}{设置谱网格维度并分配存储空间。}
+\fit{w3setg}{设置指向所选网格的指针。}
+\fit{w3dimug}{设置三角形网格专用数组的维度（网格连通性等）。}
+\fit{w3gntx}{生成非结构网格结构。}
+\end{flisti}
+
+\noindent
+描述海况的动态波浪数据 \hfill {\file w3wdatmd.ftn}
+
+\begin{flisti}
+\fit{w3ndat}{设置需要考虑的网格数量。}
+\fit{w3dimw}{设置维度并分配存储空间。}
+\fit{w3setw}{设置指向所选网格的指针。}
+\end{flisti}
+
+\noindent
+辅助存储 \hfill {\file w3adatmd.ftn}
+
+\begin{flisti}
+\fit{w3naux}{设置需要考虑的网格数量。}
+\fit{w3dima, w3xdma, w3dmnl}{}
+\fit{      }{设置维度并分配存储空间。}
+\fit{w3seta, w3xeta}{}
+\fit{      }{设置指向所选网格的指针。}
+\end{flisti}
+
+\pb \noindent
+模式输出 \hfill {\file w3odatmd.ftn}
+
+\begin{flisti}
+\fit{w3nout}{设置需要考虑的网格数量。}
+\fit{w3dmo2, w3dmo3, w3dmo5}{}
+\fit{      }{设置维度并分配存储空间。}
+\fit{w3seto}{设置指向所选网格的指针。}
+\end{flisti}
+
+\noindent
+模式输入 \hfill {\file w3idatmd.ftn}
+
+\begin{flisti}
+\fit{w3ninp}{设置需要考虑的网格数量。}
+\fit{w3dimi}{设置维度并分配存储空间。}
+\fit{w3seti}{设置指向所选网格的指针。}
+\end{flisti}
+
+\noindent
+传统格式（.inp）和 namelist 格式（.nml）等配置文件在程序中采用不同方式
+处理。传统配置文件在主程序中直接读取。namelist 配置文件则由以下模块中
+的子程序读取。
+
+\vspace{\baselineskip} \noindent
+网格预处理器 namelist 模块 \hfill {\file w3nmlgridmd.ftn}
+
+\begin{flisti}
+\fit{w3nmlgrid}{读取并报告所有 namelist。}
+\fit{read\_spectrum\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_run\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_timesteps\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_grid\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_rect\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_curv\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_unst\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_smc\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_mask\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_obst\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_slope\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_sed\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_inbound\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_excluded\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_outbound\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_spectrum\_nml}{输出默认值和用户定义值。}
+\fit{report\_run\_nml}{输出默认值和用户定义值。}
+\fit{report\_timesteps\_nml}{输出默认值和用户定义值。}
+\fit{report\_grid\_nml}{输出默认值和用户定义值。}
+\fit{report\_rect\_nml}{输出默认值和用户定义值。}
+\fit{report\_curv\_nml}{输出默认值和用户定义值。}
+\fit{report\_smc\_nml}{输出默认值和用户定义值。}
+\fit{report\_depth\_nml}{输出默认值和用户定义值。}
+\fit{report\_mask\_nml}{输出默认值和用户定义值。}
+\fit{report\_obst\_nml}{输出默认值和用户定义值。}
+\fit{report\_slope\_nml}{输出默认值和用户定义值。}
+\fit{report\_sed\_nml}{输出默认值和用户定义值。}
+\fit{report\_inbound\_nml}{输出默认值和用户定义值。}
+\fit{report\_excluded\_nml}{输出默认值和用户定义值。}
+\fit{report\_outbound\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+NetCDF 边界条件 namelist 模块 \hfill {\file w3nmlbouncmd.ftn}
+
+\begin{flisti}
+\fit{w3nmlbounc}{读取并报告所有 namelist。}
+\fit{read\_bound\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_bound\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+NetCDF 输入场预处理器 namelist 模块 \hfill {\file w3nmlprncmd.ftn}
+
+\begin{flisti}
+\fit{w3nmlprnc}{读取并报告所有 namelist。}
+\fit{read\_forcing\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_file\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_forcing\_nml}{输出默认值和用户定义值。}
+\fit{report\_file\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+通用壳 namelist 模块 \hfill {\file w3nmlshelmd.ftn}
+
+\begin{flisti}
+\fit{w3nmlshel}{读取并报告所有 namelist。}
+\fit{read\_domain\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_input\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_output\_type\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_output\_date\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_homogeneous\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_domain\_nml}{输出默认值和用户定义值。}
+\fit{report\_input\_nml}{输出默认值和用户定义值。}
+\fit{report\_output\_type\_nml}{输出默认值和用户定义值。}
+\fit{report\_output\_date\_nml}{输出默认值和用户定义值。}
+\fit{report\_homogeneous\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+多网格壳 namelist 模块 \hfill {\file w3nmlmultimd.ftn}
+
+\begin{flisti}
+\fit{w3nmlmultidef}{设置模式网格和强迫网格数量。}
+\fit{w3nmlmulticonf}{读取并报告所有 namelist。}
+\fit{read\_domain\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_input\_grid\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_model\_grid\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_output\_type\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_output\_date\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_homogeneous\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_domain\_nml}{输出默认值和用户定义值。}
+\fit{report\_input\_grid\_nml}{输出默认值和用户定义值。}
+\fit{report\_model\_grid\_nml}{输出默认值和用户定义值。}
+\fit{report\_output\_type\_nml}{输出默认值和用户定义值。}
+\fit{report\_output\_date\_nml}{输出默认值和用户定义值。}
+\fit{report\_homogeneous\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+网格输出 NetCDF 后处理器 namelist 模块 \hfill {\file w3nmlounfmd.ftn}
+
+\begin{flisti}
+\fit{w3nmlounf}{读取并报告所有 namelist。}
+\fit{read\_field\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_file\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_smc\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_field\_nml}{输出默认值和用户定义值。}
+\fit{report\_file\_nml}{输出默认值和用户定义值。}
+\fit{report\_smc\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+点输出 NetCDF 后处理器 namelist 模块 \hfill {\file w3nmlounpmd.ftn}
+
+\begin{flisti}
+\fit{w3nmlounp}{读取并报告所有 namelist。}
+\fit{read\_point\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_file\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_spectra\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_param\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_source\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_point\_nml}{输出默认值和用户定义值。}
+\fit{report\_file\_nml}{输出默认值和用户定义值。}
+\fit{report\_spectra\_nml}{输出默认值和用户定义值。}
+\fit{report\_param\_nml}{输出默认值和用户定义值。}
+\fit{report\_source\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+轨迹输出 NetCDF 后处理器 namelist 模块 \hfill {\file w3nmltrncmd.ftn}
+
+\begin{flisti}
+\fit{w3nmltrnc}{读取并报告所有 namelist。}
+\fit{read\_track\_nml}{初始化并把数值保存到派生类型。}
+\fit{read\_file\_nml}{初始化并把数值保存到派生类型。}
+\fit{report\_track\_nml}{输出默认值和用户定义值。}
+\fit{report\_file\_nml}{输出默认值和用户定义值。}
+\end{flisti}
+
+\noindent
+风和流等输入场通过 {\F w3wave} 的参数列表传入模式。这些信息在
+{\F w3wave} 内部由以下模块中的例程处理。
+
+\vspace{\baselineskip} \noindent
+输入更新模块 \hfill {\file w3updtmd.ftn}
+
+\begin{flisti}
+\fit{w3ucur}{流场的时间插值。}
+\fit{w3uwnd}{风场的时间插值。}
+\fit{w3uini}{由初始风场生成初始条件。}
+\fit{w3ubpt}{嵌套运行中边界条件的更新。}
+\fit{w3uice}{海冰覆盖的更新。}
+\fit{w3ulev}{水位的更新。}
+\fit{w3utrn}{更新网格箱透明度。}
+\fit{w3ddxy}{计算水深的空间导数。}
+\fit{w3dcxy}{计算流的空间导数。} 
+\end{flisti}
+
+\noindent
+\ws\ 有七类数据文件（不包括预处理输入场；这些输入场属于程序壳，而不是
+实际波浪模式）。对应例程汇集在六个模块中。
+
+\vspace{\baselineskip} \noindent
+I/O 模块（{\file mod\_def.ww3}） \hfill {\file w3iogrmd.ftn}
+
+\begin{flisti}
+\fit{w3iogr}{读取和写入 {\file mod\_def.ww3}。}
+\end{flisti}
+
+\noindent
+I/O 模块（{\file out\_grd.ww3}） \hfill {\file w3iogomd.ftn}
+
+\begin{flisti}
+\fit{w3outg}{计算网格输出参数。}
+\fit{w3iogo}{读取和写入 {\file out\_grd.ww3}。}
+\end{flisti}
+
+\noindent
+I/O 模块（{\file out\_pnt.ww3}） \hfill {\file w3iopomd.ftn}
+
+\begin{flisti}
+\fit{w3iopp}{处理点输出请求。}
+\fit{w3iope}{计算点输出数据。}
+\fit{w3iopo}{读取和写入 {\file out\_pnt.ww3}。}
+\end{flisti}
+
+\noindent
+I/O 模块（{\file track\_o.ww3}） \hfill {\file w3iotrmd.ftn}
+
+\begin{flisti}
+\fit{w3iotr}{在 {\file track\_o.ww3} 中生成轨迹输出。}
+\end{flisti}
+
+\noindent
+I/O 模块（{\file restart.ww3}） \hfill {\file w3iorsmd.ftn}
+
+\begin{flisti}
+\fit{w3iors}{读取和写入 {\file restart{\sl{n}}.ww3}。}
+\end{flisti}
+
+\noindent
+I/O 模块（{\file nest.ww3}） \hfill {\file w3iobcmd.ftn}
+
+\begin{flisti}
+\fit{w3iobc}{读取和写入 {\file nest{\sl{n}}.ww3}。}
+\end{flisti}
+
+\noindent
+I/O 模块（{\file partition.ww3}） \hfill {\file w3iofsmd.ftn}
+
+\begin{flisti}
+\fit{w3iofs}{写入 {\file partition.ww3}。}
+\end{flisti}
+
+\noindent
+目前，矩形网格和曲线网格可使用若干传播格式和 GSE 缓解技术，也有一个
+供用户提供传播例程的“插槽”；三角形网格则有四种格式。传播格式封装在
+以下模块中。
+
+\vspace{\baselineskip} \noindent
+传播模块（一阶，无 GSE 缓解） \hfill {\file w3pro1md.ftn}
+
+\begin{flisti}
+\fit{w3map1}{生成辅助映射。}
+\fit{w3xyp1}{物理空间中的传播。}
+\fit{w3ktp1}{谱空间中的传播。}
+\end{flisti}
+
+\noindent
+传播模块（带 GSE 扩散的高阶格式） \hfill {\file
+  w3pro2md.ftn}
+
+\begin{flisti}
+\fit{w3map2}{生成辅助映射。}
+\fit{w3xyp2}{物理空间中的传播。}
+\fit{w3ktp2}{谱空间中的传播。}
+\end{flisti}
+
+\noindent
+传播模块（带 GSE 平均的高阶格式） \hfill {\file
+  w3pro3md.ftn}
+
+\begin{flisti}
+\fit{w3map3}{生成辅助映射。}
+\fit{w3mapt}{生成透明度映射。}
+\fit{w3xyp3}{物理空间中的传播。}
+\fit{w3ktp3}{谱空间中的传播。}
+\end{flisti}
+
+\noindent
+传播模块（通用 UQ） \hfill {\file w3uqckmd.ftn}
+
+\begin{flisti}
+\fit{w3qck{\it{n}}}{在任意空间中执行 \uq\ 格式的例程
+                 （1：规则网格；2：不规则网格；
+                         3：带障碍物的规则网格）。}
+\end{flisti}
+
+\noindent
+传播模块（通用 UNO） \hfill {\file w3uqckmd.ftn}
+
+\begin{flisti}
+\fit{w3uno, w3unor w3unos}{}
+\fit{}{类似上述 UQ 格式。}
+\end{flisti}
+
+\noindent
+SMC 网格例程 \hfill {\file w3psmcmd.ftn}
+
+\begin{flisti}
+\fit{W3PSMC   }{SMC 网格上的空间传播。}
+\fit{W3KSMC   }{由 GCT 和折射产生的谱修正。}
+\fit{SMCxUNO2/3 }{由 UNO2/3 计算不规则网格 U 面中点通量。}
+\fit{SMCyUNO2/3 }{由 UNO2/3 计算不规则网格 V 面中点通量。}
+\fit{SMCxUNO2r/3r}{由 UNO2/3 计算规则网格 U 面中点通量。}
+\fit{SMCyUNO2r/3r}{由 UNO2/3 计算规则网格 V 面中点通量。}
+\fit{SMCkUNO2 }{由 UNO2 导致的折射引起的 $k$ 空间位移。}
+\fit{SMCGradn }{计算单元中心处的场梯度。}
+\fit{SMCAverg }{中心场的 1-2-1 加权平均。}
+\fit{SMCGtCrfr}{在 $\theta$ 方向上的折射和 GCT 旋转。}
+\fit{SMCDHXY  }{计算水深梯度和折射限制器。}
+\fit{SMCDCXY  }{计算流速梯度。}
+\fit{W3GATHSMC W3SCATSMC}{}
+\fit{         }{汇集和分散谱分量。}
+\end{flisti}
+
+\noindent
+基于三角形的传播格式 \hfill {\file w3profsmd.ftn}
+
+\begin{flisti}
+\fit{w3xypug}{非结构传播格式接口。}
+\fit{w3cflug}{计算空间传播的最大 CFL 数。}
+\fit{w3xypfsn2}{N 格式。}
+\fit{w3xypfspsi2}{PSI 格式。}
+\fit{w3xypfsnimp}{N 格式的隐式版本。}
+\fit{w3xypfsfct2}{FCT 格式。}
+\fit{bcgstab}{迭代 SPARSKIT 求解器的一部分，用于隐式格式。}
+\end{flisti}
+
+\vspace{\baselineskip} \noindent
+源项计算和积分包含在多个模块中。模块 {\file w3srcemd.ftn} 管理一般计算和
+积分。其他模块包含实际的源项选项。
+
+\vspace{\baselineskip} \noindent
+源项积分模块 \hfill {\file w3srcemd.ftn}
+
+\begin{flisti}
+\fit{w3srce}{源项积分。}
+\end{flisti}
+
+\noindent
+通量（应力）模块（Wu, 1980） \hfill {\file w3flx1md.ftn}
+
+\begin{flisti}
+\fit{w3flx1}{应力计算。}
+\end{flisti}
+
+\noindent
+通量（应力）模块（Tolman and Chalikov） \hfill {\file w3flx2md.ftn}
+
+\begin{flisti}
+\fit{w3flx2}{应力计算。}
+\end{flisti}
+
+\noindent
+通量（应力）模块（Tolman and Chalikov，封顶） \hfill {\file w3flx3md.ftn}
+
+\begin{flisti}
+\fit{w3flx3}{应力计算。}
+\end{flisti}
+
+\noindent
+线性输入（Cavaleri and Malanotte Rizzoli） \hfill {\file w3sln1md.ftn}
+
+\begin{flisti}
+\fit{w3sln1}{计算 $S_{lin}$。}
+\end{flisti}
+
+\noindent
+输入和耗散模块（占位版本） \hfill {\file w3src0md.ftn}
+
+\begin{flisti}
+\fit{w3spr0}{计算平均波浪参数（单个网格点）。}
+\end{flisti}
+
+\noindent
+输入和耗散模块（\wam-3） \hfill {\file w3src1md.ftn}
+
+\begin{flisti}
+\fit{w3spr1}{计算平均波浪参数（单个网格点）。}
+\fit{w3sin1}{计算 $S_{in}$。}
+\fit{w3sds1}{计算 $S_{ds}$。}
+\end{flisti}
+
+\noindent
+输入和耗散模块 Tolman and Chalikov 1996 \hfill {\file w3src2md.ftn}
+
+\begin{flisti}
+\fit{w3spr2}{计算平均波浪参数（单个网格点）。}
+\fit{w3sin2}{计算 $S_{in}$。}
+\fit{w3sds2}{计算 $S_{ds}$。}
+\fit{inptab}{生成 $\beta$ 的插值表。}
+\fit{w3beta}{计算 $\beta$ 的函数（内部）。}
+\end{flisti}
+
+\noindent
+输入和耗散模块 \wam-4 和 ECWAM。 \hfill {\file w3src3md.ftn}
+
+\begin{flisti}
+\fit{w3spr3}{计算平均波浪参数（单个网格点）。}
+\fit{w3sin3}{计算 $S_{in}$。}
+\fit{w3sds3}{计算 $S_{ds}$。}
+\fit{tabu\_stress}{把风应力表格化为 $U_{10}$ 和 $\tau_w$ 的函数。}
+\fit{tabu\_tauhf}{短波支撑应力的表格化。}
+\fit{calc\_ustar}{使用应力表计算摩擦速度。}
+\end{flisti}
+
+\noindent
+输入和耗散模块 Ardhuin et al. 2010 \hfill {\file w3src4md.ftn}
+
+\begin{flisti}
+\fit{w3spr4}{计算平均波浪参数（单个网格点）。}
+\fit{w3sin4}{计算 $S_{in}$。}
+\fit{w3sds4}{计算 $S_{ds}$。}
+\fit{tabu\_stress}{把风应力表格化为 $U_{10}$ 和 $\tau_w$ 的函数。}
+\fit{tabu\_tauhf}{短波支撑应力的表格化。}
+\fit{tabu\_tauhf2}{带遮蔽效应的短波支撑应力表格化。}
+\fit{tabu\_swellft}{针对 $S_{in}$ 负值部分的振荡摩擦因子表格化。}
+\fit{calc\_ustar}{使用应力表计算摩擦速度。}
+\end{flisti}
+
+\noindent
+输入和耗散模块 BYDRZ \hfill {\file w3src6md.ftn}
+
+\begin{flisti}
+\fit{w3spr6  }{按 {\F st1} 计算积分参数。}
+\fit{w3sin6  }{基于观测的风输入。}
+\fit{w3sds6  }{基于观测的耗散。}
+\fit{irange  }{生成整数值序列。}
+\fit{lfactor }{计算 Sin 的折减因子。}
+\fit{tauwinds}{计算 Sin 的法向应力。}
+\fit{polyfit2}{使用最小二乘的二次拟合。}
+\end{flisti}
+
+\noindent
+涌浪耗散模块 \hfill {\file w3swldmd.ftn}
+
+\begin{flist}
+\fit{w3swl4}{Ardhuin et al (2010+) 涌浪耗散。}
+\fit{w3swl6}{Babanin (2011) 涌浪耗散。}
+\fit{irange}{生成整数值序列。}
+\end{flist}
+
+\noindent
+非线性相互作用模块（\dia{} 或 GQM） \hfill {\file w3snl1md.ftn}
+
+\begin{flisti}
+\fit{w3snl1}{计算 $S_{nl}$。}
+\fit{insnl1}{初始化 $S_{nl}$。}
+\fit{w3snlgqm}{计算 $S_{nl}$。}
+\fit{w3scouple}{计算耦合系数。}
+\fit{gauleg}{计算 Gauss-Legendre 求积系数。}
+\fit{INSNLGQM}{用 GQ 方法初始化 $S_{nl}$。}
+\end{flisti}
+
+\noindent
+非线性相互作用模块（\xnl{}） \hfill {\file w3snl2md.ftn}
+
+\begin{flisti}
+\fit{w3snl2}{用于 $S_{nl}$ 的接口例程。}
+\fit{insnl2}{初始化 $S_{nl}$。}
+\end{flisti}
+这些例程提供通往 \xnl\ 例程的接口。\xnl\ 例程由文件
+{\file mod\_constants.f90}、{\file mod\_fileio.f90}、
+{\file mod\_xnl4v4.f90} 和 {\file serv\_xnl4v4.f90} 提供。关于这些文件
+的详细信息，见 \cite{rep:vVl02b}。
+
+\vspace{\baselineskip}
+\noindent
+非线性相互作用模块（GMD） \hfill {\file w3snl3md.ftn}
+
+\begin{flisti}
+\fit{w3snl3}{计算 $S_{nl}$。}
+\fit{expand}{扩展谱空间。}
+\fit{expan2}{把扩展形式映射回原始谱空间。}
+\fit{insnl3}{初始化 $S_{nl}$。}
+\end{flisti}
+
+\vspace{\baselineskip}
+\noindent
+非线性高频滤波器 \hfill {\file w3snlsmd.ftn}
+
+\begin{flisti}
+\fit{w3snls}{计算滤波器。}
+\fit{expand}{扩展谱空间。}
+\fit{insnls}{初始化滤波器。}
+\end{flisti}
+
+\noindent
+底摩擦模块（\js{}） \hfill {\file w3sbt1md.ftn}
+
+\begin{flisti}
+\fit{w3bt1}{计算 $S_{bot}$。}
+\end{flisti}
+
+\noindent
+底摩擦模块（\showex{}） \hfill {\file w3sbt4md.ftn}
+
+\begin{flisti}
+\fit{insbt4}{初始化 $S_{bot}$。}
+\fit{tabu\_erf}{误差函数表。} 
+\fit{w3sbt4}{计算 $S_{bot}$，以及进入底边界层的能量和动量通量。}
+\end{flisti}
+
+\noindent
+流体泥耗散 \citep{art:DL78}  \hfill {\file w3sbt8md.ftn}
+
+\begin{flisti}
+\fit{w3sbt8}{源项。}
+\end{flisti}
+
+\pb \noindent
+流体泥耗散 \citep{art:Ng00}  \hfill {\file w3sbt9md.ftn}
+
+\begin{flisti}
+\fit{w3sbt9}{源项。}
+\end{flisti}
+
+\noindent
+水深诱导破碎模块（Battjes-Janssen） \hfill {\file w3sdb1md.ftn}
+
+\begin{flisti}
+\fit{w3sdb1}{计算 $S_{db}$。}
+\end{flisti}
+
+\noindent
+三波相互作用模块（LTA） \hfill {\file w3str1md.ftn}
+
+\begin{flisti}
+\fit{w3str1}{计算 $S_{tr}$。}
+\end{flisti}
+
+\noindent
+底散射模块 \hfill {\file w3sbs1md.ftn}
+
+\begin{flisti}
+\fit{w3sbs1}{计算 $S_{bs}$ 及其相关的到底部的动量通量。}  
+\fit{insbs1}{初始化 $S_{bs}$。}
+\end{flisti}
+
+\pb \noindent
+波-冰相互作用（简单） \hfill {\file w3sic1md.ftn}
+
+\begin{flisti}
+\fit{w3sic1}{计算 $S_{id}$。}
+\end{flisti}
+
+\noindent
+波-冰相互作用（Liu et al.） \hfill {\file w3sic2md.ftn}
+
+\begin{flisti}
+\fit{w3sic2}{计算 $S_{id}$。}
+\fit{      }{插值表。}
+\end{flisti}
+
+\noindent
+波-冰相互作用 \cite{art:WS10} \hfill {\file w3sic3md.ftn}
+
+\begin{flisti}
+\fit{w3sic3}{计算 $S_{id}$。}
+\fit{bsdet }{计算色散关系的行列式。}
+\fit{wn\_complex}{计算冰中的复波数。}
+\fit{cmplx\_root\_muller}{寻找复数根。}
+\fit{fun\_zhao}{以下函数的包装器。}
+\fit{func0\_zhao, finc1\_zhao}{}
+\end{flisti}
+
+\begin{flisti}
+\fit{w3sis2}{计算 $S_{is}$。}
+\end{flisti}
+
+\noindent
+冰中波散射和海冰破裂 \hfill {\file w3sis2md.ftn}
+
+\noindent
+岸线反射 \hfill {\file w3ref1md.ftn}
+
+\begin{flisti}
+\fit{w3ref1}{计算 $S_{ref}$。}
+\end{flisti}
+
+\noindent
+为完成基本波浪模式，还需要若干附加模块。服务模块的实际内容见源代码文件
+中的文档。
+
+\begin{flist}
+\fit{constants.ftn}{物理和数学常数以及 Kelvin 函数。}
+%\begin{flisti}
+%\fit{kzeone}{Kelvin 函数的预计算}
+%\fit{kerkei}{Kelvin 函数计算}
+%\end{flisti}
+
+\fit{w3arrymd.ftn}{数组操作例程，包括“print plot”例程。}
+\fit{w3bullmd.ftn}{为输出点执行公报式输出。}
+\fit{w3cspcmd.ftn}{谱离散转换。}
+\fit{w3dispmd.ftn}{求解 Laplace 色散关系的例程（线性波、平底、无冰），
+                   包括插值表。还包括 liu\_foreward\_dispersion 和
+                   liu\_inverse\_dispersion 中的冰修正。}
+\fit{w3gsrumd.ftn}{重网格化工具。}
+\fit{w3partmd.ftn}{对单个谱执行谱分区。}
+\fit{w3servmd.ftn}{通用服务例程。}
+\fit{w3timemd.ftn}{时间管理例程。}
+\fit{w3triamd.ftn}{基于三角形网格的基本例程：读取、插值、杂项数组定义、
+                   边界点确定。}
+\end{flist}
+
+\noindent
+至此，基本波浪模式例程说明结束。初始化例程与其他例程之间的关系见
+图~\ref{fig:w3init}。波浪模式例程的类似关系图见图~\ref{fig:w3wave}。
+   
+% fig:w3init
+% fig:w3wave
+
+\input{zh/sys/fig_w3init_zh}
+
+\input{zh/sys/fig_w3wave_zh}

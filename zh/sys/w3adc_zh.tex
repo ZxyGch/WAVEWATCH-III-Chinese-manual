@@ -1,0 +1,64 @@
+\vssub
+\subsection{~预处理器} \label{sec:w3adc}
+\vssub
+
+\ws\ 的源代码文件并不是可直接使用的 {\fortran} 文件；强制和可选的程序
+选项仍需选择，测试输出也可被激活\footnote{~例外情况包括一些原本不属于
+  \ws\ 的模块，例如精确相互作用模块。这类扩展名为 {\file .f} 或
+  {\file .f90} 的模块会绕过预处理器，并以 {\file .f} 扩展名复制到工作
+  目录。}。编译级选项通过“开关”激活。任意开关 ``{\F swt}'' 在
+\ws\ 文件中以 {\F !/swt} 形式的注释出现，其中开关名 {\F swt} 后面跟一个
+空格或一个 ``{\F /}''。如果选中了某个开关，预处理器会去掉注释字符，从而
+激活对应的源代码行。如果开关后跟 ``{\F/}''，该字符也会被删除，因此可以
+有选择地包含与硬件相关的编译器指令等。开关区分大小写，可用开关见
+\para\ref{sec:switches}。
+
+可通过输入 \command{find\_switch '!/SWT'} 查找包含开关 {\F c/swt} 的文件。
+输入 \command{all\_switches} 可以得到 \ws\ 文件中包含的所有开关列表。
+
+\pb
+\noindent
+传统上，每一行源代码只能使用一个开关。不过，从 {\ww} 7.00 版开始，一行
+可以设置多个开关（最多 4 个）。该行要被纳入编译步骤，所有开关都必须激活。
+多个开关必须在行首连续串接，中间不能有空格。每个开关都必须以
+``{\F !/}'' 开头，并可选地以 ``{\F /}'' 终止。这样即可处理只有在某一特定
+开关组合被设置时才应包含某行源代码的情况。例如，若只在 ``{\F /OMPH}''
+和 ``{\F /T1}'' 开关均被设置时启用某一行，可写为：
+
+\begin{footnotesize}
+\begin{verbatim}
+!/OMPH!/!T1     ! Line included only if OMPH and T1 activated
+\end{verbatim}
+\end{footnotesize}
+
+\pb
+%\vspace{\baselineskip}
+\noindent
+预处理由程序 {\code w3adc} 执行。该程序位于文件 {\file w3adc.f} 中，其中
+包含可直接编译的 {\fortran} 源代码和完整文档\footnote{~目前仍为固定格式
+  {\fortran}-77。}。{\code w3adc} 的若干属性在 {\file w3adc.f} 的
+{\F parameter} 语句中设置，例如开关最大长度、include 文件最大数量、每个
+include 文件的最大行数以及行长。{\code w3adc} 从标准输入读取其“命令”。
+{\code w3adc} 的输入文件示例见图~\ref{fig:w3adc}。逐行来看，输入包括：
+
+\begin{list}{$\rightarrow$}{\itemsep 0mm \parsep 0mm}
+\item	测试指示符和压缩指示符。
+\item	输入代码和输出代码的文件名。
+\item	以单个字符串给出的待开启开关（见 \para\ref{sec:switches}）。
+\item   可以给出包含 include 文件的附加行，但自动化编译系统已不再使用
+        这些行。
+\end{list}
+
+% fig:w3adc
+
+\input{zh/sys/fig_ad3_zh}
+
+\noindent
+测试指示符 0 会关闭测试输出；数值增大时，测试输出的详细程度也随之提高。
+压缩指示符 0 保持文件原样。压缩指示符 1 会删除所有由 ``{\F !}'' 标记的
+注释行，但空开关除外，也就是以 ``{\F !/}'' 开头的行。压缩指示符 2 会在
+此基础上继续删除所有注释。该输入文件中不允许出现注释行。上述 {\F w3adc}
+输入采用自由格式读取，因此字符串需要加引号。回显和测试输出会发送到标准
+输出设备。为方便使用预处理器，\ws\ 随附了若干 \unix\ 脚本，相关内容见
+\para\ref{sec:comp}。注意，编译器指令应通过开关定义，以避免在文件压缩时
+被删除。

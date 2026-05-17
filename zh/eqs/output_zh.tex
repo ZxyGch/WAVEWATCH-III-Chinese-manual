@@ -1,0 +1,310 @@
+\vssub
+\subsection{~输出参数} \label{sub:outpars}
+\vssub
+
+波浪模式可在模式地理网格上输出参数；这些参数可以是积分参数，也可以是频率函数，此时每个频率对应一个网格。所有作为频率函数的参数（例如 \textbf{EF} 或 \textbf{USF}）都需要在 ww3\_grid.inp 或 ww3\_grid.nml 中定义的 {\F OUTS} namelist 中设置特定 namelist 参数。这样做是为了在不需要这些参数时减少内存使用。
+
+下面给出输出场参数的简要定义。定义表可在 \para\ref{sec:ww3shel} 的示例 {\code ww3\_shel.inp} 文件中找到。该输入文件还提供了一组标志，用于指示不同场输出文件类型（ASCII、grib、igrads、NetCDF）是否支持相应输出参数。若需了解这些参数如何计算，用户可阅读 {\code w3iogomd.F90} 模块中 {\code w3iogo} 例程的代码。
+
+在 {\code ww3\_shel.nml} 或 {\code ww3\_shel.inp} 中选择场输出，最简单的方法是给出所需参数列表。例如，{\textbf HS DIR SPR} 会要求计算有效波高、平均方向和方向扩展。它们随后会存储在 {\code out\_grd.XX} 文件中，并可进行后处理，例如使用 {\code ww3\_ouf} 转为 NetCDF。示例见 \para\ref{sec:ww3multi} 和 \para\ref{sec:ww3ounf}。这些 namelist 使用下列粗体名称，例如 \textbf{HS}。
+
+下面列出的所有参数都可在 ASCII 和 NetCDF 输出文件中使用。如果选择的输出文件类型为 grads 或 grib，部分参数可能不可用。是否可用由 \para\ref{sec:ww3shel} 示例输入文件中场输出参数表的前两列标识。该表还为所有参数列出内部 WAVEWATCH III 代码标签、输出标签（ASCII 文件扩展名、NetCDF 变量名和基于 namelist 的选择所用名称，另见 \para\ref{sec:ww3ounf}），以及较长的参数名称/定义。
+
+当结果对未解析谱段（$f<f_{NK}$）贡献不太敏感时，谱尾贡献按谱的幂律衰减进行参数化，默认 $E(f,\theta) = E(f_{NK},\theta) (f_{NK}/f)^{-5}$。对某些参数而言，这样做要么不必要，要么可能造成误导，因此积分仅计算到 $f_{NK}$。
+
+
+最后需注意，在所有定义中，频率均为\emph{相对}频率。因此，在有流存在时，这些参数只能与漂流测量资料，或以波数获得后转换为频率的数据进行比较。若要与固定仪器资料比较，需要使用完整谱并正确转换到固定参考系。
+
+\begin{list}{\Roman{outgrps})\hfill}
+            {\usecounter{outgrps} \leftmargin 7mm \labelwidth 5mm
+             \rightmargin 0mm \itemsep \baselineskip \parsep 0mm}
+
+\item {强迫场}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+\item \textbf{DPT} 平均水深 (m)。包括变化水位。
+\item \textbf{CUR} 平均流速（矢量，m/s）。
+\item \textbf{WND} 平均风速（矢量，m/s）。该风速始终为输入模式的风速，即未针对流速修正。
+\item \textbf{AST} 气海温差 ($^\circ$C)。
+\item \textbf{WLV} 水位。
+\item \textbf{ICE} 冰密集度。
+\item \textbf{IBG} 冰山导致的波浪衰减：该参数是在小冰山场中与波能损失相关的 e 折尺度的倒数 \citep{art:Aea11}。
+\item \textbf{D50} 沉积物中值粒径 ($D_{50}$)。
+\item \textbf{IC1} 冰厚。
+\item \textbf{IC5} 最大浮冰直径，$D_{\max}$。
+\end{list}
+
+\item{标准平均波浪参数}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+\item \textbf{HS} 有效波高 (m) [见式~(\ref{eq:etot})]
+      \begin{equation} H_s = 4 \sqrt{E} \: . \label{eq:Hs} \end{equation}
+\item \textbf{LM} 平均波长 (m) [见式~(\ref{eq:zbar})]
+      \begin{equation} L_m = 2\pi \overline{k^{-1}}
+      \: . \label{eq:Lm} \end{equation}
+\item \textbf{T02} 平均波周期 (s) [见式~(\ref{eq:zbar})]
+      \begin{equation} T_{m02} = 2\pi /\sqrt{\overline{\sigma^{2}}}
+      \: . \label{eq:Tm02} \end{equation}
+\item \textbf{T0M1} 平均波周期 (s) [见式~(\ref{eq:zbar})]
+      \begin{equation} T_{m0,-1} = 2\pi \overline{\sigma^{-1}}
+      \: . \label{eq:Tm0m1} \end{equation}
+\item \textbf{T01} 平均波周期 (s) [见式~(\ref{eq:zbar})]
+      \begin{equation} T_{m0,1} = 2\pi /\overline{\sigma}
+      \: . \label{eq:Tm} \end{equation}
+\item \textbf{FP} 峰值频率 (Hz)，由一维频率谱在离散峰附近作抛物线拟合计算。
+\item \textbf{DIR} 平均波向（度，气象约定）
+      \begin{equation} \theta_m = \mbox{atan} \left ( \frac{b}{a} \right )
+      \: , \label{eq:theta_m} \end{equation} \begin{equation}
+      a = \int_0^{2\pi} \int_0^\infty \cos(\theta) F(\sigma,\theta) \:
+      d\sigma \: d\theta \: , \end{equation} \begin{equation}
+      b = \int_0^{2\pi} \int_0^\infty \sin(\theta) F(\sigma,\theta) \:
+      d\sigma \: d\theta \: . \end{equation}
+\item \textbf{SPR} 平均方向扩展 \citep[度；][]{art:KVH88}
+      \begin{equation} \sigma_\theta = \left [ 2 \left \{ 1 - \left (
+      \frac{a^2+b^2}{E^2} \right )^{1/2} \right \} \right ]^{1/2}
+      \: , \label{eq:sig_th} \end{equation}
+\item \textbf{DP} 峰值方向（度），定义方式与平均方向相同，但只使用包含峰值频率的谱 $F(k)$ 的频率/波数箱。
+\item \textbf{HIG} 次重力波高度。
+\item \textbf{MXE} 最大海面高程（时空极值，STE）
+\item \textbf{MXES} 最大海面高程标准差（STE）
+\item \textbf{MXH} 最大波高（STE）
+\item \textbf{MXHC} 由波峰得到的最大波高（STE）
+\item \textbf{SDMH} MXC 的标准差（STE）
+\item \textbf{SDMHC} MXHC 的标准差（STE）
+\item \textbf{WBT} 主导波浪破碎概率 $b_T$ (\ref{eq:bt})
+\item \textbf{TP} 峰值波周期，由峰值频率（\textbf{FP}）的倒数得到。
+\end{list}
+
+\item{谱参数（前 5 个矩和波数）。
+
+所有这些参数都是频率的函数，因此为三维数组。由于内存占用较大，计算这些参数需要在 {\F OUTS} namelist 中激活相应开关。}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+   
+\item \textbf{EF} 波浪频率谱 (m$^2$/Hz)
+      \begin{equation} E(f) = 2 \pi  \int F(\sigma,\theta) \mathrm{d} \theta 
+      \: . \label{eq:Ef} \end{equation}
+\item \textbf{TH1M} 每个频率的平均方向 \citep[度；][]{art:KVH88}
+       \begin{equation} \theta_1 (f)= \mbox{atan} \left ( \frac{b_1(f)}{a_1(f)} \right )
+      \: , \label{eq:theta_b} \end{equation} \begin{equation}
+      a_1(f) = 2 \pi \int_0^{2\pi} \int_0^\infty \cos(\theta) F(\sigma,\theta) \:
+       \mathrm{d}\theta \: , \end{equation} \begin{equation}
+      b_1(f) = 2 \pi \int_0^{2\pi} \int_0^\infty \sin(\theta) F(\sigma,\theta) \:
+       \mathrm{d}\theta \: . \end{equation}
+\item \textbf{STH1M} 每个频率的第一方向扩展（度；）
+      \begin{equation} \sigma_1(f) = \left [ 2 \left \{ 1 - \left (
+      \frac{a_1(f)^2+b_1(f)^2}{E(f)^2} \right )^{1/2} \right \} \right ]^{1/2}
+      \: , \label{eq:sig_th1} \end{equation}
+\item \textbf{TH2M} 由 $a_2$ 和 $b_2$ 得到的平均方向（度）
+       \begin{equation} \theta_2 (f)= 0.5 \mbox{atan} \left ( \frac{b_2(f)}{a_2(f)} \right )
+      \: , \label{eq:theta_2} \end{equation} \begin{equation}
+      a_2(f) = 2 \pi \int_0^{2\pi} \int_0^\infty \cos(2 \theta) F(\sigma,\theta) \:
+       \mathrm{d}\theta \: , \end{equation} \begin{equation}
+      b_2(f) = 2 \pi \int_0^{2\pi} \int_0^\infty \sin(2 \theta) F(\sigma,\theta) \:
+       \mathrm{d}\theta \: . \end{equation}
+\item \textbf{STH2M} 由 $a_2$ 和 $b_2$ 得到的方向扩展（度）
+      \begin{equation} \sigma_2(f) = \left [ 0.5 \left \{ 1 - \left (
+      \frac{a_2(f)^2+b_2(f)^2}{E(f)^2} \right )^{1/2} \right \} \right ]^{1/2}
+      \: , \label{eq:sig_th1} \end{equation}
+\item \textbf{WN} 波数 $k(\sigma)$ (rad/m)
+      \begin{equation} \sigma^2 = g k \tanh (k D) 
+      \: , \label{eq:k} \end{equation}
+\end{list}
+
+\item{谱分区参数} \label{out:spec_part}
+
+这些输出参数基于把谱划分为各个独立波场。
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 5mm \itemsep 0mm \parsep 0mm}
+
+
+\item \textbf{PHS} 谱分区的波高 $H_s$（见下文）。\label{out:first_part}
+\item \textbf{PTP} 谱分区的峰值（相对）周期（抛物线拟合）。
+\item \textbf{PLP} 谱分区的峰值波长（由峰值周期得到）。
+\item \textbf{PSP} 谱分区的平均方向。
+\item 谱分区的方向扩展，参见式~(\ref{eq:sig_th})。
+\item \textbf{PWS} 谱分区的风海比例。采用 \cite{art:HP01} 的方法，并按 \cite{tol:Oahu07a} 所述实现。由此引入“风海比例” $W$：
+\begin{equation}
+W = E^{-1}  \: E |_{U_p > c}  \:\:\: , \label{eq:wsf}
+\end{equation}
+其中 $E$ 为总谱能，$E |_{U_p > c}$ 是谱中投影风速 $U_p$ 大于局地波相速 $c = \sigma / k$ 的区域内的能量。后者定义了谱中受风直接影响的区域。为允许非线性相互作用把该边界移向较低频率，并随后在该区域内形成充分成长的风海，$U_p$ 包含一个乘子 $C_{mult}$：
+\begin{equation}
+U_p = C_{mult} U_{10} \cos ( \theta - \theta_w )  \:\:\: . \label{eq:Up}
+\end{equation}
+该乘子可由用户设置，默认值为 $C_{mult} = 1.7$。
+\item \textbf{PDP} 谱分区的峰值方向。
+\item \textbf{PQP} 谱分区的 Goda 峰度。
+\item \textbf{PPE} 谱分区的 JONSWAP 峰值增强因子。它度量相对于对应 \citeauthor{art:PM64} 谱峰值的谱峰放大。
+\item \textbf{PGW} 谱分区的 Gaussian 频率宽度 (Hz)。即把 Gaussian 谱最小二乘拟合到一维谱分区。
+\item \textbf{PSW} 谱分区的谱宽 \citep{art:LH84}
+\item \textbf{PTE} 谱分区的波能周期 [见式~(\ref{eq:Tm0m1})]
+\item \textbf{PT1} 谱分区的平均波周期 [见式~(\ref{eq:Tm})]
+\item \textbf{PT2} 谱分区的波浪零上跨周期 [见式~(\ref{eq:Tm02})]
+\item \textbf{PEP} 谱分区的波浪峰值谱密度
+\item \textbf{TWS} 整个谱的风海比例。
+\item \textbf{PNR} 在谱中找到的分区数量。\label{out:last_part}
+\end{list}
+
+
+\item{大气-波浪层}
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+\item \textbf{UST} 摩擦速度 $u_\ast$（标量）。定义取决于所选源项参数化 (m/s)。应力的另一种矢量版本可用于研究（需要用户修改代码）。
+\item \textbf{CHA} 气海摩擦的 Charnock 参数（无量纲）
+\item \textbf{CGE} 能量通量 (W/m)
+      \begin{equation} C_g E =  \rho_w g \overline{C_g} E
+      \: . \label{eq:CgE} \end{equation}
+\item \textbf{FAW} 风到波浪的能量通量
+\item \textbf{TAW} 净波浪支撑应力（风到波浪的动量通量）
+\item \textbf{TWA} 波浪支撑应力的负值部分
+\item \textbf{WCC} 白冠覆盖率（无量纲）
+\item \textbf{WCF} 波浪到风的动量通量
+\item \textbf{WCH} 白冠平均厚度 (m)
+\item \textbf{WCM} 平均破碎波高 (m)（尚不可用）
+%\item \textbf{PWS} Moment of whitecap distribution (?) (NOT PLUGGED YET)
+\end{list}
+
+\item{波浪-海洋层}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+\item \textbf{SXY} 辐射应力
+      \begin{equation} S_{xx} = \rho_w g \int \!\!\!\! \int \left
+        ( n - 0.5 + n \cos^2 \theta \right )  \: F(k,\theta) \: dk d\theta
+      \: , \label{eq:Sxx} \end{equation}
+      \begin{equation} S_{xy} =\rho_w g \int \!\!\!\! \int
+        n \sin \theta \cos \theta  \: F(k,\theta) \: dk d\theta
+      \: , \label{eq:Syy} \end{equation}
+      \begin{equation} S_{yy} =\rho_w g \int \!\!\!\! \int \left
+        ( n - 0.5 + n \sin^2 \theta \right )  \: F(k,\theta) \: dk d\theta
+      \: , \label{eq:Sxy} \end{equation}
+      其中
+      \begin{equation} n = \frac{1}{2} + \frac{kd}{\sinh 2kd}
+      \: . \label{eq:n} \end{equation}
+\item \textbf{TWO} 波浪到海洋的动量通量 (m$^2$/s$^2$)
+\item \textbf{BHD} Bernoulli 水头 (m$^2$/s$^2$)
+      \begin{equation} J =  g \int \!\!\!\! \int  \frac{k}
+        {\sinh 2kd}  \: F(k,\theta) \: dk d\theta
+      \: , \label{eq:BHD} \end{equation}
+\item \textbf{FOC} 波浪到海洋的能量通量 (W/m$^2$)
+\item \textbf{TUS} Stokes 体积输运 (m$^2$/s)
+     \begin{equation} (M^w_x,M^w_y) =  g \int \!\!\!\! \int  \frac{(k \cos(\theta),k \sin(\theta))}
+        {\sigma}  \: F(k,\theta) \: dk d\theta
+      \: , \label{eq:Mw} \end{equation}
+\item \textbf{USS} 海表 Stokes 漂流 (m/s)
+     \begin{equation} (U_{ssx},U_{ssy}) =  \int \!\!\!\! \int  \sigma \cosh 2kd \frac{(k \cos(\theta),k \sin(\theta))}
+        {\sinh^2 kd}  \: F(k,\theta) \: dk d\theta
+      \: , \label{eq:Uss} \end{equation}
+\item \textbf{P2S} 二阶压力方差 (m$^2$) 以及该压力的峰值周期 (s)，它们会对声学和地震噪声产生贡献：
+      \begin{equation} F_{p2D}(k=0) = \int_0^{\infty} \frac{4 \sigma}{C_g} \int_0^{\pi}  F(k,\theta) \:  F(k,\theta+\pi) \:  d\theta dk
+      \: , \label{eq:sop} \end{equation}
+\item \textbf{USF} 海表 Stokes 漂流的频率谱 (m/s/Hz)
+     \begin{equation} (U_{ssx}(f),U_{ssy}(f)) =  \int \sigma \cosh 2kd \frac{(k \cos(\theta),k \sin(\theta))}
+        {\sinh^2 kd}  \: F(k,\theta) \frac{2 \pi}{C_g} d\theta
+      \: , \label{eq:Ussf} \end{equation}
+注意，为激活 USF 输出所需的三维数组，必须在 ww3\_grid.inp 的 OUTS namelist 中设置 US3D=1。
+\item \textbf{P2L} 二阶压力的频率谱 (m$^2$s)，它对声学和地震噪声有贡献：
+      \begin{equation} F_{p2D}(k=0,f) =  \frac{2 \sigma}{\pi} \int_0^{\pi}  \frac{4 \pi^2}{C_g^2} F(k,\theta) \:  F(k,\theta+\pi) \:  d\theta
+      \: . \label{eq:sopf} \end{equation}
+\item \textbf{TWI} 波浪到海冰的应力
+\item \textbf{FIC} 波浪到海冰的能量通量
+\item \textbf{USP} 按运行时定义的频率分量划分的表层 Stokes 漂流 (m/s)：
+      \begin{equation} (U_{ssp},V_{ssp})(n) =  \int \!\!\!\! \int_{k_n}  \sigma \cosh 2kd \frac{(k\
+      \cos(\theta),k \sin(\theta))}
+        {\sinh^2 kd}  \: F(k,\theta) \: dk d\theta
+      \: . \label{eq:Ussp} \end{equation}
+这里的数量 $n$ 以及各分区中心波数 $k_n$ 称为“运行时”量，因为它们定义在由 ww3\_grid.inp 生成的模式定义文件中（这些量的设置细节见示例输入文件）。每个 $n$ 分区的波数积分边界会划分模式波谱，以适应给定的 $k_n$ 值。
+\item \textbf{TOC} 总海洋应力 (Pa)
+      \begin{equation} \tau_{oc} = \tau_a - \tau_{aw} + \tau_{woc}
+      \: . \label{eq:Toc} \end{equation}
+\end{list}
+
+\item{波浪-海底层}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+
+\item \textbf{ABR} 近底均方根位移幅度
+      \begin{equation} a_{b,rms} = \left [ 2 \int \!\!\!\! \int
+      \frac{1}{\sinh^2 kd} \: F(k,\theta) \: dk d\theta \right ] ^{1/2}
+      \: . \label{eq:ab_rms} \end{equation}
+\item \textbf{UBR} 近底均方根轨道速度
+      \begin{equation} u_{b,rms} = \left [ 2 \int \!\!\!\! \int
+      \frac{\sigma^2}{\sinh^2 kd} \: F(k,\theta) \: dk d\theta \right ] ^{1/2}
+      \: . \label{eq:ub_rms} \end{equation}
+\item \textbf{BED} 床形参数：沙纹高度和方向（尚未测试）
+\item \textbf{FBB} WBBL 中的能量耗散
+\item \textbf{TBB} WBBL 中的动量损失
+\end{list}
+
+\item{谱参数}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+
+\item \textbf{MSS} $u$ 和 $c$ 方向上的均方坡度（顺波和横波坡度方差分量）。
+\item \textbf{MSC} 谱尾水平（无量纲）
+\item \textbf{MSD} 最大坡度方差 mss$_u$ 的方向
+\item \textbf{MCD} 谱尾方向
+\item \textbf{QP} 峰度参数 \citep{art:G70}
+      \begin{equation} Q_p = \frac{2}{E^2} \int_0^{f_{NK}} f \left( \int_0^{2\pi} 
+      F(f,\theta) \:\rd \theta \right)^2 \: \rd  f \: \label{eq:qp}
+      \end{equation}
+\item \textbf{QKK} 波数峰度 \citep{art:DC23}
+      \begin{equation} Q_{kk} = \frac{1}{E^2} \int_0^{f_{NK}} \int_0^{2\pi} 
+      0.5 \left[ A(k,\theta)+ A(k,\theta+\pi)\right]^2 \frac{\sigma^2}{k C_g} \:\rd \theta  \: \rd  \sigma \: \label{eq:qkk}
+      \end{equation}
+\item \textbf{SKW} 在零坡度处采样的海面高程偏度。这是 \cite{Barrick&Lipa1985} 中定义的 $\lambda_1$ 参数，或 \cite{Srokosz1986} 中的 $\lambda_{3,0,0}$。它由表面高程的二阶修正计算，使用 P. Janssen 的 ECWAM 代码。
+\item \textbf{EMB} 该量为 $-\gamma/8 = -(\lambda_{1,2,0}+\lambda_{1,0,2}-2 \lambda{0,1,1} \lambda{1,1,1})/8 (1-\lambda_{0,1,1}^2)$，使零坡度点的平均海面为 EMB$\times H_s$。
+\item \textbf{EMC} 这是额外的跟踪器偏差系数，等于 $-\lambda_{3,0,0}/24$，它与 retracker 的选择有关，见 \cite{DeCarlo&Ardhuin2024} 中的 $J_z$ 函数。
+\end{list}
+
+\item{数值诊断}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+\item \textbf{DTD} 源项积分中的平均时间步长 (s)。
+\item \textbf{FC} 截止频率 $f_c$ (Hz，取决于输入和耗散的参数化)。
+\item \textbf{CFX} 空间平流的最大 CFL 数
+\item \textbf{CFD} 角向平流的最大 CFL 数
+\item \textbf{CFK} 波数平流的最大 CFL 数
+\end{list}
+
+\item{用户定义}
+
+\begin{list}{\arabic{outpars})\hfill}
+            {\usecounter{outpars} \leftmargin 8mm \labelwidth 7mm
+             \rightmargin 0mm \itemsep 0mm \parsep 0mm}
+
+\item \textbf{U1} 用户定义参数槽位（需要修改代码）。
+\item \textbf{U2} 同上。
+\end{list}
+
+\end{list}
+
+
+
+
+%\vspace{\baselineskip}
+%\centerline{\ldots NEEDS CLEAN UP BELOW HERE \ldots}
+%\vspace{\baselineskip}
+
+%THESE TWO PARAMETERS WILL BE PUT BACK. 
+%Old output types \ref{out:old_fpw} and \ref{out:old_thw} have become obsolete
+%with the introduction of the partitioned output types \ref{out:first_part}
+%through \ref{out:last_part}. However, they are retained in the present model
+%release to provide required downward compatibility with model version 1.18 at
+%NCEP. These output types are likely to be retired in upcoming versions of \ws.

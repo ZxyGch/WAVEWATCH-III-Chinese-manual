@@ -1,0 +1,96 @@
+\vssub
+\subsection{~源项}
+\vsssub
+\subsubsection{~一般概念}
+\vsssub
+
+在深水中，净源项 $S$ 通常认为由三部分组成：大气--波浪相互作用项
+$S_{\mathrm{in}}$，它通常表示正的能量输入，但在涌浪情况下也可以为负；
+非线性波--波相互作用项 $S_{\mathrm{nl}}$；以及通常以破碎为主的波浪--海洋
+相互作用项 $S_{\mathrm{ds}}$。输入项 $S_{\mathrm{in}}$ 主要由指数型
+风浪增长项控制，因此该源项通常只描述这一主导过程。为进行模型初始化并给出
+更真实的初始波浪增长，\ws\ 中还可以加入线性输入项 $S_{\mathrm{ln}}$。
+
+在浅水中，还必须考虑额外过程，最重要的是波浪--海底相互作用
+$S_{\mathrm{bot}}$ \cite[例如][]{pro:Sea78}。在极浅水中，如果
+$S_{\mathrm{ds}}$ 不能很好地表示破碎过程，还应考虑额外的破碎项
+（$S_{\mathrm{db}}$）\citep[见][]{Filipot&Ardhuin2012}。也可以考虑
+三波相互作用（$S_{\mathrm{tr}}$），但现有参数化的精度有限。\ws\ 还提供
+由海底特征引起的波浪散射源项（$S_{\mathrm{sc}}$）、波浪--海冰相互作用
+（$S_{\mathrm{ice}}$）、海岸线或冰山等漂浮物反射项
+（$S_{\mathrm{ref}}$，其中可包含次重力波能量源），以及用于额外用户自定义
+源项的通用接口（$S_{\mathrm{user}}$）。
+
+因此，\ws\ 中使用的一般源项定义为
+
+%---------------------------------%
+% General source term composition %
+%---------------------------------%
+% eq:general_st
+
+\begin{equation}
+S = S_{\mathrm{ln}} + S_{\mathrm{in}} + S_{\mathrm{nl}} + S_{\mathrm{ds}} + S_{\mathrm{bot}} + S_{\mathrm{db}} 
+    + S_{\mathrm{tr}} +
+    S_{\mathrm{sc}} + S_{\mathrm{ice}} + S_{\mathrm{ref}} + S_{\mathrm{user}}\: .
+\label{eq:general_st}
+\end{equation}
+
+\noindent
+还可以很容易地加入其他源项。这些源项是针对{\em 能量}谱定义的。然而在模型
+中，大多数源项直接针对作用量谱计算。后一类源项记为
+$\cS \equiv S/\sigma$。
+
+对非线性相互作用的显式处理定义了第三代波浪模型。因此，首先讨论
+$S_{\mathrm  nl}$ 的计算选项，从第~\ref{sec:NL1} 节开始。
+$S_{\mathrm  in}$ 和 $S_{\mathrm ds}$ 表示彼此独立的过程，但二者往往相互
+关联，因为这两个源项之间的平衡控制波能的积分增长特征。模型提供了这些基本
+源项的若干组合，说明见第~\ref{sec:ST1} 节及其后各节。线性输入的说明从
+第~\ref{sec:LN1} 节开始；第~\ref{sec:BT1} 节及后续各节描述可用的附加过程，
+其中大多与浅水和海冰有关。
+
+%\vspace{\baselineskip} \noindent
+
+第三代波浪模型实际上只将谱积分到截断频率 $f_{hf}$（或波数 $k_{hf}$），
+理想情况下该截断频率等于最高离散频率。实际应用中，源项参数化或所用时间步
+可能无法得到合适的平衡，因此 $f_{hf}$ 可取在模型频率范围之内。在截断频率
+以上，采用参数化谱尾 \citep[例如][]{art:WAM88}：
+
+%--------------------------------------%
+% General tail parameterization E(f,t) %
+%--------------------------------------%
+% eq:tail_E_f
+
+\begin{equation}
+F(f_r,\theta) = F(f_{r,hf},\theta) \left ( \frac{f_r}{f_{r,hf}}
+\right ) ^{-m} \label{eq:tail_E_f} ,
+\end{equation}
+
+\noindent
+利用前文讨论的 Jacobian 变换，可以很容易将其转换为任意其他谱。例如，对于
+当前的作用量谱，参数化谱尾可写为（假设谱尾中的波分量处于深水条件）：
+
+%--------------------------------------%
+% General tail parameterization N(k,t) %
+%--------------------------------------%
+% eq:tail_N_k
+
+\begin{equation}
+N(k,\theta) = N(k_{hf},\theta) \left ( \frac{f_r}{f_{r,hf}}
+\right ) ^{-m-2} \label{eq:tail_N_k} ,
+\end{equation}
+
+\noindent
+$m$ 的实际取值以及 $f_{r,hf}$ 的表达式取决于所使用的源项参数化，并将在下文
+给出。
+
+%\vspace{\baselineskip} \noindent
+在描述具体源项参数化之前，需要先说明风的定义。在存在海流时，可以将风定义
+在固定参考系中，也可以定义在随海流运动的参考系中。\ws\ 同时提供这两种
+定义，并可在编译时选择。不过，程序输出始终是不以任何方式按海流修正的
+风速。
+
+%\vspace{\baselineskip} \noindent
+源项中对部分海冰覆盖（海冰密集度）的处理遵循有限气--海界面的概念。这意味
+着从大气传递给波浪的动量受到限制。因此，输入项和耗散项按海冰密集度比例
+缩放。非线性波--波相互作用项可用于开阔水域和海冰区域
+\citep{art:PL07}。这种缩放实现与所选择的源项无关。
