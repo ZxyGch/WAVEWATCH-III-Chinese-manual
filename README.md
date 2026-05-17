@@ -28,20 +28,6 @@ zh/app/*.tex
 
 ## 依赖
 
-在当前机器上，下面这些命令已经可用，可以直接执行本文档中的构建命令：
-
-```sh
-make
-latex
-xelatex
-bibtex
-dvipdf
-```
-
-如果换到一台新机器，需要先安装一个完整的 LaTeX 发行版。macOS 上通常可安装
-MacTeX；Linux 上通常可安装 TeX Live，并确保包含 `xelatex`、`bibtex`、
-`ctex` 和 Fandol 中文字体。英文版还会用到 `latex` 和 `dvipdf`。
-
 macOS（Homebrew）：
 
 ```sh
@@ -50,7 +36,7 @@ echo 'export PATH="/Library/TeX/texbin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Ubuntu / Debian（完整安装，最省心但体积较大）：
+Ubuntu / Debian：
 
 ```sh
 sudo apt update
