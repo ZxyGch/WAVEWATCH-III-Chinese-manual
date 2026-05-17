@@ -67,14 +67,7 @@ sudo dnf install -y make texlive-scheme-full
 which make latex xelatex bibtex dvipdf
 ```
 
-中文 PDF 不需要额外的 Python 或 Node 包。它依赖 `manual_zh.tex` 中的
-`ctex` 设置：
 
-```tex
-\usepackage[UTF8,heading=false,fontset=fandol]{ctex}
-```
-
-因此只要 LaTeX 发行版包含 `ctex` 和 Fandol 字体即可。
 
 ## 生成英文 PDF
 
@@ -101,15 +94,6 @@ make inp
 `../model/inp` 和 `../model/nml`。
 
 ## 生成中文 PDF
-
-中文手册使用 XeLaTeX 编译，因为需要中文字体和 `ctex` 支持。先生成手册
-中引用的示例片段：
-
-```sh
-make inp
-```
-
-然后编译中文入口文件：
 
 ```sh
 xelatex -interaction=nonstopmode -halt-on-error manual_zh.tex
@@ -143,4 +127,5 @@ make clean
 
 注意：`make clean` 会删除编译生成的 `.aux`、`.log`、`.out`、`.toc`、
 `.bbl`、`.blg`、`.dvi`、`.pdf` 等文件，也会删除 `make inp` 生成的示例
-片段。清理后如果要重新生成中文 PDF，需要再次运行 `make inp`。
+片段。清理后如果要重新生成中文 PDF，需要再次运行
+`make ww3_gspl.sh.out run_test.out`。
