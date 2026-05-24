@@ -1,0 +1,226 @@
+\pagestyle{myheadings} \setcounter{page}{1} \setcounter{footnote}{0}
+
+\section{~输入文件配置} \label{app:config}
+\newcounters
+
+本节列出各程序的传统 \texttt{*.inp} 格式输入文件和新的
+\texttt{*.nml} 格式 namelist 输入文件。这些文件也分别可在
+{\file model/inp} 和 {\file model/nml} 目录中找到。
+
+\newcommand{\zhmissingconfigfile}[1]{%
+  \vspace{\baselineskip}\noindent
+  {\footnotesize\texttt{\detokenize{#1}} 未生成。运行 \texttt{make inp} 可生成此示例输入文件。}%
+}
+\newcommand{\zhinpfile}[1]{\IfFileExists{#1}{\inpfile{#1}}{\zhmissingconfigfile{#1}}}
+\newcommand{\zhnmlfile}[1]{\IfFileExists{#1}{\nmlfile{#1}}{\zhmissingconfigfile{#1}}}
+
+\vssub
+\subsection{~ww3\_grid}
+\vsssub
+\subsubsection{~ww3\_grid.inp} \label{sec:config011}
+\zhinpfile{ww3_grid.tex}
+\vsssub
+
+\vsssub
+\subsubsection{~ww3\_grid.nml} \label{sec:config012}
+\zhnmlfile{ww3_grid.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_strt}
+\vsssub
+\subsubsection{~ww3\_strt.inp} \label{sec:config021}
+\zhinpfile{ww3_strt.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_bound}
+\vsssub
+\subsubsection{~ww3\_bound.inp} \label{sec:config031}
+\zhinpfile{ww3_bound.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_bounc}
+\vsssub
+\subsubsection{~ww3\_bounc.inp} \label{sec:config041}
+\zhinpfile{ww3_bounc.tex}
+\vsssub
+\vsssub
+\subsubsection{~ww3\_bounc.nml} \label{sec:config042}
+\zhnmlfile{ww3_bounc.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_prep}
+\vsssub
+\subsubsection{~ww3\_prep.inp} \label{sec:config051}
+\zhinpfile{ww3_prep.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_prnc}
+\vsssub
+\subsubsection{~ww3\_prnc.inp} \label{sec:config061}
+\zhinpfile{ww3_prnc.tex}
+\vsssub
+\vsssub
+\subsubsection{~ww3\_prnc.nml} \label{sec:config062}
+\zhnmlfile{ww3_prnc.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_prtide}
+\vsssub
+\subsubsection{~ww3\_prtide.inp} \label{sec:config071}
+\zhinpfile{ww3_prtide.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_shel}
+\vsssub
+\subsubsection{~ww3\_shel.inp} \label{sec:config081}
+\zhinpfile{ww3_shel.tex}
+\vsssub
+\vsssub
+\subsubsection{~ww3\_shel.nml} \label{sec:config082}
+\zhnmlfile{ww3_shel.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_gspl}
+\vsssub
+\subsubsection{~ww3\_gspl.inp} \label{sec:config091}
+\zhinpfile{ww3_gspl.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_multi}
+\vsssub
+\subsubsection{~ww3\_multi.inp} \label{sec:config101}
+\zhinpfile{ww3_multi.tex}
+\vsssub
+\vsssub
+\subsubsection{~ww3\_multi.nml} \label{sec:config102}
+\zhnmlfile{ww3_multi.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_gint}
+\vsssub
+\subsubsection{~ww3\_gint.inp} \label{sec:config111}
+\zhinpfile{ww3_gint.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_outf}
+\vsssub
+\subsubsection{~ww3\_outf.inp} \label{sec:config121}
+\zhinpfile{ww3_outf.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_ounf}
+\vsssub
+\subsubsection{~ww3\_ounf.inp} \label{sec:config131}
+\zhinpfile{ww3_ounf.tex}
+\vsssub
+\vsssub
+\subsubsection{~ww3\_ounf.nml} \label{sec:config132}
+\zhnmlfile{ww3_ounf.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~gx\_outf}
+\vsssub
+\subsubsection{~gx\_outf.inp} \label{sec:config141}
+\zhinpfile{gx_outf.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_grib}
+\vsssub
+\subsubsection{~ww3\_grib.inp} \label{sec:config151}
+\zhinpfile{ww3_grib.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_outp}
+\vsssub
+\subsubsection{~ww3\_outp.inp} \label{sec:config161}
+\zhinpfile{ww3_outp.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_ounp}
+\vsssub
+\subsubsection{~ww3\_ounp.inp} \label{sec:config171}
+\zhinpfile{ww3_ounp.tex}
+\vsssub
+\vsssub
+\subsubsection{~ww3\_ounp.nml} \label{sec:config172}
+\zhnmlfile{ww3_ounp.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~gx\_outp}
+\vsssub
+\subsubsection{~gx\_outp.inp} \label{sec:config181}
+\zhinpfile{gx_outp.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_trck}
+\vsssub
+\subsubsection{~ww3\_trck.inp} \label{sec:config191}
+\zhinpfile{ww3_trck.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_trnc}
+\vsssub
+\subsubsection{~ww3\_trnc.inp} \label{sec:config201}
+\zhinpfile{ww3_trnc.tex}
+\vsssub
+\vsssub
+\subsubsection{~ww3\_trnc.nml} \label{sec:config202}
+\zhnmlfile{ww3_trnc.tel}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_systrk}
+\vsssub
+\subsubsection{~ww3\_systrk.inp} \label{sec:config211}
+\zhinpfile{ww3_systrk.tex}
+\vsssub
+\vssub
+
+\vssub
+\subsection{~ww3\_uprstr}
+\vsssub
+\subsubsection{~ww3\_uprstr.inp} \label{sec:config221}
+\zhinpfile{ww3_uprstr.tex}
+\vsssub
+\vssub
+
+\bpage \pagestyle{empty}

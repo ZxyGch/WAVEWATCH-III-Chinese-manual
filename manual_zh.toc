@@ -1,0 +1,269 @@
+\contentsline {section}{\numberline {1}~引言}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}~WAVEWATCH~III\ 建模框架}{1}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}~关于本手册}{2}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}~许可条款}{5}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}~版权和商标}{6}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}~WAVEWATCH III\textsuperscript {\textregistered } 开发组（WW3DG）}{6}{subsection.1.5}%
+\contentsline {subsection}{\numberline {1.6}~致谢}{12}{subsection.1.6}%
+\contentsline {section}{\numberline {2}~控制方程}{14}{section.2}%
+\contentsline {subsection}{\numberline {2.1}~引言}{14}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}~传播}{16}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}~源项}{17}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}~一般概念}{17}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}~$S_{nl}$：离散相互作用近似（DIA）}{19}{subsubsection.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.3.3}~$S_{nl}$：Gaussian Quadrature Method（DIA）}{22}{subsubsection.2.3.3}%
+\contentsline {subsubsection}{\numberline {2.3.4}~$S_{nl}$：完整 Boltzmann 积分（WRT）}{23}{subsubsection.2.3.4}%
+\contentsline {subsubsection}{\numberline {2.3.5}~$S_{nl}$：广义多重 DIA\ （GMD）}{26}{subsubsection.2.3.5}%
+\contentsline {subsubsection}{\numberline {2.3.6}~$S_{nl}$：双尺度近似（TSA）}{29}{subsubsection.2.3.6}%
+\contentsline {paragraph}{TSA 和 FBI}{30}{section*.3}%
+\contentsline {subsubsection}{\numberline {2.3.7}~$S_{nl}$：广义动力学方程（GKE）}{34}{subsubsection.2.3.7}%
+\contentsline {paragraph}{四元组筛选。}{35}{section*.5}%
+\contentsline {paragraph}{相位混合。}{36}{section*.6}%
+\contentsline {paragraph}{源项积分。}{36}{section*.7}%
+\contentsline {paragraph}{\textit {\underline {代码限制：}}}{36}{section*.8}%
+\contentsline {subsubsection}{\numberline {2.3.8}~$S_{nl}$：非线性滤波器}{36}{subsubsection.2.3.8}%
+\contentsline {subsubsection}{\numberline {2.3.9}~$S_{in} + S_{ds}$：WAM\ cycle 3}{38}{subsubsection.2.3.9}%
+\contentsline {subsubsection}{\numberline {2.3.10}~$S_{in} + S_{ds}$：Tolman 和 Chalikov 1996}{40}{subsubsection.2.3.10}%
+\contentsline {subsubsection}{\numberline {2.3.11}~$S_{in} + S_{ds}$：WAM\ cycle 4 (ECWAM)}{46}{subsubsection.2.3.11}%
+\contentsline {subsubsection}{\numberline {2.3.12}~$S_{\mathrm {in}} + S_{\mathrm {ds}}$：基于饱和度的耗散}{51}{subsubsection.2.3.12}%
+\contentsline {subsubsection}{\numberline {2.3.13}~$S_{in} + S_{ds}$：Rogers et al. 2012 \& Zieger et al. 2015}{61}{subsubsection.2.3.13}%
+\contentsline {paragraph}{风输入。}{61}{section*.14}%
+\contentsline {paragraph}{风输入约束。}{62}{section*.15}%
+\contentsline {paragraph}{负输入。}{63}{section*.16}%
+\contentsline {paragraph}{白帽耗散。}{63}{section*.17}%
+\contentsline {paragraph}{涌浪耗散。}{66}{section*.20}%
+\contentsline {paragraph}{vers.\,6.07 以来的更新}{66}{section*.21}%
+\contentsline {paragraph}{主导波破碎概率}{68}{section*.23}%
+\contentsline {paragraph}{整体调整。}{68}{section*.24}%
+\contentsline {subsubsection}{\numberline {2.3.14}~$S_{ln}$：Cavaleri and Malanotte-Rizzoli 1981}{69}{subsubsection.2.3.14}%
+\contentsline {subsubsection}{\numberline {2.3.15}~$S_{bot}$：JONSWAP\ 底摩擦}{70}{subsubsection.2.3.15}%
+\contentsline {subsubsection}{\numberline {2.3.16}~$S_{bot}$：SHOWEX\ 底摩擦}{71}{subsubsection.2.3.16}%
+\contentsline {subsubsection}{\numberline {2.3.17}~$S_{mud}$：黏性浮泥耗散（D\&L）}{73}{subsubsection.2.3.17}%
+\contentsline {subsubsection}{\numberline {2.3.18}~$S_{mud}$：黏性浮泥耗散（Ng）}{74}{subsubsection.2.3.18}%
+\contentsline {subsubsection}{\numberline {2.3.19}~$S_{db}$：Battjes and Janssen 1978}{75}{subsubsection.2.3.19}%
+\contentsline {subsubsection}{\numberline {2.3.20}~$S_{tr}$：三波非线性相互作用（LTA）}{76}{subsubsection.2.3.20}%
+\contentsline {subsubsection}{\numberline {2.3.21}~$S_{bs}$：底部散射}{78}{subsubsection.2.3.21}%
+\contentsline {subsubsection}{\numberline {2.3.22}~$S_{uo}$：未解析障碍物源项}{80}{subsubsection.2.3.22}%
+\contentsline {subsubsection}{\numberline {2.3.23}~$S_{xx}$：用户定义}{83}{subsubsection.2.3.23}%
+\contentsline {subsection}{\numberline {2.4}~波-冰相互作用的源项}{83}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}~$S_{ice}$：海冰阻尼（简单方法）}{86}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}~$S_{ice}$：海冰阻尼（Liu et al.）}{86}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}~$S_{ice}$：海冰阻尼（Shen et al.）}{88}{subsubsection.2.4.3}%
+\contentsline {subsubsection}{\numberline {2.4.4}~$S_{ice}$：海冰经验/参数化阻尼}{91}{subsubsection.2.4.4}%
+\contentsline {subsubsection}{\numberline {2.4.5}~$S_{ice}$：海冰阻尼（有效介质模型）}{95}{subsubsection.2.4.5}%
+\contentsline {subsubsection}{\numberline {2.4.6}~$S_{is}$：海冰扩散散射（简单方法）}{98}{subsubsection.2.4.6}%
+\contentsline {subsubsection}{\numberline {2.4.7}~$S_{is}$：依赖浮冰尺度的散射与耗散}{98}{subsubsection.2.4.7}%
+\contentsline {subsubsection}{\numberline {2.4.8}~$S_{ref}$：岸线和冰山处的能量反射}{103}{subsubsection.2.4.8}%
+\contentsline {subsubsection}{\numberline {2.4.9}~二阶谱和自由次重力波}{106}{subsubsection.2.4.9}%
+\contentsline {subsection}{\numberline {2.5}~气海过程}{109}{subsection.2.5}%
+\contentsline {subsubsection}{\numberline {2.5.1}~一般概念}{109}{subsubsection.2.5.1}%
+\contentsline {paragraph}{依赖海况的气海通量}{109}{section*.29}%
+\contentsline {subsubsection}{\numberline {2.5.2}~依赖海况的 $\tau $：Reichl et al. 2014}{110}{subsubsection.2.5.2}%
+\contentsline {paragraph}{Reichl et al., 2014 的风应力}{110}{section*.30}%
+\contentsline {subsubsection}{\numberline {2.5.3}~依赖海况的 $\tau $：Donelan et al. 2012}{112}{subsubsection.2.5.3}%
+\contentsline {paragraph}{Donelan et al., 2012 的风应力}{112}{section*.31}%
+\contentsline {subsection}{\numberline {2.6}~输出参数}{113}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}~派生参数}{122}{subsection.2.7}%
+\contentsline {subsubsection}{\numberline {2.7.1}方向坡度和近天底后向散射}{122}{subsubsection.2.7.1}%
+\contentsline {subsubsection}{\numberline {2.7.2}Stokes 漂流剖面}{123}{subsubsection.2.7.2}%
+\contentsline {section}{\numberline {3}~数值方法}{125}{section.3}%
+\contentsline {subsection}{\numberline {3.1}~谱离散}{125}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}~波作用量方程的分裂}{126}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}~水深随时间变化}{128}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}~空间传播}{129}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}~一般概念}{129}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}~传统规则网格}{130}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\strut \hspace {24mm} 一阶格式}{130}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\strut \hspace {24mm} 二阶格式 (UNO)}{131}{equation.9}%
+\contentsline {subsubsection}{\strut \hspace {24mm} 三阶格式 (UQ)}{132}{equation.11}%
+\contentsline {subsubsection}{\numberline {3.4.3}~曲线网格}{134}{subsubsection.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.4.4}~三角形非结构网格}{135}{subsubsection.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.4.5}~球面多单元（SMC）网格}{140}{subsubsection.3.4.5}%
+\contentsline {subsubsection}{\numberline {3.4.6}~Garden Sprinkler Effect}{145}{subsubsection.3.4.6}%
+\contentsline {subsubsection}{\strut \hspace {24mm} 不进行 GSE 缓解}{146}{subsubsection.3.4.6}%
+\contentsline {subsubsection}{\strut \hspace {24mm} Booij and Holthuijsen 1987}{147}{subsubsection.3.4.6}%
+\contentsline {subsubsection}{\strut \hspace {24mm} 空间平均}{150}{equation.41}%
+\contentsline {subsubsection}{\numberline {3.4.7}~未解析障碍物}{152}{subsubsection.3.4.7}%
+\contentsline {subsubsection}{\numberline {3.4.8}~连续移动网格}{153}{subsubsection.3.4.8}%
+\contentsline {subsubsection}{\strut \hspace {24mm} 一般概念}{153}{subsubsection.3.4.8}%
+\contentsline {subsubsection}{\numberline {3.4.9}~旋转网格}{155}{subsubsection.3.4.9}%
+\contentsline {subsection}{\numberline {3.5}~谱内传播}{157}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1}~一般概念}{157}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2}~一阶格式}{159}{subsubsection.3.5.2}%
+\contentsline {subsubsection}{\numberline {3.5.3}~二阶格式 (UNO)}{159}{subsubsection.3.5.3}%
+\contentsline {subsubsection}{\numberline {3.5.4}~三阶格式 (UQ)}{160}{subsubsection.3.5.4}%
+\contentsline {subsection}{\numberline {3.6}~非冰源项积分}{161}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}~冰源项积分}{164}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}~简单冰阻挡 ({\tt IC0})}{165}{subsection.3.8}%
+\contentsline {subsection}{\numberline {3.9}~风和流}{167}{subsection.3.9}%
+\contentsline {subsection}{\numberline {3.10}~潮汐分析的使用}{167}{subsection.3.10}%
+\contentsline {subsection}{\numberline {3.11}~波峰和波高的时空极值}{168}{subsection.3.11}%
+\contentsline {subsection}{\numberline {3.12}~谱分区}{171}{subsection.3.12}%
+\contentsline {subsubsection}{\numberline {3.12.1}地形式分区方法}{172}{subsubsection.3.12.1}%
+\contentsline {subsubsection}{\numberline {3.12.2}风海/涌浪归属与分区方法}{174}{subsubsection.3.12.2}%
+\contentsline {subsection}{\numberline {3.13}~波系的空间和时间追踪}{176}{subsection.3.13}%
+\contentsline {subsection}{\numberline {3.14}~嵌套}{178}{subsection.3.14}%
+\contentsline {subsubsection}{\numberline {3.14.1}~传统单向嵌套}{178}{subsubsection.3.14.1}%
+\contentsline {subsubsection}{\numberline {3.14.2}~双向嵌套}{179}{subsubsection.3.14.2}%
+\contentsline {section}{\numberline {4}~波浪模型结构与数据流}{183}{section.4}%
+\contentsline {subsection}{\numberline {4.1}~程序设计}{183}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}~波浪模式例程}{184}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}~数据同化接口}{187}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}~辅助程序}{188}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}一般概念}{188}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}配置文件}{189}{subsubsection.4.4.2}%
+\contentsline {subsubsection}{\numberline {4.4.3}网格预处理器}{192}{subsubsection.4.4.3}%
+\contentsline {subsubsection}{\numberline {4.4.4}初始条件程序}{193}{subsubsection.4.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.5}边界条件程序}{194}{subsubsection.4.4.5}%
+\contentsline {subsubsection}{\numberline {4.4.6}NetCDF 边界条件程序}{195}{subsubsection.4.4.6}%
+\contentsline {subsubsection}{\numberline {4.4.7}输入场预处理器}{196}{subsubsection.4.4.7}%
+\contentsline {subsubsection}{\numberline {4.4.8}NetCDF 输入场预处理器}{197}{subsubsection.4.4.8}%
+\contentsline {subsubsection}{\numberline {4.4.9}潮汐预报程序}{198}{subsubsection.4.4.9}%
+\contentsline {subsubsection}{\numberline {4.4.10}通用壳程序}{199}{subsubsection.4.4.10}%
+\contentsline {subsubsection}{\numberline {4.4.11}ww3\_multi 的自动网格拆分 (ww3\_gspl)}{201}{subsubsection.4.4.11}%
+\contentsline {subsubsection}{\numberline {4.4.12}多网格壳程序}{203}{subsubsection.4.4.12}%
+\contentsline {subsubsection}{\numberline {4.4.13}网格整合}{204}{subsubsection.4.4.13}%
+\contentsline {subsubsection}{\numberline {4.4.14}网格输出后处理器}{205}{subsubsection.4.4.14}%
+\contentsline {subsubsection}{\numberline {4.4.15}网格输出 NetCDF 后处理器}{206}{subsubsection.4.4.15}%
+\contentsline {paragraph}{元数据的用户配置：}{206}{section*.48}%
+\contentsline {paragraph}{修改/添加 WW3 网格输出场的属性：}{207}{section*.49}%
+\contentsline {paragraph}{修改“全局”元数据：}{208}{section*.50}%
+\contentsline {paragraph}{修改/定义坐标参考系统：}{208}{section*.51}%
+\contentsline {paragraph}{分区参数模板字符串}{209}{section*.52}%
+\contentsline {paragraph}{ounfmeta.inp 文件示例：}{209}{section*.53}%
+\contentsline {paragraph}{添加“forecast variables”：}{211}{section*.54}%
+\contentsline {subsubsection}{\numberline {4.4.16}用于 GrADS 的网格输出后处理器}{212}{subsubsection.4.4.16}%
+\contentsline {subsubsection}{\numberline {4.4.17}网格 GRIB 输出后处理器}{213}{subsubsection.4.4.17}%
+\contentsline {subsubsection}{\numberline {4.4.18}点输出后处理器}{215}{subsubsection.4.4.18}%
+\contentsline {subsubsection}{\numberline {4.4.19}点输出 NetCDF 后处理器}{216}{subsubsection.4.4.19}%
+\contentsline {subsubsection}{\numberline {4.4.20}用于 GrADS 的点输出后处理器}{217}{subsubsection.4.4.20}%
+\contentsline {subsubsection}{\numberline {4.4.21}轨迹输出后处理器}{218}{subsubsection.4.4.21}%
+\contentsline {subsubsection}{\numberline {4.4.22}轨迹输出 NetCDF 后处理器}{219}{subsubsection.4.4.22}%
+\contentsline {subsubsection}{\numberline {4.4.23}波浪系统的时空跟踪}{220}{subsubsection.4.4.23}%
+\contentsline {subsubsection}{\numberline {4.4.24}重启动文件处理器}{222}{subsubsection.4.4.24}%
+\contentsline {paragraph}{引言 \newline }{222}{section*.55}%
+\contentsline {subparagraph}{\textbf {ww3\_uprstr} 的目的 \newline }{222}{section*.56}%
+\contentsline {subparagraph}{核心算法 \newline }{222}{section*.57}%
+\contentsline {paragraph}{如何使用 ww3\_uprstr \newline }{222}{section*.58}%
+\contentsline {subparagraph}{更新方法 \newline }{224}{section*.59}%
+\contentsline {subparagraph}{示例 \newline }{227}{section*.61}%
+\contentsline {section}{\numberline {5}~安装、编译和运行波浪模型}{231}{section.5}%
+\contentsline {subsection}{\numberline {5.1}~引言}{231}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}~发行方式}{231}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}~安装}{232}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}~设置}{232}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}~目录结构}{233}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}~可选环境设置}{238}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}~编译和链接}{238}{subsection.5.7}%
+\contentsline {subsection}{\numberline {5.8}~详细编译}{240}{subsection.5.8}%
+\contentsline {subsection}{\numberline {5.9}~选择模式选项}{243}{subsection.5.9}%
+\contentsline {subsubsection}{\numberline {5.9.1}~强制开关}{244}{subsubsection.5.9.1}%
+\contentsline {subsubsection}{\numberline {5.9.2}~可选开关}{248}{subsubsection.5.9.2}%
+\contentsline {subsubsection}{\numberline {5.9.3}~默认模式设置}{251}{subsubsection.5.9.3}%
+\contentsline {subsection}{\numberline {5.10}~修改源代码}{252}{subsection.5.10}%
+\contentsline {subsection}{\numberline {5.11}~运行测试案例}{253}{subsection.5.11}%
+\contentsline {section}{\numberline {6}~系统文档}{260}{section.6}%
+\contentsline {subsection}{\numberline {6.1}~引言}{260}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}~预处理器}{260}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}~程序文件}{263}{subsection.6.3}%
+\contentsline {subsubsection}{\numberline {6.3.1}~波浪模式模块}{263}{subsubsection.6.3.1}%
+\contentsline {subsubsection}{\numberline {6.3.2}~多网格模块}{282}{subsubsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.3}~数据同化模块}{284}{subsubsection.6.3.3}%
+\contentsline {subsubsection}{\numberline {6.3.4}~辅助程序}{284}{subsubsection.6.3.4}%
+\contentsline {subsection}{\numberline {6.4}~优化}{288}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}~内部数据存储}{289}{subsection.6.5}%
+\contentsline {subsubsection}{\numberline {6.5.1}~网格}{289}{subsubsection.6.5.1}%
+\contentsline {subsubsection}{\numberline {6.5.2}~分布式内存概念}{294}{subsubsection.6.5.2}%
+\contentsline {subsubsection}{\numberline {6.5.3}~多网格}{297}{subsubsection.6.5.3}%
+\contentsline {subsection}{\numberline {6.6}~模块中的变量}{298}{subsection.6.6}%
+\contentsline {subsubsection}{\numberline {6.6.1}~模块中的参数设置}{298}{subsubsection.6.6.1}%
+\contentsline {subsubsection}{\numberline {6.6.2}~数据结构}{305}{subsubsection.6.6.2}%
+\vspace {\baselineskip }
+\contentsline {section}{参考文献}{307}{section*.76}%
+\vspace {\baselineskip }
+\vspace {\baselineskip }
+ 
+\noindent {\bf 附录}
+ 
+\contentsline {section}{\numberline {A}~设置模式时间步长}{A.1}{appendix.A}%
+\contentsline {subsection}{\numberline {A.1}~单个网格}{A.1}{subsection.A.1}%
+\contentsline {subsection}{\numberline {A.2}~网格镶嵌}{A.3}{subsection.A.2}%
+\contentsline {section}{\numberline {B}~设置嵌套运行}{B.1}{appendix.B}%
+\contentsline {subsection}{\numberline {B.1}~使用 {\sf ww3\_shel}}{B.1}{subsection.B.1}%
+\contentsline {subsection}{\numberline {B.2}~使用 {\sf ww3\_bound} 和/或非结构网格}{B.3}{subsection.B.2}%
+\contentsline {subsection}{\numberline {B.3}~使用 {\sf ww3\_multi}}{B.4}{subsection.B.3}%
+\contentsline {section}{\numberline {C}~分布式机器设置（MPI）}{C.1}{appendix.C}%
+\contentsline {subsection}{\numberline {C.1}~模式设置}{C.1}{subsection.C.1}%
+\contentsline {subsection}{\numberline {C.2}~常见错误}{C.4}{subsection.C.2}%
+\contentsline {subsection}{\numberline {C.3}~MPI 点对点通信错误}{C.5}{subsection.C.3}%
+\contentsline {section}{\numberline {D}~非规则网格的镶嵌方法}{D.1}{appendix.D}%
+\contentsline {subsection}{\numberline {D.1}~引言}{D.1}{subsection.D.1}%
+\contentsline {subsection}{\numberline {D.2}~SCRIP-WW3}{D.1}{subsection.D.2}%
+\contentsline {subsection}{\numberline {D.3}~SCRIP 操作}{D.2}{subsection.D.3}%
+\contentsline {subsection}{\numberline {D.4}~优化和常见问题}{D.3}{subsection.D.4}%
+\contentsline {subsection}{\numberline {D.5}~限制}{D.5}{subsection.D.5}%
+\contentsline {section}{\numberline {E}~使用 OASIS 进行海洋-海冰-波浪-大气耦合}{E.1}{appendix.E}%
+\contentsline {subsection}{\numberline {E.1}~引言}{E.1}{subsection.E.1}%
+\contentsline {subsection}{\numberline {E.2}~与 OASIS3-MCT 建立接口}{E.2}{subsection.E.2}%
+\contentsline {subsection}{\numberline {E.3}~使用 OASIS3-MCT 编译}{E.2}{subsection.E.3}%
+\contentsline {subsection}{\numberline {E.4}~启动耦合模拟}{E.3}{subsection.E.4}%
+\contentsline {subsection}{\numberline {E.5}~限制}{E.4}{subsection.E.5}%
+\contentsline {section}{\numberline {F}~与 NUOPC 耦合}{F.1}{appendix.F}%
+\contentsline {subsection}{\numberline {F.1}~引言}{F.1}{subsection.F.1}%
+\contentsline {subsection}{\numberline {F.2}~构建和安装 NUOPC Cap}{F.1}{subsection.F.2}%
+\contentsline {subsection}{\numberline {F.3}~NUOPC Cap 中的导入/导出场}{F.2}{subsection.F.3}%
+\contentsline {subsection}{\numberline {F.4}~NUOPC Cap 输入文件配置}{F.3}{subsection.F.4}%
+\contentsline {subsection}{\numberline {F.5}~运行 NUOPC Cap}{F.3}{subsection.F.5}%
+\contentsline {section}{\numberline {G}~输入文件配置}{G.1}{appendix.G}%
+\contentsline {subsection}{\numberline {G.1}~ww3\_grid}{G.1}{subsection.G.1}%
+\contentsline {subsubsection}{\numberline {G.1.1}~ww3\_grid.inp}{G.1}{subsubsection.G.1.1}%
+\contentsline {subsubsection}{\numberline {G.1.2}~ww3\_grid.nml}{G.1}{subsubsection.G.1.2}%
+\contentsline {subsection}{\numberline {G.2}~ww3\_strt}{G.1}{subsection.G.2}%
+\contentsline {subsubsection}{\numberline {G.2.1}~ww3\_strt.inp}{G.1}{subsubsection.G.2.1}%
+\contentsline {subsection}{\numberline {G.3}~ww3\_bound}{G.2}{subsection.G.3}%
+\contentsline {subsubsection}{\numberline {G.3.1}~ww3\_bound.inp}{G.2}{subsubsection.G.3.1}%
+\contentsline {subsection}{\numberline {G.4}~ww3\_bounc}{G.2}{subsection.G.4}%
+\contentsline {subsubsection}{\numberline {G.4.1}~ww3\_bounc.inp}{G.2}{subsubsection.G.4.1}%
+\contentsline {subsubsection}{\numberline {G.4.2}~ww3\_bounc.nml}{G.2}{subsubsection.G.4.2}%
+\contentsline {subsection}{\numberline {G.5}~ww3\_prep}{G.2}{subsection.G.5}%
+\contentsline {subsubsection}{\numberline {G.5.1}~ww3\_prep.inp}{G.2}{subsubsection.G.5.1}%
+\contentsline {subsection}{\numberline {G.6}~ww3\_prnc}{G.3}{subsection.G.6}%
+\contentsline {subsubsection}{\numberline {G.6.1}~ww3\_prnc.inp}{G.3}{subsubsection.G.6.1}%
+\contentsline {subsubsection}{\numberline {G.6.2}~ww3\_prnc.nml}{G.3}{subsubsection.G.6.2}%
+\contentsline {subsection}{\numberline {G.7}~ww3\_prtide}{G.3}{subsection.G.7}%
+\contentsline {subsubsection}{\numberline {G.7.1}~ww3\_prtide.inp}{G.3}{subsubsection.G.7.1}%
+\contentsline {subsection}{\numberline {G.8}~ww3\_shel}{G.3}{subsection.G.8}%
+\contentsline {subsubsection}{\numberline {G.8.1}~ww3\_shel.inp}{G.3}{subsubsection.G.8.1}%
+\contentsline {subsubsection}{\numberline {G.8.2}~ww3\_shel.nml}{G.4}{subsubsection.G.8.2}%
+\contentsline {subsection}{\numberline {G.9}~ww3\_gspl}{G.4}{subsection.G.9}%
+\contentsline {subsubsection}{\numberline {G.9.1}~ww3\_gspl.inp}{G.4}{subsubsection.G.9.1}%
+\contentsline {subsection}{\numberline {G.10}~ww3\_multi}{G.4}{subsection.G.10}%
+\contentsline {subsubsection}{\numberline {G.10.1}~ww3\_multi.inp}{G.4}{subsubsection.G.10.1}%
+\contentsline {subsubsection}{\numberline {G.10.2}~ww3\_multi.nml}{G.4}{subsubsection.G.10.2}%
+\contentsline {subsection}{\numberline {G.11}~ww3\_gint}{G.5}{subsection.G.11}%
+\contentsline {subsubsection}{\numberline {G.11.1}~ww3\_gint.inp}{G.5}{subsubsection.G.11.1}%
+\contentsline {subsection}{\numberline {G.12}~ww3\_outf}{G.5}{subsection.G.12}%
+\contentsline {subsubsection}{\numberline {G.12.1}~ww3\_outf.inp}{G.5}{subsubsection.G.12.1}%
+\contentsline {subsection}{\numberline {G.13}~ww3\_ounf}{G.5}{subsection.G.13}%
+\contentsline {subsubsection}{\numberline {G.13.1}~ww3\_ounf.inp}{G.5}{subsubsection.G.13.1}%
+\contentsline {subsubsection}{\numberline {G.13.2}~ww3\_ounf.nml}{G.5}{subsubsection.G.13.2}%
+\contentsline {subsection}{\numberline {G.14}~gx\_outf}{G.6}{subsection.G.14}%
+\contentsline {subsubsection}{\numberline {G.14.1}~gx\_outf.inp}{G.6}{subsubsection.G.14.1}%
+\contentsline {subsection}{\numberline {G.15}~ww3\_grib}{G.6}{subsection.G.15}%
+\contentsline {subsubsection}{\numberline {G.15.1}~ww3\_grib.inp}{G.6}{subsubsection.G.15.1}%
+\contentsline {subsection}{\numberline {G.16}~ww3\_outp}{G.6}{subsection.G.16}%
+\contentsline {subsubsection}{\numberline {G.16.1}~ww3\_outp.inp}{G.6}{subsubsection.G.16.1}%
+\contentsline {subsection}{\numberline {G.17}~ww3\_ounp}{G.7}{subsection.G.17}%
+\contentsline {subsubsection}{\numberline {G.17.1}~ww3\_ounp.inp}{G.7}{subsubsection.G.17.1}%
+\contentsline {subsubsection}{\numberline {G.17.2}~ww3\_ounp.nml}{G.7}{subsubsection.G.17.2}%
+\contentsline {subsection}{\numberline {G.18}~gx\_outp}{G.7}{subsection.G.18}%
+\contentsline {subsubsection}{\numberline {G.18.1}~gx\_outp.inp}{G.7}{subsubsection.G.18.1}%
+\contentsline {subsection}{\numberline {G.19}~ww3\_trck}{G.7}{subsection.G.19}%
+\contentsline {subsubsection}{\numberline {G.19.1}~ww3\_trck.inp}{G.7}{subsubsection.G.19.1}%
+\contentsline {subsection}{\numberline {G.20}~ww3\_trnc}{G.8}{subsection.G.20}%
+\contentsline {subsubsection}{\numberline {G.20.1}~ww3\_trnc.inp}{G.8}{subsubsection.G.20.1}%
+\contentsline {subsubsection}{\numberline {G.20.2}~ww3\_trnc.nml}{G.8}{subsubsection.G.20.2}%
+\contentsline {subsection}{\numberline {G.21}~ww3\_systrk}{G.8}{subsection.G.21}%
+\contentsline {subsubsection}{\numberline {G.21.1}~ww3\_systrk.inp}{G.8}{subsubsection.G.21.1}%
+\contentsline {subsection}{\numberline {G.22}~ww3\_uprstr}{G.8}{subsection.G.22}%
+\contentsline {subsubsection}{\numberline {G.22.1}~ww3\_uprstr.inp}{G.8}{subsubsection.G.22.1}%

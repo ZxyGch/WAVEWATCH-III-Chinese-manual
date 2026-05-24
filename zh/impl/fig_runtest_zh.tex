@@ -1,5 +1,9 @@
 \begin{figure}
-{\scriptsize \input{run_test.out} }
+{\scriptsize
+\IfFileExists{run_test.out}
+  {\input{run_test.out}}
+  {\noindent\texttt{run\_test.out} 未生成。运行 \texttt{make inp} 可生成此帮助输出。}
+}
 \caption{使用 {\file -h} 命令行选项运行 {\file run\_test} 得到的选项。} \label{fig:runtest}
 %\botline
 \end{figure}
